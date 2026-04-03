@@ -93,12 +93,14 @@ export default function Footer() {
         <div className="border-t border-white/10 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-white/50 text-center md:text-left">
-              株式会社フェリアホーム｜宅地建物取引業 東京都知事(X)第XXXXX号
+              株式会社フェリアホーム｜宅地建物取引業 東京都知事（2）第104842号
               <br />
-              〒XXX-XXXX 東京都渋谷区千駄ヶ谷X-XX-XX
+              千駄ヶ谷本店: 〒151-0051 東京都渋谷区千駄ヶ谷4-16-7 北参道DTビル1階
+              <br />
+              TEL: 03-5981-8601 / FAX: 03-5981-8602
             </div>
             <div className="text-sm text-white/30">
-              © 2024 Felia Home Co., Ltd. All Rights Reserved.
+              © 2025 Felia Home Co., Ltd. All Rights Reserved.
             </div>
           </div>
         </div>
