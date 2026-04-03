@@ -3,6 +3,7 @@ import { Noto_Serif_JP, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Providers } from "./providers";
 
 const notoSerif = Noto_Serif_JP({
   subsets: ["latin"],
@@ -40,9 +41,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja" className={`${notoSerif.variable} ${notoSans.variable}`}>
       <body className="font-sans bg-[#fafaf8] text-[#1c1b18] antialiased">
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <Providers>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

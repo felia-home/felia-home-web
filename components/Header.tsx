@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 
 const NAV_ITEMS = [
   { href: "/properties", label: "物件検索" },
@@ -17,6 +18,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   // トップページ以外は常に白背景
   const isTop = pathname === "/";
@@ -70,12 +72,31 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
-          <Link
-            href="/contact"
-            className="bg-[#c9a96e] text-white text-sm px-5 py-2.5 rounded-full tracking-wide hover:bg-[#b8935a] transition-colors"
-          >
-            無料相談
-          </Link>
+          {session ? (
+            <>
+              <Link href="/mypage" className={`text-sm tracking-wide transition-colors hover:text-[#c9a96e] ${isTransparent ? "text-white" : "text-[#1c1b18]"}`}>
+                マイページ
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className={`text-sm tracking-wide transition-colors hover:text-[#c9a96e] ${isTransparent ? "text-white/70" : "text-[#706e68]"}`}
+              >
+                ログアウト
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className={`text-sm tracking-wide transition-colors hover:text-[#c9a96e] ${isTransparent ? "text-white" : "text-[#1c1b18]"}`}>
+                ログイン
+              </Link>
+              <Link
+                href="/register"
+                className="bg-[#c9a96e] text-white text-sm px-5 py-2.5 rounded-full tracking-wide hover:bg-[#b8935a] transition-colors"
+              >
+                無料会員登録
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* SP ハンバーガー */}
@@ -103,14 +124,26 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
-          <div className="p-4">
-            <Link
-              href="/contact"
-              className="block text-center bg-[#c9a96e] text-white py-3 rounded-full text-sm font-bold"
-              onClick={() => setMenuOpen(false)}
-            >
-              無料相談
-            </Link>
+          <div className="p-4 space-y-2">
+            {session ? (
+              <>
+                <Link href="/mypage" className="block text-center border border-[#1a3a2a] text-[#1a3a2a] py-3 rounded-full text-sm font-bold" onClick={() => setMenuOpen(false)}>
+                  マイページ
+                </Link>
+                <button onClick={() => { setMenuOpen(false); signOut({ callbackUrl: "/" }); }} className="block w-full text-center text-[#706e68] py-2 text-sm">
+                  ログアウト
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/register" className="block text-center bg-[#c9a96e] text-white py-3 rounded-full text-sm font-bold" onClick={() => setMenuOpen(false)}>
+                  無料会員登録
+                </Link>
+                <Link href="/login" className="block text-center border border-[#1a3a2a] text-[#1a3a2a] py-3 rounded-full text-sm font-bold" onClick={() => setMenuOpen(false)}>
+                  ログイン
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
