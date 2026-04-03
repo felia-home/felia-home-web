@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/company", label: "会社案内" },
   { href: "/staff", label: "スタッフ" },
   { href: "/news", label: "お知らせ" },
+  { href: "/recruit", label: "採用情報" },
 ];
 
 export default function Header() {

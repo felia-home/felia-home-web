@@ -24,6 +24,7 @@ const COMPANY_LINKS = [
   { href: "/staff", label: "スタッフ紹介" },
   { href: "/service", label: "サービス" },
   { href: "/news", label: "お知らせ" },
+  { href: "/recruit", label: "採用情報" },
   { href: "/contact", label: "お問合せ" },
   { href: "/privacy", label: "プライバシーポリシー" },
 ];
