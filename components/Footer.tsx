@@ -36,11 +36,12 @@ export default function Footer() {
           {/* ブランド */}
           <div className="col-span-1">
             <div className="font-serif text-xl font-bold tracking-widest mb-1">Felia Home</div>
-            <div className="text-xs tracking-[0.2em] text-white/50 mb-4">フェリアホーム</div>
-            <p className="text-sm text-white/60 leading-relaxed">
-              東京都心・城南・城西エリアの
-              不動産売買専門。お客様の幸せを
-              住まいで実現します。
+            <div className="text-xs tracking-[0.2em] text-[#c9a96e] mb-4">フェリアホーム</div>
+            <div className="w-8 h-px bg-[#c9a96e] mb-4" />
+            <p className="text-sm text-white/50 leading-relaxed">
+              お客様の幸せを、住まいで実現する。
+              <br />
+              東京都心・城南・城西エリアに特化した不動産のプロフェッショナル。
             </p>
           </div>
 
