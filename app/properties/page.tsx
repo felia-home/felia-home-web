@@ -55,24 +55,11 @@ async function getProperties(searchParams: {
     if (searchParams.page) params.set("page", searchParams.page);
 
     const adminUrl = process.env.ADMIN_API_URL ?? "http://localhost:3001";
-    const apiUrl = `${adminUrl}/api/properties?${params.toString()}`;
-    console.log("[HP Properties] Fetching:", apiUrl);
-
-    const res = await fetch(apiUrl, { cache: "no-store" });
-    console.log("[HP Properties] Status:", res.status);
-
-    if (!res.ok) {
-      console.log("[HP Properties] Error:", res.statusText);
-      return { properties: [], total: 0 };
-    }
-
+    const res = await fetch(`${adminUrl}/api/properties?${params.toString()}`, { cache: "no-store" });
+    if (!res.ok) return { properties: [], total: 0 };
     const data = await res.json();
-    console.log("[HP Properties] Count:", data.properties?.length, "Total:", data.total);
-    console.log("[HP Properties] First ID:", data.properties?.[0]?.id);
-
     return { properties: (data.properties ?? []) as Property[], total: data.total ?? 0 };
-  } catch (e: unknown) {
-    console.error("[HP Properties] Exception:", e instanceof Error ? e.message : String(e));
+  } catch {
     return { properties: [], total: 0 };
   }
 }

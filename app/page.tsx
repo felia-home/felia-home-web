@@ -1,61 +1,19 @@
 import Link from "next/link";
 import PropertyCard, { type Property } from "@/components/PropertyCard";
 
-const FALLBACK_PROPERTIES: Property[] = [
-  {
-    id: "1",
-    property_type: "NEW_HOUSE",
-    title: "目黒区平町 新築戸建",
-    catch_copy: "閑静な住宅街に佇む、光溢れる住まい",
-    price: 12800,
-    city: "目黒区",
-    town: "平町2丁目",
-    station_name1: "都立大学",
-    station_walk1: 8,
-    rooms: "4LDK",
-    area_build_m2: 105.5,
-    area_land_m2: 78.2,
-  },
-  {
-    id: "2",
-    property_type: "USED_HOUSE",
-    title: "世田谷区上馬 中古戸建",
-    catch_copy: "駅徒歩5分・整形地・リフォーム済み",
-    price: 8500,
-    city: "世田谷区",
-    town: "上馬3丁目",
-    station_name1: "三軒茶屋",
-    station_walk1: 5,
-    rooms: "3LDK",
-    area_build_m2: 92.3,
-    area_land_m2: 65.8,
-  },
-  {
-    id: "3",
-    property_type: "LAND",
-    title: "渋谷区本町 土地",
-    catch_copy: "建築条件なし・南向き整形地",
-    price: 18000,
-    city: "渋谷区",
-    town: "本町4丁目",
-    station_name1: "幡ヶ谷",
-    station_walk1: 6,
-    area_land_m2: 120.0,
-  },
-];
+export const dynamic = "force-dynamic";
 
 async function getFeaturedProperties(): Promise<Property[]> {
   try {
-    const adminUrl = process.env.ADMIN_API_URL ?? "http://localhost:3001";
-    const res = await fetch(`${adminUrl}/api/properties?status=PUBLISHED`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return FALLBACK_PROPERTIES;
+    const res = await fetch(
+      `${process.env.ADMIN_API_URL}/api/properties?status=PUBLISHED&limit=6&sort=published_at_desc`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return [];
     const data = await res.json();
-    const props = (data.properties ?? []).slice(0, 6);
-    return props.length > 0 ? props : FALLBACK_PROPERTIES;
+    return data.properties ?? [];
   } catch {
-    return FALLBACK_PROPERTIES;
+    return [];
   }
 }
 
@@ -219,11 +177,18 @@ export default async function HomePage() {
             <h2 className="font-serif text-3xl font-bold text-[#1c1b18]">注目の物件</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {properties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
+          {properties.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {properties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 text-[#706e68]">
+              <p className="text-lg mb-2">物件情報を準備中です</p>
+              <p className="text-sm">最新の物件は物件検索ページでご確認ください。</p>
+            </div>
+          )}
 
           <div className="text-center mt-12">
             <Link
