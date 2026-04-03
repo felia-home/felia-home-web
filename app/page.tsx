@@ -111,11 +111,23 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* スクロールインジケーター */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/60 text-xs tracking-widest">
-          <div className="flex flex-col items-center gap-2">
-            <span>SCROLL</span>
-            <div className="w-px h-8 bg-white/40 animate-pulse" />
+        {/* 統計数字バー */}
+        <div className="absolute bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm">
+          <div className="container-xl py-6">
+            <div className="grid grid-cols-3 gap-8 text-white text-center">
+              <div>
+                <div className="font-serif text-3xl font-bold text-[#c9a96e]">20+</div>
+                <div className="text-sm text-white/70 mt-1">年の実績</div>
+              </div>
+              <div>
+                <div className="font-serif text-3xl font-bold text-[#c9a96e]">1,000+</div>
+                <div className="text-sm text-white/70 mt-1">成約実績</div>
+              </div>
+              <div>
+                <div className="font-serif text-3xl font-bold text-[#c9a96e]">全員</div>
+                <div className="text-sm text-white/70 mt-1">宅建士有資格</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

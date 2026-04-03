@@ -35,17 +35,22 @@ export default function Header() {
       <div className="container-xl flex items-center justify-between">
         {/* ロゴ */}
         <Link href="/" className="flex items-center gap-3">
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+            scrolled ? "bg-[#1a3a2a]" : "bg-white/20"
+          }`}>
+            <span className="font-serif text-lg font-bold text-white">F</span>
+          </div>
           <div className="flex flex-col">
             <span
-              className={`text-xl font-serif font-bold tracking-widest transition-colors ${
+              className={`text-lg font-serif font-bold tracking-[0.1em] transition-colors ${
                 scrolled ? "text-[#1a3a2a]" : "text-white"
               }`}
             >
               Felia Home
             </span>
             <span
-              className={`text-[10px] tracking-[0.2em] transition-colors ${
-                scrolled ? "text-[#706e68]" : "text-white/70"
+              className={`text-[9px] tracking-[0.25em] uppercase transition-colors ${
+                scrolled ? "text-[#706e68]" : "text-white/60"
               }`}
             >
               フェリアホーム

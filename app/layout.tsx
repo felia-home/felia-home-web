@@ -19,6 +19,7 @@ const notoSans = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://felia-home.co.jp"),
   title: {
     default: "フェリアホーム｜東京都心・城南・城西の不動産",
     template: "%s｜フェリアホーム",

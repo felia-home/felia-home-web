@@ -15,6 +15,7 @@ export type Property = {
   rooms?: string;
   area_build_m2?: number;
   area_land_m2?: number;
+  published_at?: string;
   images?: { url: string; room_type?: string; is_main?: boolean }[];
 };
 
@@ -43,11 +44,15 @@ export default function PropertyCard({ property }: { property: Property }) {
   const typeLabel = TYPE_LABEL[property.property_type] ?? property.property_type;
   const typeColor = TYPE_COLOR[property.property_type] ?? "#706e68";
 
+  const isNew =
+    property.published_at &&
+    Date.now() - new Date(property.published_at).getTime() < 7 * 24 * 60 * 60 * 1000;
+
   return (
     <Link href={`/properties/${property.id}`} className="group block">
-      <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+      <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
         {/* 物件画像 */}
-        <div className="relative h-52 bg-[#e8e6e0] overflow-hidden">
+        <div className="relative h-52 overflow-hidden">
           {mainImage ? (
             <Image
               src={mainImage}
@@ -57,8 +62,11 @@ export default function PropertyCard({ property }: { property: Property }) {
               unoptimized
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-[#706e68]">
-              <span className="text-5xl">🏠</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#1a3a2a] to-[#2d5a3e]">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" className="opacity-30">
+                <path d="M24 8L4 22h6v18h10V28h8v12h10V22h6L24 8z" fill="white"/>
+              </svg>
+              <span className="text-white/30 text-xs mt-2">写真準備中</span>
             </div>
           )}
           {/* 物件種別バッジ */}
@@ -68,12 +76,18 @@ export default function PropertyCard({ property }: { property: Property }) {
           >
             {typeLabel}
           </div>
+          {/* 新着バッジ */}
+          {isNew && (
+            <div className="absolute top-3 right-3 bg-[#c9a96e] text-white text-xs font-bold px-2 py-1 rounded-full">
+              NEW
+            </div>
+          )}
         </div>
 
         {/* 物件情報 */}
         <div className="p-5">
           {/* 価格 */}
-          <div className="text-2xl font-bold text-[#1a3a2a] mb-1">
+          <div className="text-2xl font-bold text-[#c9a96e] mb-1">
             {property.price
               ? `${property.price.toLocaleString()}万円`
               : "価格応談"}
@@ -81,7 +95,7 @@ export default function PropertyCard({ property }: { property: Property }) {
 
           {/* キャッチコピー */}
           {property.catch_copy && (
-            <p className="text-[#c9a96e] text-sm mb-2 font-serif line-clamp-1">
+            <p className="text-[#706e68] text-sm mb-2 font-serif line-clamp-1">
               {property.catch_copy}
             </p>
           )}
