@@ -193,16 +193,16 @@ export default async function HomePage() {
           <div className="max-w-4xl mx-auto px-4 py-5">
             <div className="grid grid-cols-3 gap-4 text-white text-center">
               <div>
-                <div className="font-serif text-3xl font-bold text-[#c9a96e]">20+</div>
-                <div className="text-xs text-white/60 mt-1 tracking-wider">年の実績</div>
+                <div className="font-serif text-2xl font-bold text-[#c9a96e]">東京</div>
+                <div className="text-xs text-white/60 mt-1 tracking-wider">都心・城南・城西特化</div>
               </div>
               <div className="border-x border-white/20">
-                <div className="font-serif text-3xl font-bold text-[#c9a96e]">1,000+</div>
-                <div className="text-xs text-white/60 mt-1 tracking-wider">成約実績</div>
+                <div className="font-serif text-2xl font-bold text-[#c9a96e]">宅建士</div>
+                <div className="text-xs text-white/60 mt-1 tracking-wider">資格者が対応</div>
               </div>
               <div>
-                <div className="font-serif text-3xl font-bold text-[#c9a96e]">全員</div>
-                <div className="text-xs text-white/60 mt-1 tracking-wider">宅建士有資格</div>
+                <div className="font-serif text-2xl font-bold text-[#c9a96e]">未公開</div>
+                <div className="text-xs text-white/60 mt-1 tracking-wider">物件も多数ご紹介</div>
               </div>
             </div>
           </div>
