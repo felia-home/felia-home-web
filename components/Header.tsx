@@ -17,42 +17,40 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  // トップページ以外は常に白背景
+  const isTop = pathname === "/";
+  const isTransparent = isTop && !scrolled;
+
   useEffect(() => {
+    if (!isTop) return;
     const handleScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isTop]);
 
-  // Close menu on route change
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white shadow-md py-3" : "bg-transparent py-5"
-      }`}
-    >
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isTransparent ? "bg-transparent py-5" : "bg-white shadow-md py-3"
+    }`}>
       <div className="container-xl flex items-center justify-between">
         {/* ロゴ */}
         <Link href="/" className="flex items-center gap-3">
           <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
-            scrolled ? "bg-[#1a3a2a]" : "bg-white/20"
+            isTransparent ? "bg-white/20" : "bg-[#1a3a2a]"
           }`}>
             <span className="font-serif text-lg font-bold text-white">F</span>
           </div>
           <div className="flex flex-col">
-            <span
-              className={`text-lg font-serif font-bold tracking-[0.1em] transition-colors ${
-                scrolled ? "text-[#1a3a2a]" : "text-white"
-              }`}
-            >
+            <span className={`text-lg font-serif font-bold tracking-[0.1em] transition-colors ${
+              isTransparent ? "text-white" : "text-[#1a3a2a]"
+            }`}>
               Felia Home
             </span>
-            <span
-              className={`text-[9px] tracking-[0.25em] uppercase transition-colors ${
-                scrolled ? "text-[#706e68]" : "text-white/60"
-              }`}
-            >
+            <span className={`text-[9px] tracking-[0.25em] uppercase transition-colors ${
+              isTransparent ? "text-white/60" : "text-[#706e68]"
+            }`}>
               フェリアホーム
             </span>
           </div>
@@ -65,7 +63,7 @@ export default function Header() {
               key={item.href}
               href={item.href}
               className={`text-sm tracking-wide transition-colors hover:text-[#c9a96e] ${
-                scrolled ? "text-[#1c1b18]" : "text-white"
+                isTransparent ? "text-white" : "text-[#1c1b18]"
               } ${pathname === item.href ? "text-[#c9a96e]" : ""}`}
             >
               {item.label}
@@ -85,21 +83,9 @@ export default function Header() {
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="メニュー"
         >
-          <span
-            className={`block w-6 h-0.5 mb-1.5 transition-all ${
-              scrolled ? "bg-[#1c1b18]" : "bg-white"
-            }`}
-          />
-          <span
-            className={`block w-6 h-0.5 mb-1.5 transition-all ${
-              scrolled ? "bg-[#1c1b18]" : "bg-white"
-            }`}
-          />
-          <span
-            className={`block w-6 h-0.5 transition-all ${
-              scrolled ? "bg-[#1c1b18]" : "bg-white"
-            }`}
-          />
+          <div className={`w-6 h-0.5 mb-1.5 transition-all ${isTransparent ? "bg-white" : "bg-[#1c1b18]"}`} />
+          <div className={`w-6 h-0.5 mb-1.5 transition-all ${isTransparent ? "bg-white" : "bg-[#1c1b18]"}`} />
+          <div className={`w-6 h-0.5 transition-all ${isTransparent ? "bg-white" : "bg-[#1c1b18]"}`} />
         </button>
       </div>
 
@@ -111,6 +97,7 @@ export default function Header() {
               key={item.href}
               href={item.href}
               className="block px-6 py-4 text-sm border-b border-[#e8e6e0] text-[#1c1b18] hover:text-[#c9a96e]"
+              onClick={() => setMenuOpen(false)}
             >
               {item.label}
             </Link>
@@ -119,6 +106,7 @@ export default function Header() {
             <Link
               href="/contact"
               className="block text-center bg-[#c9a96e] text-white py-3 rounded-full text-sm font-bold"
+              onClick={() => setMenuOpen(false)}
             >
               無料相談
             </Link>

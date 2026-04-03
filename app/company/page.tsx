@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 const COMPANY_INFO = [
   { label: "会社名", value: "株式会社フェリアホーム" },
   { label: "代表者", value: "代表取締役 〇〇 〇〇" },
-  { label: "設立", value: "2004年4月" },
+  { label: "設立", value: "----年" },
   { label: "免許", value: "宅地建物取引業 東京都知事(X)第XXXXX号" },
   { label: "所在地", value: "〒XXX-XXXX 東京都渋谷区千駄ヶ谷X-XX-XX" },
   { label: "TEL", value: "0120-000-000" },
@@ -36,7 +36,7 @@ export default function CompanyPage() {
           </h2>
           <p className="text-white/75 text-sm leading-relaxed max-w-xl mx-auto">
             フェリアホームは、東京都心・城南・城西エリアに特化した不動産会社です。
-            地域に根ざした20年の経験と、宅地建物取引士のプロフェッショナルが、
+            地域に根ざした豊富な経験と、宅地建物取引士のプロフェッショナルが、
             お客様の大切な住まい探しを全力でサポートします。
           </p>
         </div>
