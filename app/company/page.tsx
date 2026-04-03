@@ -75,7 +75,7 @@ export default function CompanyPage() {
         <div className="container-xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* 代表写真 */}
-            <div className="relative h-96 rounded-2xl overflow-hidden bg-[#e8e6e0]">
+            <div className="relative h-[400px] rounded-2xl overflow-hidden bg-[#e8e6e0]">
               <Image
                 src="https://img.hs.aws.multi-use.net/adm1/felia/images/staff/kitahara.jpg"
                 alt="代表取締役 北原 啓輔"
