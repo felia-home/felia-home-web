@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "物件検索",
   description: "東京都心・城南・城西エリアの土地・戸建て・マンションを検索できます。",
@@ -53,7 +55,7 @@ async function getProperties(searchParams: {
     if (searchParams.page) params.set("page", searchParams.page);
 
     const adminUrl = process.env.ADMIN_API_URL ?? "http://localhost:3001";
-    const res = await fetch(`${adminUrl}/api/properties?${params}`, { next: { revalidate: 300 } });
+    const res = await fetch(`${adminUrl}/api/properties?${params.toString()}`, { cache: "no-store" });
     if (!res.ok) return { properties: [], total: 0 };
     const data = await res.json();
     return { properties: (data.properties ?? []) as Property[], total: data.total ?? 0 };
