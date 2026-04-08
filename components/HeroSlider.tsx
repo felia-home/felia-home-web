@@ -38,7 +38,7 @@ export default function HeroSlider() {
   return (
     <div
       className="relative w-full overflow-hidden"
-      style={{ height: "calc(100vh - 70px)", marginTop: "70px" }}
+      style={{ height: "calc(100vh - 70px)" }}
     >
       {/* スライド背景（画像がないため、グラデーション） */}
       {SLIDES.map((s, i) => (

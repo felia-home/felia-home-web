@@ -40,10 +40,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja" className={`${notoSerif.variable} ${notoSans.variable}`}>
-      <body className="font-sans bg-[#fafaf8] text-[#1c1b18] antialiased">
+      <body className="font-sans bg-white text-[#333] antialiased">
         <Providers>
           <Header />
-          <main>{children}</main>
+          <main className="pt-[70px]">{children}</main>
           <Footer />
         </Providers>
       </body>
