@@ -6,9 +6,8 @@ import { useSession, signOut } from "next-auth/react";
 
 const NAV_ITEMS = [
   { href: "/properties", label: "物件検索" },
-  { href: "/mypage/favorites", label: "お気に入り" },
-  { href: "/recruit", label: "採用情報" },
-  { href: "/contact", label: "お問合せ" },
+  { href: "/recruit",    label: "採用情報" },
+  { href: "/contact",    label: "お問合せ" },
 ];
 
 export default function Header() {
@@ -25,22 +24,17 @@ export default function Header() {
     >
       <div className="container-xl h-full flex items-center justify-between">
         {/* ロゴ */}
-        <Link href="/" className="flex items-center gap-2">
-          <svg width="38" height="38" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-            <rect width="40" height="40" rx="4" fill="#5BAD52" />
-            <path d="M20 8L8 18v14h8v-8h8v8h8V18L20 8z" fill="white" />
-            <circle cx="26" cy="13" r="3" fill="white" opacity="0.85" />
-          </svg>
-          <span
-            className="text-xl text-[#333] tracking-wider"
-            style={{ fontFamily: "sans-serif", fontWeight: 300 }}
-          >
-            felia home
-          </span>
+        <Link href="/" className="flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://felia-home.co.jp/assets/images/common/logo.png"
+            alt="Felia home"
+            style={{ height: "40px", width: "auto" }}
+          />
         </Link>
 
         {/* PC ナビゲーション */}
-        <nav className="hidden lg:flex items-center gap-7">
+        <nav className="hidden lg:flex items-center gap-6">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
@@ -53,13 +47,34 @@ export default function Header() {
             </Link>
           ))}
 
+          {/* お気に入り */}
+          <Link
+            href="/mypage/favorites"
+            className="flex items-center gap-1 text-sm text-[#333] hover:text-[#5BAD52] transition-colors"
+            title="お気に入り"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://felia-home.co.jp/assets/images/common/icon_hart_black.png"
+              alt="お気に入り"
+              style={{ height: "22px", width: "auto" }}
+            />
+          </Link>
+
+          {/* ログイン / マイページ */}
           {session ? (
             <>
               <Link
                 href="/mypage"
-                className="text-sm text-[#333] hover:text-[#5BAD52] transition-colors"
+                className="flex items-center gap-1 text-sm text-[#333] hover:text-[#5BAD52] transition-colors"
+                title="マイページ"
               >
-                マイページ
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://felia-home.co.jp/assets/images/common/icon_acount_black.png"
+                  alt="マイページ"
+                  style={{ height: "22px", width: "auto" }}
+                />
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: "/" })}
@@ -72,9 +87,15 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="text-sm text-[#333] hover:text-[#5BAD52] transition-colors"
+                className="flex items-center gap-1 text-sm text-[#333] hover:text-[#5BAD52] transition-colors"
+                title="ログイン"
               >
-                ログイン
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://felia-home.co.jp/assets/images/common/icon_door_black.png"
+                  alt="ログイン"
+                  style={{ height: "22px", width: "auto" }}
+                />
               </Link>
               <Link
                 href="/register"
@@ -122,6 +143,13 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
+          <Link
+            href="/mypage/favorites"
+            className="block px-6 py-4 text-sm border-b border-[#e0e0e0] text-[#333] hover:text-[#5BAD52] hover:bg-[#f0f7ee]"
+            onClick={() => setMenuOpen(false)}
+          >
+            お気に入り
+          </Link>
           <div className="p-4 space-y-2">
             {session ? (
               <>
