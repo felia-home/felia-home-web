@@ -1,5 +1,6 @@
 import Link from "next/link";
 import PropertyCard, { type Property } from "@/components/PropertyCard";
+import HeroSlider from "@/components/HeroSlider";
 
 export const dynamic = "force-dynamic";
 
@@ -17,285 +18,276 @@ async function getFeaturedProperties(): Promise<Property[]> {
   }
 }
 
-const AREAS = [
-  { name: "目黒区", slug: "meguro", count: 381 },
-  { name: "世田谷区", slug: "setagaya", count: 941 },
-  { name: "渋谷区", slug: "shibuya", count: 520 },
-  { name: "品川区", slug: "shinagawa", count: 340 },
-  { name: "港区", slug: "minato", count: 1116 },
-  { name: "中野区", slug: "nakano", count: 280 },
-];
+async function getNewProperties(): Promise<Property[]> {
+  try {
+    const res = await fetch(
+      `${process.env.ADMIN_API_URL}/api/properties?status=PUBLISHED&limit=6&sort=published_at_desc&days=30`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.properties ?? [];
+  } catch {
+    return [];
+  }
+}
 
-const STRENGTHS = [
-  {
-    icon: (
-      <svg width="40" height="40" viewBox="0 0 48 48" fill="none" className="mx-auto">
-        <path d="M24 10L8 22h4v16h10v-10h4v10h10V22h4L24 10z" fill="#c9a96e"/>
-      </svg>
-    ),
-    title: "地域密着20年",
-    description:
-      "城南・城西エリアに特化した豊富な取引実績。地域の相場感と独自の情報ネットワークを持っています。",
-  },
-  {
-    icon: (
-      <svg width="40" height="40" viewBox="0 0 48 48" fill="none" className="mx-auto">
-        <rect x="10" y="20" width="28" height="20" rx="2" stroke="#c9a96e" strokeWidth="2.5"/>
-        <path d="M18 20v-4a6 6 0 0 1 12 0v4" stroke="#c9a96e" strokeWidth="2.5"/>
-        <circle cx="24" cy="31" r="3" fill="#c9a96e"/>
-      </svg>
-    ),
-    title: "未公開物件多数",
-    description:
-      "ポータルサイトに掲載されない弊社限定物件を多数ご紹介。会員登録で全物件をご覧いただけます。",
-  },
-  {
-    icon: (
-      <svg width="40" height="40" viewBox="0 0 48 48" fill="none" className="mx-auto">
-        <rect x="10" y="14" width="28" height="22" rx="2" stroke="#c9a96e" strokeWidth="2.5"/>
-        <path d="M16 22h16M16 28h10" stroke="#c9a96e" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M24 8v6" stroke="#c9a96e" strokeWidth="2.5" strokeLinecap="round"/>
-      </svg>
-    ),
-    title: "宅建士が直接対応",
-    description:
-      "全スタッフが宅地建物取引士の資格保有。専門知識を持つプロが購入から引き渡しまでサポートします。",
-  },
-  {
-    icon: (
-      <svg width="40" height="40" viewBox="0 0 48 48" fill="none" className="mx-auto">
-        <path d="M16 20c0-4.4 3.6-8 8-8s8 3.6 8 8" stroke="#c9a96e" strokeWidth="2.5"/>
-        <path d="M10 34c0-6 6-10 14-10s14 4 14 10" stroke="#c9a96e" strokeWidth="2.5" strokeLinecap="round"/>
-        <path d="M34 26l4 4-4 4" stroke="#c9a96e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
-    title: "契約後も寄り添う",
-    description:
-      "建築打ち合わせへの同席など、引き渡しまで一貫サポート。10年後も頼れるパートナーを目指します。",
-  },
+const AREAS = [
+  { name: "渋谷区",   city: "渋谷区" },
+  { name: "新宿区",   city: "新宿区" },
+  { name: "杉並区",   city: "杉並区" },
+  { name: "世田谷区", city: "世田谷区" },
+  { name: "文京区",   city: "文京区" },
+  { name: "豊島区",   city: "豊島区" },
+  { name: "中野区",   city: "中野区" },
+  { name: "目黒区",   city: "目黒区" },
+  { name: "北区",     city: "北区" },
+  { name: "板橋区",   city: "板橋区" },
+  { name: "練馬区",   city: "練馬区" },
+  { name: "品川区",   city: "品川区" },
+  { name: "港区",     city: "港区" },
+  { name: "大田区",   city: "大田区" },
+  { name: "千代田区", city: "千代田区" },
+  { name: "中央区",   city: "中央区" },
+  { name: "その他",   city: "" },
 ];
 
 export default async function HomePage() {
-  const properties = await getFeaturedProperties();
+  const [featuredProperties, newProperties] = await Promise.all([
+    getFeaturedProperties(),
+    getNewProperties(),
+  ]);
 
   return (
     <>
-      {/* ── Hero ────────────────────────────────────────────────────────── */}
-      <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-        {/* 背景グラデーション */}
-        <div className="absolute inset-0" style={{
-          background: "linear-gradient(135deg, #0d2418 0%, #1a3a2a 40%, #234d38 70%, #1a3a2a 100%)",
-        }} />
+      {/* ── Hero スライダー ───────────────────────────────────────────── */}
+      <HeroSlider />
 
-        {/* 装飾パターン */}
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a96e' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }} />
-
-        {/* ゴールドのトップライン */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#c9a96e] to-transparent" />
-
-        <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
-          <p className="text-xs tracking-[0.4em] mb-8 text-[#c9a96e] font-serif uppercase">
-            Tokyo Premium Real Estate
-          </p>
-          <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
-            あなたの幸せを、
-            <br />
-            <span className="text-[#c9a96e]">住まい</span>で実現する。
-          </h1>
-          <p className="text-base sm:text-lg text-white/70 mb-14 leading-relaxed">
-            東京都心・城南・城西エリアの不動産売買専門。
-            <br className="hidden sm:block" />
-            ご家族のライフスタイルに合った、理想の住まいをご提案します。
-          </p>
-
-          {/* 検索ボックス */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-2 max-w-2xl mx-auto border border-white/20">
-            <div className="flex gap-2">
-              <select className="flex-1 px-4 py-3.5 rounded-xl bg-white text-[#1c1b18] text-sm border-0 focus:ring-2 focus:ring-[#c9a96e] focus:outline-none">
-                <option value="">エリアを選択</option>
-                <option value="meguro">目黒区</option>
-                <option value="setagaya">世田谷区</option>
-                <option value="shibuya">渋谷区</option>
-                <option value="shinagawa">品川区</option>
-                <option value="minato">港区</option>
-                <option value="nakano">中野区</option>
-                <option value="suginami">杉並区</option>
-              </select>
-              <select className="flex-1 px-4 py-3.5 rounded-xl bg-white text-[#1c1b18] text-sm border-0 focus:ring-2 focus:ring-[#c9a96e] focus:outline-none">
-                <option value="">種別を選択</option>
-                <option value="NEW_HOUSE">新築戸建て</option>
-                <option value="USED_HOUSE">中古戸建て</option>
-                <option value="MANSION">マンション</option>
-                <option value="LAND">土地</option>
-              </select>
-              <Link
-                href="/properties"
-                className="bg-[#c9a96e] text-white px-8 py-3.5 rounded-xl text-sm font-bold hover:bg-[#b8935a] transition-colors whitespace-nowrap"
-              >
-                検索する
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* スクロールインジケーター */}
-        <div className="absolute bottom-28 left-1/2 -translate-x-1/2 text-white/40 text-[10px] tracking-[0.3em] flex flex-col items-center gap-2">
-          <span>SCROLL</span>
-          <div className="w-px h-6 bg-gradient-to-b from-white/40 to-transparent" />
-        </div>
-
-        {/* 統計数字バー */}
-        <div className="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-blur-sm border-t border-white/10">
-          <div className="max-w-4xl mx-auto px-4 py-5">
-            <div className="grid grid-cols-3 gap-4 text-white text-center">
-              <div>
-                <div className="font-serif text-2xl font-bold text-[#c9a96e]">東京</div>
-                <div className="text-xs text-white/60 mt-1 tracking-wider">都心・城南・城西特化</div>
-              </div>
-              <div className="border-x border-white/20">
-                <div className="font-serif text-2xl font-bold text-[#c9a96e]">宅建士</div>
-                <div className="text-xs text-white/60 mt-1 tracking-wider">資格者が対応</div>
-              </div>
-              <div>
-                <div className="font-serif text-2xl font-bold text-[#c9a96e]">未公開</div>
-                <div className="text-xs text-white/60 mt-1 tracking-wider">物件も多数ご紹介</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 注目物件 ────────────────────────────────────────────────────── */}
-      <section className="py-20 bg-white">
+      {/* ── Felia Selection（厳選物件） ──────────────────────────────── */}
+      <section className="py-16 bg-white">
         <div className="container-xl">
-          <div className="text-center mb-12">
-            <p className="text-[#c9a96e] text-sm tracking-[0.3em] mb-3 font-serif">
-              FEATURED PROPERTIES
+          <div className="text-center mb-10">
+            <p className="text-[#5BAD52] text-sm tracking-[0.3em] mb-2 font-light italic">
+              Felia Selection
             </p>
-            <h2 className="font-serif text-3xl font-bold text-[#1c1b18]">注目の物件</h2>
+            <h2 className="text-2xl font-bold text-[#333]">厳選物件情報</h2>
+            <div className="w-12 h-px bg-[#5BAD52] mx-auto mt-3" />
           </div>
 
-          {properties.length > 0 ? (
+          {featuredProperties.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {properties.map((property) => (
+              {featuredProperties.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 text-[#706e68]">
+            <div className="text-center py-16 text-[#666]">
               <p className="text-lg mb-2">物件情報を準備中です</p>
               <p className="text-sm">最新の物件は物件検索ページでご確認ください。</p>
             </div>
           )}
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-10">
             <Link
               href="/properties"
-              className="inline-flex items-center gap-2 border border-[#1a3a2a] text-[#1a3a2a] px-8 py-3.5 rounded-full text-sm hover:bg-[#1a3a2a] hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 border border-[#5BAD52] text-[#5BAD52] px-8 py-3 text-sm hover:bg-[#5BAD52] hover:text-white transition-colors"
             >
-              物件をもっと見る
-              <span>→</span>
+              厳選物件一覧はこちら →
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── エリアから探す ───────────────────────────────────────────────── */}
-      <section className="py-20 bg-[#fafaf8]">
+      {/* ── Recommend（エリア別） ────────────────────────────────────── */}
+      <section className="py-16 bg-[#f0f7ee]">
         <div className="container-xl">
-          <div className="text-center mb-12">
-            <p className="text-[#c9a96e] text-sm tracking-[0.3em] mb-3 font-serif">
-              SEARCH BY AREA
+          <div className="text-center mb-10">
+            <p className="text-[#5BAD52] text-sm tracking-[0.3em] mb-2 font-light italic">
+              Recommend
             </p>
-            <h2 className="font-serif text-3xl font-bold text-[#1c1b18]">エリアから探す</h2>
+            <h2 className="text-2xl font-bold text-[#333]">エリア別おすすめ物件</h2>
+            <div className="w-12 h-px bg-[#5BAD52] mx-auto mt-3" />
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+          <div className="flex flex-wrap gap-2 justify-center">
             {AREAS.map((area) => (
               <Link
-                key={area.slug}
-                href={`/feature/${area.slug}`}
-                className="group relative h-52 rounded-2xl overflow-hidden block"
+                key={area.name}
+                href={area.city ? `/properties?city=${encodeURIComponent(area.city)}` : "/properties"}
+                className="px-4 py-2 border border-[#5BAD52] text-[#5BAD52] text-sm hover:bg-[#5BAD52] hover:text-white transition-colors"
               >
-                {/* グラデーション背景 */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#1a3a2a] to-[#2d5a3e] group-hover:from-[#234d38] group-hover:to-[#3d7a52] transition-all duration-500" />
-
-                {/* 装飾パターン */}
-                <div className="absolute inset-0 opacity-5" style={{
-                  backgroundImage: "radial-gradient(circle at 70% 30%, #c9a96e 1px, transparent 1px)",
-                  backgroundSize: "20px 20px",
-                }} />
-
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                  <div className="font-serif text-3xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300">
-                    {area.name}
-                  </div>
-                  <div className="text-xs text-white/50 tracking-wider">{area.name} REAL ESTATE</div>
-                  <div className="mt-4 bg-[#c9a96e]/20 border border-[#c9a96e]/40 rounded-full px-4 py-1 text-xs text-[#c9a96e]">
-                    {area.count.toLocaleString()}件掲載中
-                  </div>
-                </div>
-
-                {/* ホバー時アクセントライン */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#c9a96e] scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                {area.name}
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── 選ばれる理由 ────────────────────────────────────────────────── */}
-      <section className="py-20 bg-[#1a3a2a] text-white">
+      {/* ── New（新着物件） ──────────────────────────────────────────── */}
+      <section className="py-16 bg-white">
         <div className="container-xl">
-          <div className="text-center mb-16">
-            <p className="text-[#c9a96e] text-sm tracking-[0.3em] mb-3 font-serif">
-              WHY FELIA HOME
+          <div className="text-center mb-10">
+            <p className="text-[#5BAD52] text-sm tracking-[0.3em] mb-2 font-light italic">
+              New
             </p>
-            <h2 className="font-serif text-3xl font-bold">
-              フェリアホームが選ばれる理由
-            </h2>
+            <h2 className="text-2xl font-bold text-[#333]">新着物件</h2>
+            <div className="w-12 h-px bg-[#5BAD52] mx-auto mt-3" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {STRENGTHS.map((s, i) => (
-              <div key={i} className="relative text-center group">
-                {/* 番号バッジ */}
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#c9a96e]/20 border border-[#c9a96e]/40 flex items-center justify-center">
-                  <span className="text-[#c9a96e] text-xs font-serif font-bold">0{i + 1}</span>
-                </div>
 
-                <div className="pt-6 mb-4">{s.icon}</div>
-                <h3 className="font-serif text-lg font-bold mb-3 text-[#c9a96e]">
-                  {s.title}
-                </h3>
-                <p className="text-sm text-white/60 leading-relaxed max-w-[200px] mx-auto">{s.description}</p>
-              </div>
-            ))}
+          {newProperties.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {newProperties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-[#666]">
+              <p className="text-sm">新着物件を準備中です</p>
+            </div>
+          )}
+
+          <div className="text-center mt-10">
+            <Link
+              href="/properties?sort=published_at_desc"
+              className="inline-flex items-center gap-2 border border-[#5BAD52] text-[#5BAD52] px-8 py-3 text-sm hover:bg-[#5BAD52] hover:text-white transition-colors"
+            >
+              新着物件一覧はこちら →
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── お問合せCTA ─────────────────────────────────────────────────── */}
-      <section className="py-20 bg-[#c9a96e]">
+      {/* ── 物件検索フォーム ─────────────────────────────────────────── */}
+      <section className="py-16 bg-[#f0f7ee]">
+        <div className="container-xl">
+          <div className="text-center mb-10">
+            <p className="text-[#5BAD52] text-sm tracking-[0.3em] mb-2 font-light italic">
+              Search
+            </p>
+            <h2 className="text-2xl font-bold text-[#333]">物件を探す</h2>
+            <div className="w-12 h-px bg-[#5BAD52] mx-auto mt-3" />
+          </div>
+
+          {/* エリア・路線タブ（簡略版） */}
+          <div className="max-w-3xl mx-auto bg-white border border-[#e0e0e0] p-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <select
+                className="px-4 py-3 border border-[#e0e0e0] text-sm text-[#333] focus:outline-none focus:border-[#5BAD52]"
+                defaultValue=""
+              >
+                <option value="">エリアを選択</option>
+                {AREAS.filter((a) => a.city).map((area) => (
+                  <option key={area.city} value={area.city}>{area.name}</option>
+                ))}
+              </select>
+              <select
+                className="px-4 py-3 border border-[#e0e0e0] text-sm text-[#333] focus:outline-none focus:border-[#5BAD52]"
+                defaultValue=""
+              >
+                <option value="">物件種別</option>
+                <option value="NEW_HOUSE">新築戸建て</option>
+                <option value="USED_HOUSE">中古戸建て</option>
+                <option value="MANSION">マンション</option>
+                <option value="LAND">土地</option>
+              </select>
+              <select
+                className="px-4 py-3 border border-[#e0e0e0] text-sm text-[#333] focus:outline-none focus:border-[#5BAD52]"
+                defaultValue=""
+              >
+                <option value="">価格帯</option>
+                <option value="5000">5,000万円以下</option>
+                <option value="8000">8,000万円以下</option>
+                <option value="10000">1億円以下</option>
+                <option value="10001">1億円以上</option>
+              </select>
+            </div>
+            <div className="text-center">
+              <Link
+                href="/properties"
+                className="inline-block bg-[#5BAD52] text-white px-12 py-3 text-sm font-bold hover:bg-[#3d8a3a] transition-colors"
+              >
+                この条件で検索する
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 不動産購入 / 売却 サービス紹介 ─────────────────────────── */}
+      <section className="py-16 bg-white">
+        <div className="container-xl">
+          <div className="text-center mb-10">
+            <p className="text-[#5BAD52] text-sm tracking-[0.3em] mb-2 font-light italic">
+              Service
+            </p>
+            <h2 className="text-2xl font-bold text-[#333]">サービス</h2>
+            <div className="w-12 h-px bg-[#5BAD52] mx-auto mt-3" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* 購入 */}
+            <div className="border border-[#e0e0e0] p-8 text-center hover:border-[#5BAD52] hover:shadow-md transition-all">
+              <div className="w-16 h-16 rounded-full bg-[#f0f7ee] flex items-center justify-center mx-auto mb-4">
+                <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                  <path d="M24 8L8 20h4v18h10V28h4v10h10V20h4L24 8z" fill="#5BAD52"/>
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-[#333] mb-3">不動産を購入する</h3>
+              <p className="text-sm text-[#666] leading-relaxed mb-6">
+                東京都心・城南・城西エリアの物件を豊富にご紹介。<br />
+                宅建士スタッフが購入から引き渡しまでサポートします。
+              </p>
+              <Link
+                href="/service"
+                className="inline-block border border-[#5BAD52] text-[#5BAD52] px-6 py-2 text-sm hover:bg-[#5BAD52] hover:text-white transition-colors"
+              >
+                詳しく見る →
+              </Link>
+            </div>
+
+            {/* 売却 */}
+            <div className="border border-[#e0e0e0] p-8 text-center hover:border-[#5BAD52] hover:shadow-md transition-all">
+              <div className="w-16 h-16 rounded-full bg-[#f0f7ee] flex items-center justify-center mx-auto mb-4">
+                <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+                  <rect x="8" y="14" width="32" height="22" rx="2" stroke="#5BAD52" strokeWidth="2.5"/>
+                  <path d="M16 24h16M24 18v12" stroke="#5BAD52" strokeWidth="2.5" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-[#333] mb-3">不動産を売却する</h3>
+              <p className="text-sm text-[#666] leading-relaxed mb-6">
+                地域密着の豊富な実績で、適正価格での売却をサポート。<br />
+                まずは無料査定をお試しください。
+              </p>
+              <Link
+                href="/contact"
+                className="inline-block border border-[#5BAD52] text-[#5BAD52] px-6 py-2 text-sm hover:bg-[#5BAD52] hover:text-white transition-colors"
+              >
+                無料査定を依頼する →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── お問合せCTA ─────────────────────────────────────────────── */}
+      <section className="py-14 bg-[#5BAD52]">
         <div className="container-xl text-center text-white">
-          <h2 className="font-serif text-3xl font-bold mb-4">
-            まずはお気軽にご相談ください
-          </h2>
-          <p className="text-white/85 mb-10 text-lg">
+          <h2 className="text-2xl font-bold mb-3">まずはお気軽にご相談ください</h2>
+          <p className="text-white/85 mb-8 text-sm">
             物件探しから資金計画まで、無料でご相談を承ります。
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-white text-[#1a3a2a] px-10 py-4 rounded-full font-bold text-sm hover:bg-[#fafaf8] transition-colors"
+              className="bg-white text-[#5BAD52] px-8 py-3 font-bold text-sm hover:bg-[#f0f7ee] transition-colors"
             >
               無料相談・お問合せ
             </Link>
             <a
-              href="tel:0120-000-000"
-              className="border-2 border-white text-white px-10 py-4 rounded-full font-bold text-sm hover:bg-white/10 transition-colors"
+              href="tel:0359818601"
+              className="border-2 border-white text-white px-8 py-3 font-bold text-sm hover:bg-white/10 transition-colors"
             >
-              📞 0120-000-000
+              📞 03-5981-8601
             </a>
           </div>
         </div>

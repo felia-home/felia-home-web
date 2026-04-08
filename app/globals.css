@@ -3,12 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --color-main: #1a3a2a;
-  --color-accent: #c9a96e;
-  --color-bg: #fafaf8;
-  --color-text: #1c1b18;
-  --color-gray: #706e68;
-  --color-line: #e8e6e0;
+  --color-primary:      #5BAD52;
+  --color-primary-dark: #3d8a3a;
+  --color-primary-light:#f0f7ee;
+  --color-footer:       #2d5a3d;
+  --color-text:         #333333;
+  --color-text-sub:     #666666;
+  --color-border:       #e0e0e0;
+  --color-bg:           #ffffff;
 }
 
 html {
@@ -16,8 +18,9 @@ html {
 }
 
 body {
-  background: var(--color-bg);
-  color: var(--color-text);
+  font-family: 'Noto Sans JP', var(--font-sans), sans-serif;
+  background: #ffffff;
+  color: #333333;
 }
 
 @layer utilities {
