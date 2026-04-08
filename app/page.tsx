@@ -64,7 +64,7 @@ export default async function HomePage() {
       <HeroSlider />
 
       {/* ── Felia Selection（厳選物件） ──────────────────────────────── */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-[#f0f7ee]">
         <div className="container-xl">
           <div className="text-center mb-10">
             <p className="text-[#5BAD52] text-sm tracking-[0.3em] mb-2 font-light italic">
@@ -99,7 +99,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Recommend（エリア別） ────────────────────────────────────── */}
-      <section className="py-16 bg-[#f0f7ee]">
+      <section className="py-16 bg-white">
         <div className="container-xl">
           <div className="text-center mb-10">
             <p className="text-[#5BAD52] text-sm tracking-[0.3em] mb-2 font-light italic">
@@ -272,7 +272,7 @@ export default async function HomePage() {
       {/* ── お問合せCTA ─────────────────────────────────────────────── */}
       <section className="py-14 bg-[#5BAD52]">
         <div className="container-xl text-center text-white">
-          <h2 className="text-2xl font-bold mb-3">まずはお気軽にご相談ください</h2>
+          <h2 className="text-2xl font-bold text-white mb-3">まずはお気軽にご相談ください</h2>
           <p className="text-white/85 mb-8 text-sm">
             物件探しから資金計画まで、無料でご相談を承ります。
           </p>

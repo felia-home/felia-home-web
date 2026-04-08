@@ -69,27 +69,8 @@ export default function HeroSlider() {
             className="w-full h-full object-cover"
           />
 
-          {/* グリーンオーバーレイ + 上下波形マスク */}
-          <div className="absolute inset-0" style={{ background: "rgba(91,173,82,0.35)" }}>
-            {/* 上部の白波形 */}
-            <svg
-              className="absolute top-0 w-full"
-              viewBox="0 0 1440 100"
-              preserveAspectRatio="none"
-              style={{ height: "100px" }}
-            >
-              <path d="M0,0 L1440,0 L1440,40 C1080,100 360,0 0,60 Z" fill="white" />
-            </svg>
-            {/* 下部の白波形 */}
-            <svg
-              className="absolute bottom-0 w-full"
-              viewBox="0 0 1440 100"
-              preserveAspectRatio="none"
-              style={{ height: "100px" }}
-            >
-              <path d="M0,60 C360,0 1080,100 1440,40 L1440,100 L0,100 Z" fill="white" />
-            </svg>
-          </div>
+          {/* グリーンオーバーレイ */}
+          <div className="absolute inset-0" style={{ background: "rgba(91,173,82,0.35)" }} />
 
           {/* キャプションテキスト（左下） */}
           <div className="absolute bottom-28 left-8 right-64 z-10">
