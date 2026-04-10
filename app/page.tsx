@@ -1,6 +1,14 @@
+import '../app/home.css'
 import Link from "next/link";
 import PropertyCard, { type Property } from "@/components/PropertyCard";
 import HeroSlider from "@/components/HeroSlider";
+import NewsSection from "@/components/home/NewsSection";
+import OpenHouseSection from "@/components/home/OpenHouseSection";
+import InformationSection from "@/components/home/InformationSection";
+import FeatureSection from "@/components/home/FeatureSection";
+import BannerSection from "@/components/home/BannerSection";
+import ContactSection from "@/components/home/ContactSection";
+import AccessSection from "@/components/home/AccessSection";
 
 export const dynamic = "force-dynamic";
 
@@ -123,39 +131,41 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── New（新着物件） ──────────────────────────────────────────── */}
-      <section className="py-16 bg-white">
-        <div className="container-xl">
-          <div className="text-center mb-10">
-            <p className="text-[#5BAD52] text-sm tracking-[0.3em] mb-2 font-light italic">
-              New
-            </p>
-            <h2 className="text-2xl font-bold text-[#333]">新着物件</h2>
-            <div className="w-12 h-px bg-[#5BAD52] mx-auto mt-3" />
+      {/* ── New（新着物件）+ News（お役立ち情報）横並び ─────────────── */}
+      <div className="new-news-wrap">
+        {/* 新着物件（左） */}
+        <div style={{ padding: '20px' }}>
+          <div className="section-header">
+            <p className="section-label">New</p>
+            <h2 className="section-title">新着物件</h2>
+            <Link href="/properties?sort=published_at_desc" className="view-all-link">view more →</Link>
           </div>
-
           {newProperties.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {newProperties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
+            <div className="flex flex-col gap-3">
+              {newProperties.slice(0, 4).map((property) => (
+                <Link
+                  key={property.id}
+                  href={`/properties/${property.id}`}
+                  className="flex gap-3 border-b border-[#eee] pb-3 text-inherit no-underline hover:text-[#5BAD52]"
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <div style={{ width: 80, height: 60, background: '#ddd', flexShrink: 0 }} />
+                  <div>
+                    <p style={{ fontSize: 11, color: '#5b8a6b', marginBottom: 2 }}>{property.property_type}</p>
+                    <p style={{ fontSize: 13, color: '#333', lineHeight: 1.4 }}>{property.city}{property.town}</p>
+                    <p style={{ fontSize: 12, color: '#666' }}>{property.price ? `${(property.price / 10000).toLocaleString()}万円` : '価格未定'}</p>
+                  </div>
+                </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-[#666]">
-              <p className="text-sm">新着物件を準備中です</p>
-            </div>
+            <p className="no-data">新着物件を準備中です</p>
           )}
-
-          <div className="text-center mt-10">
-            <Link
-              href="/properties?sort=published_at_desc"
-              className="inline-flex items-center gap-2 border border-[#5BAD52] text-[#5BAD52] px-8 py-3 text-sm hover:bg-[#5BAD52] hover:text-white transition-colors"
-            >
-              新着物件一覧はこちら →
-            </Link>
-          </div>
         </div>
-      </section>
+
+        {/* お役立ち情報（右） */}
+        <NewsSection />
+      </div>
 
       {/* ── 物件検索フォーム ─────────────────────────────────────────── */}
       <section className="py-16 bg-[#f0f7ee]">
@@ -168,7 +178,6 @@ export default async function HomePage() {
             <div className="w-12 h-px bg-[#5BAD52] mx-auto mt-3" />
           </div>
 
-          {/* エリア・路線タブ（簡略版） */}
           <div className="max-w-3xl mx-auto bg-white border border-[#e0e0e0] p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <select
@@ -213,85 +222,23 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── 不動産購入 / 売却 サービス紹介 ─────────────────────────── */}
-      <section className="py-16 bg-white">
-        <div className="container-xl">
-          <div className="text-center mb-10">
-            <p className="text-[#5BAD52] text-sm tracking-[0.3em] mb-2 font-light italic">
-              Service
-            </p>
-            <h2 className="text-2xl font-bold text-[#333]">サービス</h2>
-            <div className="w-12 h-px bg-[#5BAD52] mx-auto mt-3" />
-          </div>
+      {/* ── CTA バナー群（査定・買い替え・FP・採用） ─────────────────── */}
+      <BannerSection />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* 購入 */}
-            <div className="border border-[#e0e0e0] p-8 text-center hover:border-[#5BAD52] hover:shadow-md transition-all">
-              <div className="w-16 h-16 rounded-full bg-[#f0f7ee] flex items-center justify-center mx-auto mb-4">
-                <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
-                  <path d="M24 8L8 20h4v18h10V28h4v10h10V20h4L24 8z" fill="#5BAD52"/>
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-[#333] mb-3">不動産を購入する</h3>
-              <p className="text-sm text-[#666] leading-relaxed mb-6">
-                東京都心・城南・城西エリアの物件を豊富にご紹介。<br />
-                宅建士スタッフが購入から引き渡しまでサポートします。
-              </p>
-              <Link
-                href="/service"
-                className="inline-block border border-[#5BAD52] text-[#5BAD52] px-6 py-2 text-sm hover:bg-[#5BAD52] hover:text-white transition-colors"
-              >
-                詳しく見る →
-              </Link>
-            </div>
+      {/* ── Open House + Information 横並び ──────────────────────────── */}
+      <div className="openhouse-info-wrap">
+        <OpenHouseSection />
+        <InformationSection />
+      </div>
 
-            {/* 売却 */}
-            <div className="border border-[#e0e0e0] p-8 text-center hover:border-[#5BAD52] hover:shadow-md transition-all">
-              <div className="w-16 h-16 rounded-full bg-[#f0f7ee] flex items-center justify-center mx-auto mb-4">
-                <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
-                  <rect x="8" y="14" width="32" height="22" rx="2" stroke="#5BAD52" strokeWidth="2.5"/>
-                  <path d="M16 24h16M24 18v12" stroke="#5BAD52" strokeWidth="2.5" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold text-[#333] mb-3">不動産を売却する</h3>
-              <p className="text-sm text-[#666] leading-relaxed mb-6">
-                地域密着の豊富な実績で、適正価格での売却をサポート。<br />
-                まずは無料査定をお試しください。
-              </p>
-              <Link
-                href="/contact"
-                className="inline-block border border-[#5BAD52] text-[#5BAD52] px-6 py-2 text-sm hover:bg-[#5BAD52] hover:text-white transition-colors"
-              >
-                無料査定を依頼する →
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── Feature（特集・01/02カード・お客様の声バナー） ────────────── */}
+      <FeatureSection />
 
-      {/* ── お問合せCTA ─────────────────────────────────────────────── */}
-      <section className="py-14 bg-[#5BAD52]">
-        <div className="container-xl text-center text-white">
-          <h2 className="text-2xl font-bold text-white mb-3">まずはお気軽にご相談ください</h2>
-          <p className="text-white/85 mb-8 text-sm">
-            物件探しから資金計画まで、無料でご相談を承ります。
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="bg-white text-[#5BAD52] px-8 py-3 font-bold text-sm hover:bg-[#f0f7ee] transition-colors"
-            >
-              無料相談・お問合せ
-            </Link>
-            <a
-              href="tel:0359818601"
-              className="border-2 border-white text-white px-8 py-3 font-bold text-sm hover:bg-white/10 transition-colors"
-            >
-              📞 03-5981-8601
-            </a>
-          </div>
-        </div>
-      </section>
+      {/* ── Contact + 優良店認定 ─────────────────────────────────────── */}
+      <ContactSection />
+
+      {/* ── Access（地図×2店舗） ─────────────────────────────────────── */}
+      <AccessSection />
     </>
   );
 }
