@@ -229,6 +229,59 @@ export interface MemberInquiry {
   createdAt: string;
 }
 
+export interface MemberProfileInput {
+  property_types?:      string[];
+  desired_areas?:       string[];
+  desired_lines?:       string[];
+  budget_max?:          number;
+  desired_area_m2_min?: number;
+  desired_layout?:      string[];
+  purchase_timing?:     string;
+  current_residence?:   string;
+  current_rent?:        number;
+  lease_expiry?:        string;
+  has_property_to_sell?: string;
+  family_structure?:    string;
+  children_ages?:       string;
+  down_payment?:        number;
+  annual_income_range?: string;
+  loan_preapproval?:    string;
+  purchase_motivation?: string;
+  priority_points?:     string[];
+  other_agents?:        string;
+  remarks?:             string;
+}
+
+// 購入希望条件を保存（初回登録）
+export async function saveMemberProfile(
+  memberId: string,
+  data: MemberProfileInput
+) {
+  return fetchFromAdmin<{ success: boolean }>(
+    `/api/members/${memberId}/profile`,
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+      next: { revalidate: 0 },
+    }
+  );
+}
+
+// 購入希望条件を更新
+export async function updateMemberProfile(
+  memberId: string,
+  data: MemberProfileInput
+) {
+  return fetchFromAdmin<{ success: boolean }>(
+    `/api/members/${memberId}/profile`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(data),
+      next: { revalidate: 0 },
+    }
+  );
+}
+
 // 会員登録
 export async function registerMember(data: {
   name: string;
