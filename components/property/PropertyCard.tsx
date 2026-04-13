@@ -1,70 +1,145 @@
 // components/property/PropertyCard.tsx
-// TODO: 後続の指示文で実装する
-import Link from "next/link";
+"use client";
 
-export interface Property {
-  id: string;
-  property_number?: string;
-  title?: string;
-  catch_copy?: string;
-  property_type?: string;
-  price: number;
-  city?: string;
-  address?: string;
-  station_name1?: string;
-  station_walk1?: number;
-  area_land_m2?: number;
-  area_build_m2?: number;
-  area_exclusive_m2?: number;
-  rooms?: string;
-  building_year?: number;
-  building_month?: number;
-  images?: { url: string; is_main: boolean }[];
-  status?: string;
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { MapPin, Train, Maximize2, LayoutGrid } from "lucide-react";
+import type { Property } from "@/lib/api";
+
+interface PropertyCardProps {
+  property: Property;
+  size?: "normal" | "large";  // large: Felia Selection用
 }
 
-export default function PropertyCard({ property }: { property: Property }) {
-  const mainImage = property.images?.find((img) => img.is_main)?.url ?? property.images?.[0]?.url;
-  const priceMan = Math.round(property.price / 10000);
+export function PropertyCard({ property, size = "normal" }: PropertyCardProps) {
+  const [imgError, setImgError] = useState(false);
+  const isLarge = size === "large";
 
   return (
     <Link
       href={`/properties/${property.id}`}
-      className="block bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+      className="group block bg-white rounded-lg overflow-hidden border hover:shadow-lg transition-shadow duration-300"
+      style={{ borderColor: "#E5E5E5" }}
     >
-      {/* サムネイル */}
-      <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
-        {mainImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={mainImage}
-            alt={property.catch_copy ?? property.title ?? "物件画像"}
-            className="w-full h-full object-cover"
+      {/* 画像エリア */}
+      <div
+        className="relative overflow-hidden bg-gray-100"
+        style={{ paddingBottom: isLarge ? "62%" : "68%" }}
+      >
+        {/* バッジ群 */}
+        <div className="absolute top-2.5 left-2.5 z-10 flex flex-wrap gap-1.5">
+          {property.isNew && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded text-white"
+              style={{ backgroundColor: "#5BAD52" }}>
+              NEW
+            </span>
+          )}
+          {property.isFeatured && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded text-white"
+              style={{ backgroundColor: "#E67E22" }}>
+              厳選
+            </span>
+          )}
+          {property.isOpenHouse && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded text-white"
+              style={{ backgroundColor: "#E74C3C" }}>
+              現地販売会
+            </span>
+          )}
+          {property.isMembersOnly && (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded text-white bg-gray-600">
+              会員限定
+            </span>
+          )}
+        </div>
+
+        {/* 物件種別バッジ（右上） */}
+        <div className="absolute top-2.5 right-2.5 z-10">
+          <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-white/90 text-gray-600">
+            {property.propertyType}
+          </span>
+        </div>
+
+        {/* 写真 */}
+        {!imgError && property.mainImage ? (
+          <Image
+            src={property.mainImage}
+            alt={property.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes={isLarge
+              ? "(max-width: 768px) 100vw, 50vw"
+              : "(max-width: 768px) 50vw, 25vw"}
+            onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
-            画像なし
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg,#e8f5e8,#c8e8c8)" }}
+          >
+            <span className="text-gray-400 text-xs">画像なし</span>
           </div>
         )}
       </div>
 
-      {/* 情報 */}
-      <div className="p-3">
-        <p className="font-bold text-lg" style={{ color: "#5BAD52" }}>
-          {priceMan.toLocaleString()}万円
+      {/* 情報エリア */}
+      <div className={`p-3 ${isLarge ? "tb:p-5" : ""}`}>
+        {/* 価格 */}
+        <div className="flex items-baseline gap-1 mb-1.5">
+          <span
+            className={`font-bold ${isLarge ? "text-2xl tb:text-3xl" : "text-xl"}`}
+            style={{ color: "#5BAD52" }}
+          >
+            {property.price.toLocaleString()}
+          </span>
+          <span className="text-sm text-gray-500">万円</span>
+        </div>
+
+        {/* 物件名 */}
+        <p className={`font-medium text-gray-700 leading-snug mb-2
+          ${isLarge ? "text-base tb:text-lg" : "text-sm"}
+          line-clamp-2`}>
+          {property.name}
         </p>
-        <p className="text-sm text-gray-600 mt-1 line-clamp-1">
-          {property.catch_copy ?? property.title ?? ""}
-        </p>
-        <p className="text-xs text-gray-400 mt-1">
-          {property.city}{property.address}
-        </p>
-        {property.station_name1 && (
-          <p className="text-xs text-gray-400">
-            {property.station_name1}駅 徒歩{property.station_walk1}分
-          </p>
-        )}
+
+        {/* 詳細情報 */}
+        <div className="space-y-1">
+          {/* 所在地 */}
+          <div className="flex items-center gap-1 text-xs text-gray-500">
+            <MapPin size={11} className="flex-shrink-0" style={{ color: "#5BAD52" }} />
+            <span className="truncate">{property.address}</span>
+          </div>
+
+          {/* 最寄駅 */}
+          <div className="flex items-center gap-1 text-xs text-gray-500">
+            <Train size={11} className="flex-shrink-0" style={{ color: "#5BAD52" }} />
+            <span className="truncate">
+              {property.nearestStation} 徒歩{property.walkMinutes}分
+            </span>
+          </div>
+
+          {/* 面積・間取り */}
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            {property.area > 0 && (
+              <span className="flex items-center gap-1">
+                <Maximize2 size={10} style={{ color: "#5BAD52" }} />
+                {property.area}㎡
+              </span>
+            )}
+            {property.layout && (
+              <span className="flex items-center gap-1">
+                <LayoutGrid size={10} style={{ color: "#5BAD52" }} />
+                {property.layout}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
     </Link>
   );
 }
+
+// default export for backward compat with feature/[slug]/page.tsx
+export default PropertyCard;
+export type { Property };
