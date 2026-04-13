@@ -202,6 +202,51 @@ export interface CompanyInfo {
   licenseNumber: string;
 }
 
+// ---- 未公開物件 ----
+
+export interface PrivateProperty {
+  id: string;
+  property_no: string;
+  property_type?: string;
+  area?: string;
+  town?: string;
+  price?: number;
+  price_display?: string;
+  area_land_m2?: number;
+  area_build_m2?: number;
+  commission?: number;
+  note?: string;
+  is_land: boolean;
+  is_house: boolean;
+  is_mansion: boolean;
+}
+
+export async function getPrivateProperties(): Promise<PrivateProperty[]> {
+  try {
+    const res = await fetchFromAdmin<{ properties: PrivateProperty[] }>(
+      "/api/private-properties?filter=ACTIVE",
+      { next: { revalidate: 0 } }
+    );
+    return res.properties ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getPrivatePropertyById(
+  id: string
+): Promise<PrivateProperty | null> {
+  try {
+    const res = await fetchFromAdmin<{ properties: PrivateProperty[] }>(
+      "/api/private-properties?filter=ACTIVE",
+      { next: { revalidate: 0 } }
+    );
+    return res.properties?.find((p) => p.id === id) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // ---- 会員 ----
 
 export interface MemberProfile {

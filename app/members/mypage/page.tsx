@@ -5,7 +5,7 @@ import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { getMemberProfile, getMemberInquiries } from "@/lib/api";
 import { LogoutButton } from "@/components/members/LogoutButton";
-import { User, Heart, FileText, ChevronRight } from "lucide-react";
+import { User, Heart, FileText, Lock, ChevronRight } from "lucide-react";
 
 export const metadata = { title: "マイページ" };
 
@@ -25,6 +25,7 @@ export default async function MypagePage() {
   } catch {}
 
   const menuItems = [
+    { icon: Lock,     label: "プライベートセレクション", sub: "会員限定・非公開物件一覧", href: "/private-selection" },
     { icon: Heart,    label: "お気に入り物件",  sub: "保存した物件を確認",   href: "/members/favorites" },
     { icon: FileText, label: "問い合わせ履歴",  sub: `${inquiries.length}件の履歴`, href: "/members/inquiries" },
   ];

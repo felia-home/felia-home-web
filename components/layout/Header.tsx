@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { Search, Heart, Menu, User } from "lucide-react";
+import { Search, Heart, Menu, User, Lock } from "lucide-react";
 import { AccordionMenu } from "./AccordionMenu";
 
 export function Header() {
@@ -78,6 +78,27 @@ export function Header() {
                   採用情報
                 </span>
               </Link>
+
+              {/* 非公開物件（ログイン時のみ） */}
+              {session && (
+                <Link
+                  href="/private-selection"
+                  className="hidden tb:flex flex-col items-center gap-0.5 px-2 py-1 rounded
+                             hover:bg-gray-50 transition-colors group"
+                >
+                  <Lock
+                    size={18}
+                    strokeWidth={1.8}
+                    style={{ color: "#5BAD52" }}
+                  />
+                  <span
+                    className="text-[10px] font-medium whitespace-nowrap"
+                    style={{ color: "#5BAD52" }}
+                  >
+                    非公開物件
+                  </span>
+                </Link>
+              )}
 
               {/* 会員登録 / マイページ */}
               {session ? (
