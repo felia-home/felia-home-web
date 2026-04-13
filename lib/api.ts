@@ -27,7 +27,8 @@ async function fetchFromAdmin<T>(
 // ---- 物件 ----
 
 export async function getFeaturedProperties() {
-  return fetchFromAdmin<Property[]>("/api/hp/felia-selection");
+  const res = await fetchFromAdmin<{ properties: Property[] }>("/api/hp/felia-selection");
+  return res.properties ?? [];
 }
 
 export async function getNewProperties() {
@@ -49,14 +50,16 @@ export async function getPropertyById(id: string) {
 // ---- 現地販売会 ----
 
 export async function getOpenHouses() {
-  return fetchFromAdmin<OpenHouse[]>("/api/hp/open-house");
+  const res = await fetchFromAdmin<{ properties: OpenHouse[] }>("/api/hp/open-house");
+  return res.properties ?? [];
 }
 
 // ---- お知らせ ----
 
 export async function getNews(limit?: number) {
   const q = limit ? `?limit=${limit}` : "";
-  return fetchFromAdmin<NewsItem[]>(`/api/hp/news${q}`);
+  const res = await fetchFromAdmin<{ news: NewsItem[] }>(`/api/hp/news${q}`);
+  return res.news ?? [];
 }
 
 export async function getNewsById(slug: string) {
@@ -66,11 +69,13 @@ export async function getNewsById(slug: string) {
 // ---- 特集・バナー（Phase 2） ----
 
 export async function getFeatures() {
-  return fetchFromAdmin<Feature[]>("/api/hp/features");
+  const res = await fetchFromAdmin<{ features: Feature[] }>("/api/hp/features");
+  return res.features ?? [];
 }
 
 export async function getBanners() {
-  return fetchFromAdmin<Banner[]>("/api/hp/banners");
+  const res = await fetchFromAdmin<{ banners: Banner[] }>("/api/hp/banners");
+  return res.banners ?? [];
 }
 
 // ---- 会社情報 ----
