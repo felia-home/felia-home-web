@@ -1,3 +1,4 @@
+// lib/auth.ts
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -6,59 +7,65 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        email: { label: "メールアドレス", type: "email" },
-        password: { label: "パスワード", type: "password" },
+        email:    { label: "メールアドレス", type: "email" },
+        password: { label: "パスワード",     type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
-          const res = await fetch(`${process.env.ADMIN_API_URL}/api/members/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
-            cache: "no-store",
-          });
+          const res = await fetch(
+            `${process.env.ADMIN_API_URL}/api/members/login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email:    credentials.email,
+                password: credentials.password,
+              }),
+              cache: "no-store",
+            }
+          );
 
           if (!res.ok) return null;
           const data = await res.json();
-          if (!data.success) return null;
+          if (!data.id) return null;
 
           return {
-            id: data.member.id,
-            email: data.member.email,
-            name: data.member.name,
+            id:    String(data.id),
+            email: data.email,
+            name:  data.name,
           };
-        } catch {
+        } catch (e) {
+          console.error("[NextAuth] authorize error:", e);
           return null;
         }
       },
     }),
   ],
+
   session: {
     strategy: "jwt",
-    maxAge: 7 * 24 * 60 * 60,
+    maxAge: 7 * 24 * 60 * 60, // 7日間
   },
+
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
+      if (user) token.id = user.id;
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        (session.user as { id?: string }).id = token.id as string;
+        (session.user as any).id = token.id;
       }
       return session;
     },
   },
+
   pages: {
-    signIn: "/login",
-    error: "/login",
+    signIn: "/members/login",
+    error:  "/members/login",
   },
+
   secret: process.env.NEXTAUTH_SECRET,
 };

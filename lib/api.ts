@@ -173,3 +173,90 @@ export interface CompanyInfo {
   lng: number;
   licenseNumber: string;
 }
+
+// ---- 会員 ----
+
+export interface MemberProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  createdAt: string;
+}
+
+export interface FavoriteProperty {
+  id: string;
+  propertyId: string;
+  property: Property;
+  createdAt: string;
+}
+
+export interface MemberInquiry {
+  id: string;
+  propertyRef?: string;
+  propertyType: string;
+  message?: string;
+  inquiryType: string;
+  status: string;
+  createdAt: string;
+}
+
+// 会員登録
+export async function registerMember(data: {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+}) {
+  return fetchFromAdmin<{ success: boolean; message?: string }>(
+    "/api/members/register",
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+      next: { revalidate: 0 },
+    }
+  );
+}
+
+// 会員プロフィール取得（memberId はサーバーサイドでセッションから取得）
+export async function getMemberProfile(memberId: string) {
+  return fetchFromAdmin<MemberProfile>(`/api/members/${memberId}`, {
+    next: { revalidate: 0 },
+  });
+}
+
+// お気に入り一覧
+export async function getFavorites(memberId: string) {
+  return fetchFromAdmin<FavoriteProperty[]>(
+    `/api/members/${memberId}/favorites`,
+    { next: { revalidate: 0 } }
+  );
+}
+
+// お気に入り追加
+export async function addFavorite(memberId: string, propertyId: string) {
+  return fetchFromAdmin<{ success: boolean }>(
+    `/api/members/${memberId}/favorites`,
+    {
+      method: "POST",
+      body: JSON.stringify({ propertyId }),
+      next: { revalidate: 0 },
+    }
+  );
+}
+
+// お気に入り削除
+export async function removeFavorite(memberId: string, propertyId: string) {
+  return fetchFromAdmin<{ success: boolean }>(
+    `/api/members/${memberId}/favorites/${propertyId}`,
+    { method: "DELETE", next: { revalidate: 0 } }
+  );
+}
+
+// 問い合わせ履歴
+export async function getMemberInquiries(memberId: string) {
+  return fetchFromAdmin<MemberInquiry[]>(
+    `/api/members/${memberId}/inquiries`,
+    { next: { revalidate: 0 } }
+  );
+}

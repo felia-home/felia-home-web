@@ -1,5 +1,10 @@
+// middleware.ts
 export { default } from "next-auth/middleware";
 
 export const config = {
-  matcher: ["/mypage/:path*"],
+  matcher: [
+    "/members/mypage/:path*",
+    "/members/favorites/:path*",
+    "/members/inquiries/:path*",
+  ],
 };
