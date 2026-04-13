@@ -32,7 +32,10 @@ export async function getFeaturedProperties() {
 }
 
 export async function getNewProperties() {
-  return fetchFromAdmin<Property[]>("/api/properties?flag=new");
+  const res = await fetchFromAdmin<{ properties: Property[] }>(
+    "/api/properties?flag=new"
+  );
+  return res.properties ?? [];
 }
 
 export async function getPropertiesByArea(area: string) {
