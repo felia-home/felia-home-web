@@ -1,49 +1,37 @@
+// app/layout.tsx
 import type { Metadata } from "next";
-import { Noto_Serif_JP, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Providers } from "./providers";
-
-const notoSerif = Noto_Serif_JP({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-serif",
-  display: "swap",
-});
-
-const notoSans = Noto_Sans_JP({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-sans",
-  display: "swap",
-});
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://felia-home.co.jp"),
   title: {
-    default: "フェリアホーム｜東京都心・城南・城西の不動産",
-    template: "%s｜フェリアホーム",
+    default: "フェリアホーム | 東京の不動産売買・物件情報",
+    template: "%s | フェリアホーム",
   },
   description:
-    "東京都心・城南・城西エリアの不動産売買ならフェリアホーム。目黒区・世田谷区・渋谷区・品川区・港区の土地・戸建・マンションを豊富にご紹介。未公開物件も多数。",
-  keywords: "不動産,東京,目黒区,世田谷区,渋谷区,土地,戸建,マンション,フェリアホーム",
+    "フェリアホームは東京都内の不動産売買仲介会社です。厳選された戸建て・マンション・土地情報を多数ご紹介。売却査定・無料会員登録も受付中。",
+  keywords: ["不動産", "東京", "売買", "物件", "マンション", "戸建て", "土地", "フェリアホーム"],
   openGraph: {
     type: "website",
     locale: "ja_JP",
-    url: "https://felia-home.co.jp",
+    url: "https://index.felia-home.co.jp",
     siteName: "フェリアホーム",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="ja" className={`${notoSerif.variable} ${notoSans.variable}`}>
-      <body className="font-sans bg-white text-[#333] antialiased">
+    <html lang="ja">
+      <body className="bg-white antialiased">
         <Providers>
           <Header />
-          <main className="pt-[70px]">{children}</main>
+          <main>{children}</main>
           <Footer />
         </Providers>
       </body>

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import PropertyCard, { type Property } from "@/components/PropertyCard";
+import PropertyCard, { type Property } from "@/components/property/PropertyCard";
 import { notFound } from "next/navigation";
 
 const AREA_INFO: Record<string, { name: string; description: string; tags: string[] }> = {
