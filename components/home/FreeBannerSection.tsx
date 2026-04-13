@@ -1,23 +1,15 @@
 // components/home/FreeBannerSection.tsx
-// Phase 2: admin側の banners テーブル・API が完成次第実装
-// 現時点では app/page.tsx に組み込まない
-
 import Link from "next/link";
-
-interface Banner {
-  id: string;
-  image: string;
-  href: string;
-  alt: string;
-}
-
-// TODO: getBanners() を lib/api.ts に追加して差し替え
-async function getBanners(): Promise<Banner[]> {
-  return [];
-}
+import { getBanners, type Banner } from "@/lib/api";
 
 export async function FreeBannerSection() {
-  const banners = await getBanners();
+  let banners: Banner[] = [];
+  try {
+    banners = await getBanners();
+  } catch {
+    // Admin API 未起動時はスキップ
+  }
+
   if (banners.length === 0) return null;
 
   return (

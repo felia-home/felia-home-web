@@ -1,26 +1,16 @@
 // components/home/FeatureSection.tsx
-// Phase 2: admin側の features テーブル・API が完成次第実装
-// 現時点では app/page.tsx に組み込まない
-
 import Link from "next/link";
 import { SectionTitle } from "@/components/ui/SectionTitle";
-
-interface Feature {
-  id: string;
-  slug: string;
-  title: string;
-  subTitle: string;
-  image: string;
-  href: string;
-}
-
-// TODO: getFeatures() を lib/api.ts に追加して差し替え
-async function getFeatures(): Promise<Feature[]> {
-  return [];
-}
+import { getFeatures, type Feature } from "@/lib/api";
 
 export async function FeatureSection() {
-  const features = await getFeatures();
+  let features: Feature[] = [];
+  try {
+    features = await getFeatures();
+  } catch {
+    // Admin API 未起動時はスキップ
+  }
+
   if (features.length === 0) return null;
 
   return (

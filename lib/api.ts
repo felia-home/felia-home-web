@@ -27,7 +27,7 @@ async function fetchFromAdmin<T>(
 // ---- 物件 ----
 
 export async function getFeaturedProperties() {
-  return fetchFromAdmin<Property[]>("/api/properties?flag=featured");
+  return fetchFromAdmin<Property[]>("/api/hp/felia-selection");
 }
 
 export async function getNewProperties() {
@@ -49,18 +49,28 @@ export async function getPropertyById(id: string) {
 // ---- 現地販売会 ----
 
 export async function getOpenHouses() {
-  return fetchFromAdmin<OpenHouse[]>("/api/open-houses");
+  return fetchFromAdmin<OpenHouse[]>("/api/hp/open-house");
 }
 
 // ---- お知らせ ----
 
 export async function getNews(limit?: number) {
   const q = limit ? `?limit=${limit}` : "";
-  return fetchFromAdmin<NewsItem[]>(`/api/news${q}`);
+  return fetchFromAdmin<NewsItem[]>(`/api/hp/news${q}`);
 }
 
 export async function getNewsById(slug: string) {
   return fetchFromAdmin<NewsItem>(`/api/news/${slug}`);
+}
+
+// ---- 特集・バナー（Phase 2） ----
+
+export async function getFeatures() {
+  return fetchFromAdmin<Feature[]>("/api/hp/features");
+}
+
+export async function getBanners() {
+  return fetchFromAdmin<Banner[]>("/api/hp/banners");
 }
 
 // ---- 会社情報 ----
@@ -160,6 +170,24 @@ export interface NewsItem {
   content: string;
   category: string;
   publishedAt: string;
+}
+
+export interface Feature {
+  id: string;
+  slug: string;
+  title: string;
+  subTitle: string;
+  image: string;
+  href: string;
+  order: number;
+}
+
+export interface Banner {
+  id: string;
+  image: string;
+  href: string;
+  alt: string;
+  order: number;
 }
 
 export interface CompanyInfo {

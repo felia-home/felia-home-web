@@ -7,9 +7,8 @@ import { MemberBannerSection } from "@/components/home/MemberBannerSection";
 import { TradeUpBannerSection } from "@/components/home/TradeUpBannerSection";
 import { SearchSection } from "@/components/home/SearchSection";
 import { OpenHouseAndInfoSection } from "@/components/home/OpenHouseAndInfoSection";
-// Feature・FreeBanner は Phase 2（admin API 完成後に有効化）
-// import { FeatureSection } from "@/components/home/FeatureSection";
-// import { FreeBannerSection } from "@/components/home/FreeBannerSection";
+import { FeatureSection } from "@/components/home/FeatureSection";
+import { FreeBannerSection } from "@/components/home/FreeBannerSection";
 import { AccessSection } from "@/components/home/AccessSection";
 
 export default function HomePage() {
@@ -39,11 +38,11 @@ export default function HomePage() {
       {/* 8. 買い替え誘導バナー */}
       <TradeUpBannerSection />
 
-      {/* 9. 特集（Phase 2） */}
-      {/* <FeatureSection /> */}
+      {/* 9. 特集 */}
+      <FeatureSection />
 
-      {/* 10. フリーバナー（Phase 2） */}
-      {/* <FreeBannerSection /> */}
+      {/* 10. フリーバナー */}
+      <FreeBannerSection />
 
       {/* 11. Access */}
       <AccessSection />
