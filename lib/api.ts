@@ -69,6 +69,50 @@ export async function getCompanyInfo() {
   return fetchFromAdmin<CompanyInfo>("/api/company");
 }
 
+// ---- 物件一覧（絞り込み） ----
+
+export interface PropertyListParams {
+  area?: string;
+  line?: string;
+  flag?: "featured" | "new";
+  type?: string;
+  priceMin?: number;
+  priceMax?: number;
+  layout?: string;
+  page?: number;
+  limit?: number;
+  sort?: "newest" | "price_asc" | "price_desc";
+}
+
+export interface PropertyListResponse {
+  properties: Property[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export async function getProperties(
+  params: PropertyListParams = {}
+): Promise<PropertyListResponse> {
+  const query = new URLSearchParams();
+  if (params.area)     query.set("area",      params.area);
+  if (params.line)     query.set("line",      params.line);
+  if (params.flag)     query.set("flag",      params.flag);
+  if (params.type)     query.set("type",      params.type);
+  if (params.priceMin) query.set("priceMin",  String(params.priceMin));
+  if (params.priceMax) query.set("priceMax",  String(params.priceMax));
+  if (params.layout)   query.set("layout",   params.layout);
+  if (params.page)     query.set("page",      String(params.page));
+  if (params.limit)    query.set("limit",     String(params.limit ?? 12));
+  if (params.sort)     query.set("sort",      params.sort);
+
+  return fetchFromAdmin<PropertyListResponse>(
+    `/api/properties?${query.toString()}`,
+    { next: { revalidate: 30 } }
+  );
+}
+
 // ---- 型定義 ----
 
 export interface Property {

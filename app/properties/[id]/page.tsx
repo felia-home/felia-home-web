@@ -1,309 +1,291 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
+// app/properties/[id]/page.tsx
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import Link from "next/link";
+import {
+  MapPin, Train, Maximize2, LayoutGrid,
+  Building2, Calendar, Home, Phone, Mail,
+  ChevronRight, Heart, Share2
+} from "lucide-react";
+import { getPropertyById, getNewProperties } from "@/lib/api";
+import { PropertyImageGallery } from "@/components/property/PropertyImageGallery";
+import { PropertyCard } from "@/components/property/PropertyCard";
 
-type PropertyDetail = {
-  id: string;
-  property_number: string;
-  property_type: string;
-  title?: string;
-  catch_copy?: string;
-  description_hp?: string;
-  price?: number;
-  prefecture?: string;
-  city?: string;
-  town?: string;
-  address_display?: string;
-  station_name1?: string;
-  station_line1?: string;
-  station_walk1?: number;
-  station_name2?: string;
-  station_line2?: string;
-  station_walk2?: number;
-  station_name3?: string;
-  station_line3?: string;
-  station_walk3?: number;
-  rooms?: string;
-  area_build_m2?: number;
-  area_land_m2?: number;
-  area_exclusive_m2?: number;
-  building_year?: number;
-  building_month?: number;
-  structure?: string;
-  floors_total?: number;
-  land_right?: string;
-  use_zone_summary?: string;
-  bcr_calculated?: number;
-  far_calculated?: number;
-  current_status?: string;
-  delivery_timing?: string;
-  seller_transaction_type?: string;
-  equipment_list?: string[];
-  elementary_school?: string;
-  elementary_school_distance?: number;
-  junior_high_school?: string;
-  junior_high_school_distance?: number;
-  published_at?: string;
-  images?: { id: string; url: string; room_type?: string; caption?: string; sort_order?: number }[];
-};
+interface PageProps {
+  params: { id: string };
+}
 
-const TYPE_LABEL: Record<string, string> = {
-  NEW_HOUSE: "新築戸建", USED_HOUSE: "中古戸建", MANSION: "マンション", LAND: "土地",
-};
-
-async function getProperty(id: string): Promise<PropertyDetail | null> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {
-    const adminUrl = process.env.ADMIN_API_URL ?? "http://localhost:3001";
-    const res = await fetch(`${adminUrl}/api/properties/${id}`, { next: { revalidate: 300 } });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.property ?? null;
+    const property = await getPropertyById(params.id);
+    return {
+      title: `${property.address} ${property.layout} ${property.price.toLocaleString()}万円`,
+      description: `${property.propertyType}｜${property.address}｜${property.price.toLocaleString()}万円｜${property.area}㎡｜${property.nearestStation}徒歩${property.walkMinutes}分`,
+    };
   } catch {
-    return null;
+    return { title: "物件詳細" };
   }
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const property = await getProperty(params.id);
-  if (!property) return { title: "物件が見つかりません" };
-  return {
-    title: property.title ?? `${property.city}${property.town} ${property.rooms ?? ""}`,
-    description: property.catch_copy ?? property.description_hp?.slice(0, 120),
-    openGraph: {
-      images: property.images?.[0]?.url ? [property.images[0].url] : [],
-    },
-  };
-}
+export default async function PropertyDetailPage({ params }: PageProps) {
+  let property;
+  try {
+    property = await getPropertyById(params.id);
+  } catch {
+    notFound();
+  }
 
-export default async function PropertyDetailPage({ params }: { params: { id: string } }) {
-  const property = await getProperty(params.id);
-  if (!property) notFound();
-
-  const images = [...(property.images ?? [])].sort(
-    (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
-  );
-  const mainImage = images.find(i => i.room_type === "外観") ?? images[0];
+  // 関連物件（同エリア）
+  let relatedProperties: any[] = [];
+  try {
+    const result = await getNewProperties();
+    relatedProperties = result.filter((p: any) => p.id !== params.id).slice(0, 3);
+  } catch {}
 
   const specs = [
-    { label: "価格", value: property.price ? `${property.price.toLocaleString()}万円` : "価格応談" },
-    { label: "所在地", value: [property.prefecture, property.city, property.town, property.address_display].filter(Boolean).join("") },
-    { label: "交通", value: [
-      property.station_name1 && `${property.station_line1 ?? ""} ${property.station_name1}駅 徒歩${property.station_walk1}分`,
-      property.station_name2 && `${property.station_line2 ?? ""} ${property.station_name2}駅 徒歩${property.station_walk2}分`,
-      property.station_name3 && `${property.station_line3 ?? ""} ${property.station_name3}駅 徒歩${property.station_walk3}分`,
-    ].filter(Boolean).join("\n") || null },
-    { label: "間取り", value: property.rooms },
-    { label: "建物面積", value: property.area_build_m2 ? `${property.area_build_m2}㎡` : null },
-    { label: "専有面積", value: property.area_exclusive_m2 ? `${property.area_exclusive_m2}㎡` : null },
-    { label: "土地面積", value: property.area_land_m2 ? `${property.area_land_m2}㎡` : null },
-    { label: "築年月", value: property.building_year ? `${property.building_year}年${property.building_month ?? ""}月` : null },
-    { label: "構造", value: property.structure },
-    { label: "階建", value: property.floors_total ? `地上${property.floors_total}階` : null },
-    { label: "土地権利", value: property.land_right },
-    { label: "用途地域", value: property.use_zone_summary },
-    { label: "建ぺい率/容積率", value: property.bcr_calculated ? `${property.bcr_calculated}%/${property.far_calculated}%` : null },
-    { label: "現況", value: property.current_status },
-    { label: "引渡し時期", value: property.delivery_timing },
-    { label: "取引態様", value: property.seller_transaction_type },
-    { label: "物件番号", value: property.property_number },
-  ].filter(s => s.value);
+    { label: "物件種別",   value: property.propertyType,                         icon: Home },
+    { label: "価格",       value: `${property.price.toLocaleString()}万円`,       icon: null },
+    { label: "所在地",     value: property.address,                               icon: MapPin },
+    { label: "最寄駅",     value: `${property.nearestStation} 徒歩${property.walkMinutes}分`, icon: Train },
+    { label: "面積",       value: property.area ? `${property.area}㎡` : "—",     icon: Maximize2 },
+    { label: "間取り",     value: property.layout || "—",                         icon: LayoutGrid },
+    { label: "築年月",     value: property.buildingYear ? `${property.buildingYear}年` : "—", icon: Calendar },
+    { label: "構造",       value: property.structure || "—",                      icon: Building2 },
+    ...(property.managementFee ? [{
+      label: "管理費", value: `${property.managementFee.toLocaleString()}円/月`, icon: null
+    }] : []),
+    ...(property.repairReserve ? [{
+      label: "修繕積立金", value: `${property.repairReserve.toLocaleString()}円/月`, icon: null
+    }] : []),
+  ];
 
   return (
-    <div className="bg-[#fafaf8] min-h-screen">
+    <div className="bg-white min-h-screen">
       {/* パンくず */}
-      <div className="pt-24 pb-4 bg-white border-b border-[#e8e6e0]">
-        <div className="container-xl">
-          <nav className="flex items-center gap-2 text-xs text-[#706e68]">
-            <Link href="/" className="hover:text-[#c9a96e] transition-colors">TOP</Link>
-            <span>›</span>
-            <Link href="/properties" className="hover:text-[#c9a96e] transition-colors">物件検索</Link>
-            <span>›</span>
-            <span className="text-[#1c1b18] line-clamp-1">
-              {property.city}{property.town}
-            </span>
+      <div
+        className="py-3 border-b"
+        style={{ backgroundColor: "#F8F8F8", borderColor: "#E5E5E5" }}
+      >
+        <div className="container-content">
+          <nav className="flex items-center gap-1.5 text-xs text-gray-400 flex-wrap">
+            <Link href="/" className="hover:text-gray-600">ホーム</Link>
+            <ChevronRight size={10} />
+            <Link href="/properties" className="hover:text-gray-600">物件一覧</Link>
+            <ChevronRight size={10} />
+            <span className="text-gray-600 truncate max-w-[200px]">{property.name}</span>
           </nav>
         </div>
       </div>
 
-      <div className="container-xl py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* 左カラム */}
-          <div className="lg:col-span-2">
-            {/* メイン画像 */}
-            <div className="relative h-80 md:h-[480px] rounded-2xl overflow-hidden bg-[#e8e6e0] mb-4">
-              {mainImage?.url ? (
-                <Image
-                  src={mainImage.url}
-                  alt={property.title ?? "物件写真"}
-                  fill
-                  className="object-cover"
-                  priority
-                  unoptimized
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#1a3a2a] to-[#2d5a3e]">
-                  <span className="text-white/30 text-sm">写真準備中</span>
-                </div>
+      <div className="container-content py-8">
+        <div className="grid grid-cols-1 pc:grid-cols-3 gap-8 tb:gap-10">
+
+          {/* 左・メインカラム（PC: 2/3幅） */}
+          <div className="pc:col-span-2">
+            {/* バッジ */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {property.isNew && (
+                <span className="text-xs font-bold px-2.5 py-1 rounded text-white" style={{ backgroundColor: "#5BAD52" }}>
+                  NEW
+                </span>
               )}
-              <div className="absolute top-4 left-4 bg-[#1a3a2a] text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                {TYPE_LABEL[property.property_type] ?? property.property_type}
-              </div>
+              {property.isFeatured && (
+                <span className="text-xs font-bold px-2.5 py-1 rounded text-white" style={{ backgroundColor: "#E67E22" }}>
+                  厳選
+                </span>
+              )}
+              {property.isMembersOnly && (
+                <span className="text-xs font-bold px-2.5 py-1 rounded text-white bg-gray-600">
+                  会員限定
+                </span>
+              )}
+              <span className="text-xs px-2.5 py-1 rounded border text-gray-500" style={{ borderColor: "#E5E5E5" }}>
+                {property.propertyType}
+              </span>
             </div>
 
-            {/* サブ画像 */}
-            {images.length > 1 && (
-              <div className="grid grid-cols-5 gap-2 mb-8">
-                {images.slice(1, 5).map(img => (
-                  <div key={img.id} className="relative h-20 rounded-lg overflow-hidden bg-[#e8e6e0]">
-                    <Image src={img.url} alt={img.caption ?? ""} fill className="object-cover" unoptimized />
-                  </div>
-                ))}
-                {images.length > 5 && (
-                  <div className="relative h-20 rounded-lg overflow-hidden bg-[#1a3a2a] flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">+{images.length - 5}枚</span>
-                  </div>
-                )}
-              </div>
-            )}
+            {/* 物件名 */}
+            <h1 className="text-xl tb:text-2xl font-bold text-gray-800 mb-1">
+              {property.name}
+            </h1>
+            <p className="text-sm text-gray-500 mb-4 flex items-center gap-1">
+              <MapPin size={13} style={{ color: "#5BAD52" }} />
+              {property.address}
+            </p>
 
-            {/* タイトル・キャッチ */}
-            <div className="mb-6">
-              {property.catch_copy && (
-                <p className="text-[#c9a96e] font-serif text-sm mb-2">{property.catch_copy}</p>
-              )}
-              <h1 className="font-serif text-2xl font-bold text-[#1c1b18] mb-2">
-                {property.title ?? `${property.city}${property.town} ${TYPE_LABEL[property.property_type] ?? ""}`}
-              </h1>
-              <p className="text-sm text-[#706e68]">
-                {property.prefecture}{property.city}{property.town}
-                {property.address_display && ` ${property.address_display}`}
-              </p>
+            {/* 価格 */}
+            <div
+              className="flex items-baseline gap-1 mb-6 pb-6 border-b"
+              style={{ borderColor: "#E5E5E5" }}
+            >
+              <span className="text-3xl tb:text-4xl font-bold" style={{ color: "#5BAD52" }}>
+                {property.price.toLocaleString()}
+              </span>
+              <span className="text-lg text-gray-500">万円</span>
             </div>
 
-            {/* HP掲載文 */}
-            {property.description_hp && (
-              <div className="bg-white rounded-2xl p-6 border border-[#e8e6e0] mb-6">
-                <h2 className="font-serif text-lg font-bold text-[#1c1b18] mb-4">物件のご紹介</h2>
-                <p className="text-sm text-[#706e68] leading-relaxed whitespace-pre-line">
-                  {property.description_hp}
-                </p>
-              </div>
-            )}
+            {/* 画像ギャラリー */}
+            <div className="mb-8">
+              <PropertyImageGallery
+                images={property.images?.length ? property.images : (property.mainImage ? [property.mainImage] : [])}
+                name={property.name}
+              />
+            </div>
 
-            {/* 物件概要テーブル */}
-            <div className="bg-white rounded-2xl border border-[#e8e6e0] overflow-hidden mb-6">
-              <h2 className="font-serif text-lg font-bold text-[#1c1b18] p-6 border-b border-[#e8e6e0]">
+            {/* 物件スペック */}
+            <div className="mb-8">
+              <h2
+                className="font-bold text-lg mb-4 pb-2 border-b"
+                style={{ color: "#333", borderColor: "#5BAD52", borderBottomWidth: "2px" }}
+              >
                 物件概要
               </h2>
-              <table className="w-full">
-                <tbody>
-                  {specs.map((row, i) => (
-                    <tr key={i} className={i % 2 === 0 ? "bg-[#fafaf8]" : "bg-white"}>
-                      <th className="text-left text-xs font-bold text-[#706e68] p-4 w-1/3 border-b border-[#e8e6e0] align-top">
-                        {row.label}
-                      </th>
-                      <td className="text-sm text-[#1c1b18] p-4 border-b border-[#e8e6e0] whitespace-pre-line">
-                        {row.value}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <dl className="grid grid-cols-1 tb:grid-cols-2 gap-0 border-t border-l"
+                style={{ borderColor: "#E5E5E5" }}>
+                {specs.map(({ label, value }) => (
+                  <div
+                    key={label}
+                    className="flex border-b border-r"
+                    style={{ borderColor: "#E5E5E5" }}
+                  >
+                    <dt
+                      className="flex-shrink-0 w-28 px-3 py-2.5 text-xs font-medium text-gray-500 flex items-center"
+                      style={{ backgroundColor: "#F8F8F8" }}
+                    >
+                      {label}
+                    </dt>
+                    <dd className="flex-1 px-3 py-2.5 text-sm text-gray-700">
+                      {value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
 
-            {/* 設備一覧 */}
-            {property.equipment_list && property.equipment_list.length > 0 && (
-              <div className="bg-white rounded-2xl border border-[#e8e6e0] p-6 mb-6">
-                <h2 className="font-serif text-lg font-bold text-[#1c1b18] mb-4">設備・特徴</h2>
-                <div className="flex flex-wrap gap-2">
-                  {property.equipment_list.map((eq, i) => (
-                    <span key={i} className="bg-[#f5f5f0] text-[#706e68] text-xs px-3 py-1.5 rounded-full">
-                      {eq}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 周辺環境 */}
-            {(property.elementary_school || property.junior_high_school) && (
-              <div className="bg-white rounded-2xl border border-[#e8e6e0] p-6 mb-6">
-                <h2 className="font-serif text-lg font-bold text-[#1c1b18] mb-4">周辺環境</h2>
-                <div className="space-y-2 text-sm text-[#706e68]">
-                  {property.elementary_school && (
-                    <div className="flex justify-between border-b border-[#e8e6e0] pb-2">
-                      <span>小学校</span>
-                      <span>{property.elementary_school}（{property.elementary_school_distance}m）</span>
-                    </div>
-                  )}
-                  {property.junior_high_school && (
-                    <div className="flex justify-between">
-                      <span>中学校</span>
-                      <span>{property.junior_high_school}（{property.junior_high_school_distance}m）</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* 法的事項 */}
-            <p className="text-xs text-[#706e68] leading-relaxed">
-              ※ 掲載情報は変更になる場合があります。詳細はお問合せください。<br />
-              ※ 所在地は丁目まで表示しています。番地・号は来店またはお問合せ後にお知らせします。<br />
-              ※ 取引態様: {property.seller_transaction_type ?? "仲介"} / 物件番号: {property.property_number}
-            </p>
-          </div>
-
-          {/* 右カラム（スティッキー） */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              <div className="bg-white rounded-2xl border border-[#e8e6e0] p-6 mb-4">
-                <div className="text-2xl font-bold text-[#1a3a2a] mb-1">
-                  {property.price ? `${property.price.toLocaleString()}万円` : "価格応談"}
-                </div>
-                {property.rooms && (
-                  <div className="text-sm text-[#706e68] mb-4">{property.rooms}</div>
-                )}
-                <Link
-                  href={`/contact?property=${property.property_number}&title=${encodeURIComponent(property.title ?? "")}`}
-                  className="block w-full bg-[#c9a96e] text-white text-center py-3.5 rounded-xl font-bold text-sm hover:bg-[#b8935a] transition-colors mb-3"
+            {/* 物件説明 */}
+            {property.description && (
+              <div className="mb-8">
+                <h2
+                  className="font-bold text-lg mb-4 pb-2 border-b"
+                  style={{ color: "#333", borderColor: "#5BAD52", borderBottomWidth: "2px" }}
                 >
-                  この物件についてお問合せ
-                </Link>
-                <a
-                  href="tel:03-5981-8601"
-                  className="block w-full border-2 border-[#1a3a2a] text-[#1a3a2a] text-center py-3.5 rounded-xl font-bold text-sm hover:bg-[#1a3a2a] hover:text-white transition-colors"
-                >
-                  📞 03-5981-8601
-                </a>
-                <p className="text-center text-xs text-[#706e68] mt-2">
-                  受付時間: 9:30〜18:30（火・水定休）
+                  物件説明
+                </h2>
+                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
+                  {property.description}
                 </p>
               </div>
+            )}
+          </div>
 
-              <div className="bg-[#fafaf8] rounded-xl p-4 text-xs text-[#706e68] border border-[#e8e6e0]">
-                <div className="flex justify-between mb-1.5">
-                  <span>物件番号</span>
-                  <span className="font-mono">{property.property_number}</span>
+          {/* 右・サイドバー（PC: 1/3幅） */}
+          <div className="space-y-4">
+            {/* 価格カード（PC: sticky） */}
+            <div
+              className="bg-white rounded-xl border p-5 pc:sticky pc:top-24"
+              style={{ borderColor: "#E5E5E5" }}
+            >
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-2xl font-bold" style={{ color: "#5BAD52" }}>
+                  {property.price.toLocaleString()}
+                </span>
+                <span className="text-gray-500">万円</span>
+              </div>
+
+              {/* 主要スペック */}
+              <div className="space-y-1.5 mb-5 text-sm text-gray-600">
+                <div className="flex items-center gap-1.5">
+                  <Train size={13} style={{ color: "#5BAD52" }} />
+                  {property.nearestStation} 徒歩{property.walkMinutes}分
                 </div>
-                {property.published_at && (
-                  <div className="flex justify-between">
-                    <span>掲載日</span>
-                    <span>{new Date(property.published_at).toLocaleDateString("ja-JP")}</span>
+                {property.area > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <Maximize2 size={13} style={{ color: "#5BAD52" }} />
+                    {property.area}㎡
+                  </div>
+                )}
+                {property.layout && (
+                  <div className="flex items-center gap-1.5">
+                    <LayoutGrid size={13} style={{ color: "#5BAD52" }} />
+                    {property.layout}
                   </div>
                 )}
               </div>
+
+              {/* CTAボタン */}
+              <div className="space-y-2.5">
+                <Link
+                  href={`/inquiry?propertyId=${property.id}`}
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-lg
+                             font-bold text-sm text-white transition-all hover:scale-[1.02]"
+                  style={{ backgroundColor: "#5BAD52", boxShadow: "0 2px 8px rgba(91,173,82,0.3)" }}
+                >
+                  <Mail size={16} />
+                  この物件に問い合わせる
+                </Link>
+                <Link
+                  href={`/inquiry?propertyId=${property.id}&type=viewing`}
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-lg
+                             font-bold text-sm border transition-colors hover:border-felia-green hover:text-felia-green"
+                  style={{ borderColor: "#E5E5E5", color: "#666" }}
+                >
+                  <Home size={16} />
+                  内覧を申し込む
+                </Link>
+                <div className="flex gap-2">
+                  <button
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg
+                               border text-xs text-gray-500 hover:border-red-300 hover:text-red-400 transition-colors"
+                    style={{ borderColor: "#E5E5E5" }}
+                  >
+                    <Heart size={14} />
+                    お気に入り
+                  </button>
+                  <button
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg
+                               border text-xs text-gray-500 hover:border-gray-400 transition-colors"
+                    style={{ borderColor: "#E5E5E5" }}
+                  >
+                    <Share2 size={14} />
+                    シェア
+                  </button>
+                </div>
+              </div>
+
+              {/* 電話 */}
+              <div
+                className="mt-4 pt-4 border-t text-center"
+                style={{ borderColor: "#F0F0F0" }}
+              >
+                <p className="text-xs text-gray-400 mb-1">お電話でのお問い合わせ</p>
+                <a
+                  href="tel:03XXXXXXXX"
+                  className="font-bold text-lg flex items-center justify-center gap-1.5"
+                  style={{ color: "#5BAD52" }}
+                >
+                  <Phone size={16} />
+                  03-XXXX-XXXX
+                </a>
+                <p className="text-[10px] text-gray-400 mt-0.5">
+                  受付時間 10:00〜18:00（水曜定休）
+                </p>
+              </div>
             </div>
           </div>
+
         </div>
 
-        <div className="mt-10">
-          <Link href="/properties"
-            className="inline-flex items-center gap-2 text-sm text-[#706e68] hover:text-[#c9a96e] transition-colors">
-            ← 物件一覧に戻る
-          </Link>
-        </div>
+        {/* 関連物件 */}
+        {relatedProperties.length > 0 && (
+          <div className="mt-16 pt-10 border-t" style={{ borderColor: "#E5E5E5" }}>
+            <h2 className="text-xl font-bold text-gray-800 mb-6">関連物件</h2>
+            <div className="grid grid-cols-1 tb:grid-cols-3 gap-4">
+              {relatedProperties.map((p: any) => (
+                <PropertyCard key={p.id} property={p} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
