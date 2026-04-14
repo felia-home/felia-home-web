@@ -8,7 +8,8 @@ import { Search, Heart, Menu, User, Lock } from "lucide-react";
 import { AccordionMenu } from "./AccordionMenu";
 
 export function Header() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === "authenticated" && !!session?.user;
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -53,7 +54,7 @@ export function Header() {
 
               {/* お気に入り */}
               <Link
-                href={session ? "/members/favorites" : "/members/login"}
+                href={isLoggedIn ? "/members/favorites" : "/members/login"}
                 className="flex flex-col items-center gap-0.5 px-2 py-1 rounded hover:bg-gray-50 transition-colors group"
               >
                 <Heart
@@ -80,7 +81,7 @@ export function Header() {
               </Link>
 
               {/* 非公開物件（ログイン時のみ） */}
-              {session && (
+              {isLoggedIn && (
                 <Link
                   href="/private-selection"
                   className="hidden tb:flex flex-col items-center gap-0.5 px-2 py-1 rounded
@@ -101,7 +102,7 @@ export function Header() {
               )}
 
               {/* 会員登録 / マイページ */}
-              {session ? (
+              {isLoggedIn ? (
                 <Link
                   href="/members/mypage"
                   className="hidden tb:flex items-center gap-1 px-3 py-1.5 rounded border border-gray-300 hover:border-felia-green text-sm font-medium text-gray-600 hover:text-felia-green transition-colors"
@@ -122,7 +123,7 @@ export function Header() {
               )}
 
               {/* ログイン（PCのみ） */}
-              {!session && (
+              {!isLoggedIn && (
                 <Link
                   href="/members/login"
                   className="hidden tb:flex items-center px-3 py-1.5 rounded border text-sm font-medium text-gray-600 hover:border-felia-green hover:text-felia-green transition-colors"
