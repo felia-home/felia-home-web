@@ -255,6 +255,25 @@ export async function getPrivatePropertyById(
   }
 }
 
+// ---- プライベートセレクション トークン検証 ----
+
+export type TokenVerifyResult =
+  | { valid: true; customerId: string; email: string; expiresAt: string }
+  | { valid: false; reason: "not_found" | "expired" | "no_token" | "server_error" };
+
+export async function verifyPrivateSelectionToken(
+  token: string
+): Promise<TokenVerifyResult> {
+  try {
+    return await fetchFromAdmin<TokenVerifyResult>(
+      `/api/private-selection/verify?token=${encodeURIComponent(token)}`,
+      { next: { revalidate: 0 } }
+    );
+  } catch {
+    return { valid: false, reason: "server_error" };
+  }
+}
+
 // ---- 会員 ----
 
 export interface MemberProfile {

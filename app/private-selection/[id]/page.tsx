@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
-import { getPrivatePropertyById } from "@/lib/api";
+import { getPrivatePropertyById, verifyPrivateSelectionToken } from "@/lib/api";
 import {
   getPropertyTitle, getPriceDisplay,
   getAreaDisplay, getPropertyTypeLabel, getCardGradient,
@@ -18,13 +18,30 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
+interface PageProps {
+  params: { id: string };
+  searchParams: { token?: string };
+}
+
 export default async function PrivatePropertyDetailPage({
   params,
-}: {
-  params: { id: string };
-}) {
+  searchParams,
+}: PageProps) {
   const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/members/login");
+  const urlToken = searchParams.token;
+
+  // アクセス制御
+  if (!session?.user && !urlToken) {
+    redirect("/members/login");
+  }
+
+  if (!session?.user && urlToken) {
+    const result = await verifyPrivateSelectionToken(urlToken);
+    if (!result.valid) {
+      if (result.reason === "expired") redirect("/private-selection/expired");
+      redirect("/members/login");
+    }
+  }
 
   const property = await getPrivatePropertyById(params.id);
   if (!property) notFound();
@@ -50,7 +67,7 @@ export default async function PrivatePropertyDetailPage({
       {/* パンくず */}
       <div className="container-content py-4">
         <Link
-          href="/private-selection"
+          href={urlToken ? `/private-selection?token=${urlToken}` : "/private-selection"}
           className="flex items-center gap-1 text-sm transition-colors hover:opacity-80"
           style={{ color: "rgba(201,168,76,0.6)" }}
         >
