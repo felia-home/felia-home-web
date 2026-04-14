@@ -3,7 +3,7 @@ import { HeroSlider } from "@/components/home/HeroSlider";
 import { FeliaSectionSelection } from "@/components/home/FeliaSectionSelection";
 import { RecommendSection } from "@/components/home/RecommendSection";
 import { NewAndNewsSection } from "@/components/home/NewAndNewsSection";
-import { MemberBannerSection } from "@/components/home/MemberBannerSection";
+import { FullWidthBannerSection } from "@/components/home/FullWidthBannerSection";
 import { TradeUpBannerSection } from "@/components/home/TradeUpBannerSection";
 import { SearchSection } from "@/components/home/SearchSection";
 import { OpenHouseAndInfoSection } from "@/components/home/OpenHouseAndInfoSection";
@@ -27,7 +27,7 @@ export default function HomePage() {
       <NewAndNewsSection />
 
       {/* 5. 会員登録誘導バナー */}
-      <MemberBannerSection />
+      <FullWidthBannerSection />
 
       {/* 6. 物件検索（SVGマップ ＋ 路線） */}
       <SearchSection />
