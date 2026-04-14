@@ -1,247 +1,290 @@
+// app/contact/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import {
+  User, Mail, Phone, MessageSquare,
+  CheckCircle, Lock, Home, ChevronRight,
+} from "lucide-react";
 
-const INQUIRY_TYPES = [
-  { value: "PROPERTY", label: "物件について" },
-  { value: "SELL", label: "売却相談" },
-  { value: "OTHER", label: "その他" },
-];
+function ContactForm() {
+  const searchParams = useSearchParams();
+  const propertyId   = searchParams.get("propertyId") || "";
+  const propertyNo   = searchParams.get("propertyNo") || "";
+  const type         = searchParams.get("type") || "general";
+  const token        = searchParams.get("token") || "";
 
-export default function ContactPage() {
+  const isPrivate  = type === "private";
+  const isProperty = type === "property" || !!propertyId;
+
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    inquiry_type: "PROPERTY",
-    message: "",
+    name: "", email: "", phone: "", message: "",
   });
-  const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [done, setDone]       = useState(false);
+  const [error, setError]     = useState("");
+
+  const update = (key: string, value: string) =>
+    setForm((f) => ({ ...f, [key]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
     setError("");
+    setLoading(true);
+
     try {
-      const adminUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL ?? "http://localhost:3001";
-      const res = await fetch(`${adminUrl}/api/inquiries`, {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone || undefined,
-          inquiry_type: form.inquiry_type,
-          message: form.message,
-          source: "HP",
+          name:        form.name,
+          email:       form.email,
+          phone:       form.phone || undefined,
+          message:     form.message,
+          propertyId:  propertyId || undefined,
+          propertyNo:  propertyNo || undefined,
+          inquiryType: isPrivate ? "PROPERTY" : isProperty ? "PROPERTY" : "GENERAL",
+          token:       token || undefined,
         }),
       });
-      if (!res.ok) throw new Error("送信に失敗しました");
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.error || "送信に失敗しました");
+        return;
+      }
       setDone(true);
     } catch {
-      setError("送信中にエラーが発生しました。お電話にてお問合せください。");
+      setError("通信エラーが発生しました");
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
+  // 完了画面
   if (done) {
     return (
-      <div className="pt-32 pb-20 bg-[#fafaf8] min-h-screen">
-        <div className="container-xl max-w-xl mx-auto text-center">
-          <div className="w-16 h-16 bg-[#e8f0eb] rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              <path d="M6 16l7 7 13-13" stroke="#1a3a2a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+      <div className="min-h-screen flex items-center justify-center px-4"
+        style={{ backgroundColor: "#F8F8F8" }}>
+        <div className="bg-white rounded-2xl p-10 max-w-md w-full text-center shadow-sm border"
+          style={{ borderColor: "#E5E5E5" }}>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            style={{ backgroundColor: "#EBF7EA" }}>
+            <CheckCircle size={32} style={{ color: "#5BAD52" }} />
           </div>
-          <h1 className="font-serif text-2xl font-bold text-[#1c1b18] mb-4">
-            お問合せを受け付けました
+          <h1 className="text-xl font-bold text-gray-800 mb-2">
+            お問い合わせを受け付けました
           </h1>
-          <p className="text-[#706e68] text-sm leading-relaxed mb-8">
-            ご連絡いただきありがとうございます。
-            <br />
-            担当者よりご連絡差し上げますので、今しばらくお待ちください。
+          <p className="text-sm text-gray-500 mb-2 leading-relaxed">
+            ご入力いただいたメールアドレスに確認メールをお送りしました。
           </p>
-          <a
-            href="/"
-            className="inline-block bg-[#1a3a2a] text-white px-8 py-3 rounded-full text-sm font-bold hover:bg-[#2d5a3e] transition-colors"
-          >
-            トップページへ戻る
-          </a>
+          <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+            担当者より営業時間内にご連絡いたします。
+          </p>
+          <div className="space-y-2">
+            <Link href="/"
+              className="flex items-center justify-center w-full py-3 rounded-lg font-bold text-white"
+              style={{ backgroundColor: "#5BAD52" }}>
+              トップページに戻る
+            </Link>
+            {isPrivate && token && (
+              <Link
+                href={`/private-selection?token=${token}`}
+                className="flex items-center justify-center w-full py-3 rounded-lg border text-sm font-medium"
+                style={{ borderColor: "#E5E5E5", color: "#666" }}>
+                非公開物件一覧に戻る
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="pt-28 pb-20 bg-[#fafaf8] min-h-screen">
-      <div className="container-xl">
-        <div className="mb-12 text-center">
-          <p className="text-[#c9a96e] text-xs tracking-[0.3em] mb-2 font-serif">CONTACT</p>
-          <h1 className="font-serif text-3xl font-bold text-[#1c1b18]">お問合せ</h1>
-        </div>
+    <div style={{ backgroundColor: "#F8F8F8", minHeight: "100vh" }}>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
-          {/* 左: 会社情報 */}
-          <div>
-            <h2 className="font-serif text-xl font-bold text-[#1c1b18] mb-8">
-              お気軽にご相談ください
-            </h2>
-            <p className="text-sm text-[#706e68] leading-relaxed mb-10">
-              物件のご相談・売却のご相談など、何でもお気軽にお問合せください。
-              通常1営業日以内にご連絡差し上げます。
-            </p>
+      {/* ページヘッダー */}
+      <div className="bg-white border-b py-8" style={{ borderColor: "#E5E5E5" }}>
+        <div className="container-content">
+          <nav className="text-xs text-gray-400 mb-2 flex items-center gap-1.5">
+            <Link href="/" className="hover:text-gray-600">ホーム</Link>
+            <ChevronRight size={10} />
+            <span className="text-gray-600">
+              {isPrivate ? "非公開物件のお問い合わせ" : "お問い合わせ"}
+            </span>
+          </nav>
 
-            <div className="space-y-7">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#1a3a2a] rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" fill="white"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="font-bold text-[#1c1b18] mb-1">お電話でのお問合せ</div>
-                  <a href="tel:0120-000-000" className="text-2xl font-serif text-[#c9a96e] hover:text-[#b8935a] transition-colors">
-                    0120-000-000
-                  </a>
-                  <div className="text-sm text-[#706e68] mt-1">受付時間: 9:00〜18:00（定休日除く）</div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#1a3a2a] rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="white"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="font-bold text-[#1c1b18] mb-1">所在地</div>
-                  <div className="text-sm text-[#706e68] leading-relaxed">
-                    〒XXX-XXXX<br />
-                    東京都渋谷区千駄ヶ谷X-XX-XX
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#1a3a2a] rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="4" width="18" height="16" rx="2" stroke="white" strokeWidth="1.8"/>
-                    <path d="M3 9h18" stroke="white" strokeWidth="1.8"/>
-                    <path d="M8 2v4M16 2v4" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="font-bold text-[#1c1b18] mb-1">営業時間</div>
-                  <div className="text-sm text-[#706e68]">
-                    9:00〜18:00<br />
-                    定休日: 毎週水曜日・年末年始
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center gap-3">
+            {isPrivate ? (
+              <Lock size={22} style={{ color: "#5BAD52" }} />
+            ) : (
+              <Home size={22} style={{ color: "#5BAD52" }} />
+            )}
+            <h1 className="text-2xl font-bold text-gray-800">
+              {isPrivate
+                ? "非公開物件のお問い合わせ"
+                : isProperty
+                ? "物件のお問い合わせ"
+                : "お問い合わせ"}
+            </h1>
           </div>
 
-          {/* 右: フォーム */}
-          <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-bold text-[#1c1b18] mb-1.5">
-                  お名前 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="山田 太郎"
-                  className="w-full px-4 py-3 border border-[#e8e6e0] rounded-xl text-sm text-[#1c1b18] focus:outline-none focus:border-[#1a3a2a] transition-colors"
-                />
+          {propertyNo && (
+            <p className="text-sm text-gray-500 mt-1">
+              物件番号: <span className="font-medium text-gray-700">{propertyNo}</span>
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="container-content py-8 tb:py-12">
+        <div className="max-w-xl mx-auto">
+
+          {/* 業者お断り注意書き */}
+          <div
+            className="mb-6 p-4 rounded-xl border"
+            style={{ backgroundColor: "#FFFBEB", borderColor: "#F59E0B" }}
+          >
+            <p className="text-xs text-amber-800 leading-relaxed">
+              ⚠️ こちらのフォームは<strong>個人のお客様専用</strong>です。
+              不動産業者・同業者の方からのお問い合わせはお断りしております。
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl border p-6 tb:p-8 shadow-sm"
+            style={{ borderColor: "#E5E5E5" }}>
+
+            <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+              以下のフォームにご入力ください。
+              担当者より<strong>営業時間内（10:00〜18:00）</strong>にご連絡いたします。
+            </p>
+
+            {error && (
+              <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                {error}
               </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+
+              <ContactField
+                label="お名前" required icon={<User size={14} />}
+                type="text" value={form.name} placeholder="山田 太郎"
+                onChange={(v) => update("name", v)}
+              />
+
+              <ContactField
+                label="メールアドレス" required icon={<Mail size={14} />}
+                type="email" value={form.email} placeholder="example@email.com"
+                onChange={(v) => update("email", v)}
+              />
+
+              <ContactField
+                label="電話番号" icon={<Phone size={14} />}
+                type="tel" value={form.phone} placeholder="090-0000-0000"
+                onChange={(v) => update("phone", v)}
+              />
 
               <div>
-                <label className="block text-sm font-bold text-[#1c1b18] mb-1.5">
-                  メールアドレス <span className="text-red-500">*</span>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">
+                  お問い合わせ内容 <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="example@email.com"
-                  className="w-full px-4 py-3 border border-[#e8e6e0] rounded-xl text-sm text-[#1c1b18] focus:outline-none focus:border-[#1a3a2a] transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-[#1c1b18] mb-1.5">
-                  電話番号
-                </label>
-                <input
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="090-0000-0000"
-                  className="w-full px-4 py-3 border border-[#e8e6e0] rounded-xl text-sm text-[#1c1b18] focus:outline-none focus:border-[#1a3a2a] transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-[#1c1b18] mb-1.5">
-                  お問合せ種別 <span className="text-red-500">*</span>
-                </label>
-                <div className="flex gap-4 flex-wrap">
-                  {INQUIRY_TYPES.map((t) => (
-                    <label key={t.value} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="inquiry_type"
-                        value={t.value}
-                        checked={form.inquiry_type === t.value}
-                        onChange={(e) => setForm({ ...form, inquiry_type: e.target.value })}
-                        className="accent-[#1a3a2a]"
-                      />
-                      <span className="text-sm text-[#1c1b18]">{t.label}</span>
-                    </label>
-                  ))}
+                <div className="relative">
+                  <MessageSquare size={14}
+                    className="absolute left-3 top-3 text-gray-400" />
+                  <textarea
+                    value={form.message}
+                    onChange={(e) => update("message", e.target.value)}
+                    placeholder={
+                      isPrivate
+                        ? "非公開物件についてのご質問・ご要望をお書きください"
+                        : isProperty
+                        ? "物件についてのご質問・内覧のご希望等をお書きください"
+                        : "お問い合わせ内容をお書きください"
+                    }
+                    required
+                    rows={5}
+                    className="w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm outline-none
+                               focus:border-felia-green transition-colors resize-none"
+                    style={{ borderColor: "#E5E5E5" }}
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-[#1c1b18] mb-1.5">
-                  メッセージ <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  required
-                  rows={5}
-                  value={form.message}
-                  onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  placeholder="ご質問・ご要望をお書きください"
-                  className="w-full px-4 py-3 border border-[#e8e6e0] rounded-xl text-sm text-[#1c1b18] focus:outline-none focus:border-[#1a3a2a] transition-colors resize-none"
-                />
-              </div>
-
-              {error && (
-                <p className="text-red-500 text-sm bg-red-50 px-4 py-3 rounded-xl">{error}</p>
-              )}
+              <p className="text-xs text-gray-400 leading-relaxed">
+                送信することで
+                <Link href="/privacy" className="underline hover:text-gray-600">
+                  プライバシーポリシー
+                </Link>
+                に同意したものとみなされます。
+              </p>
 
               <button
                 type="submit"
-                disabled={submitting}
-                className="w-full bg-[#c9a96e] text-white py-4 rounded-xl font-bold text-sm hover:bg-[#b8935a] transition-colors disabled:opacity-60"
+                disabled={loading}
+                className="w-full py-3.5 rounded-xl font-bold text-white transition-all
+                           disabled:opacity-50 hover:scale-[1.01]"
+                style={{ backgroundColor: "#5BAD52" }}
               >
-                {submitting ? "送信中..." : "送信する"}
+                {loading ? "送信中..." : "送信する"}
               </button>
-
-              <p className="text-xs text-[#706e68] text-center">
-                送信いただいた個人情報は、お問合せへの回答のみに使用します。
-              </p>
             </form>
+
+            <div className="mt-6 pt-6 border-t text-center" style={{ borderColor: "#F0F0F0" }}>
+              <p className="text-xs text-gray-400 mb-2">お急ぎの方はお電話でどうぞ</p>
+              <a
+                href="tel:03XXXXXXXX"
+                className="font-bold text-lg flex items-center justify-center gap-2"
+                style={{ color: "#5BAD52" }}
+              >
+                <Phone size={18} />
+                03-XXXX-XXXX
+              </a>
+              <p className="text-xs text-gray-400 mt-1">
+                受付時間 10:00〜18:00（水曜定休）
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function ContactField({
+  label, required, icon, type, value, placeholder, onChange,
+}: {
+  label: string; required?: boolean; icon: React.ReactNode;
+  type: string; value: string; placeholder: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-medium text-gray-600 mb-1.5">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{icon}</span>
+        <input
+          type={type} value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder} required={required}
+          className="w-full pl-8 pr-4 py-2.5 border rounded-lg text-sm outline-none
+                     focus:border-felia-green transition-colors"
+          style={{ borderColor: "#E5E5E5" }}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <ContactForm />
+    </Suspense>
   );
 }
