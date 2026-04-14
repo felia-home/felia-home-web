@@ -413,3 +413,42 @@ export async function getMemberInquiries(memberId: string) {
     { next: { revalidate: 0 } }
   );
 }
+
+// 購入希望条件
+export interface MemberProfileData {
+  id?: string;
+  member_id?: string;
+  property_types?: string[];
+  desired_areas?: string[];
+  desired_lines?: string[];
+  budget_max?: number;
+  desired_area_m2_min?: number;
+  desired_layout?: string[];
+  purchase_timing?: string;
+  current_residence?: string;
+  current_rent?: number;
+  lease_expiry?: string;
+  has_property_to_sell?: string;
+  family_structure?: string;
+  children_ages?: string;
+  down_payment?: number;
+  annual_income_range?: string;
+  loan_preapproval?: string;
+  purchase_motivation?: string;
+  priority_points?: string[];
+  other_agents?: string;
+  remarks?: string;
+}
+
+export async function getMemberProfileData(
+  memberId: string
+): Promise<MemberProfileData | null> {
+  try {
+    return await fetchFromAdmin<MemberProfileData>(
+      `/api/members/${memberId}/profile`,
+      { next: { revalidate: 0 } }
+    );
+  } catch {
+    return null;
+  }
+}

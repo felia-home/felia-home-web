@@ -33,6 +33,8 @@ export const config = {
     "/members/mypage/:path*",
     "/members/favorites/:path*",
     "/members/inquiries/:path*",
+    "/members/profile/:path*",
+    "/members/profile",
     "/private-selection/:path*",
   ],
 };
