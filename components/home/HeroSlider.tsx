@@ -45,8 +45,9 @@ export function HeroSlider() {
     <section className="relative w-full overflow-hidden bg-gray-900">
       {/* スライド本体 */}
       <div
-        className="relative w-full"
         style={{
+          position: "relative",
+          width: "100%",
           // PC: 16:5 / SP: 4:3
           paddingBottom: "clamp(75%, calc(75% - (75% - 31.25%) * ((100vw - 375px) / (1200px - 375px))), 31.25%)",
         }}
