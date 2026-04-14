@@ -28,7 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className="bg-white antialiased">
+      <body style={{ backgroundColor: "#ffffff", margin: 0, padding: 0 }}>
         <Providers>
           <Header />
           <main>{children}</main>
