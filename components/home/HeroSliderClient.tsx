@@ -56,34 +56,47 @@ export function HeroSliderClient({ slides }: HeroSliderClientProps) {
   if (total === 0) return null;
 
   return (
-    <section className="relative w-full overflow-hidden bg-gray-900">
-      {/* スライド本体 */}
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          paddingBottom: "clamp(75%, calc(75% - (75% - 31.25%) * ((100vw - 375px) / (1200px - 375px))), 31.25%)",
-        }}
-      >
-        {slides.map((slide, index) => (
-          <SlideItem
-            key={slide.id}
-            slide={slide}
-            isActive={index === current}
-          />
-        ))}
-      </div>
+    <section
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "clamp(280px, 50vw, 600px)",
+        overflow: "hidden",
+        backgroundColor: "#1a1a1a",
+      }}
+    >
+      {/* スライド群 */}
+      {slides.map((slide, index) => (
+        <SlideItem
+          key={slide.id}
+          slide={slide}
+          isActive={index === current}
+        />
+      ))}
 
       {/* 左矢印 */}
       {total > 1 && (
         <button
           onClick={() => handleManual(prev)}
-          className="absolute left-3 tb:left-6 top-1/2 -translate-y-1/2 z-20
-                     w-9 h-9 tb:w-11 tb:h-11 rounded-full bg-white/20 hover:bg-white/40
-                     backdrop-blur-sm flex items-center justify-center transition-colors duration-200"
+          style={{
+            position: "absolute",
+            left: "12px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 20,
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            backgroundColor: "rgba(255,255,255,0.2)",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
           aria-label="前のスライド"
         >
-          <ChevronLeft size={20} className="text-white" strokeWidth={2} />
+          <ChevronLeft size={20} color="white" strokeWidth={2} />
         </button>
       )}
 
@@ -91,28 +104,57 @@ export function HeroSliderClient({ slides }: HeroSliderClientProps) {
       {total > 1 && (
         <button
           onClick={() => handleManual(next)}
-          className="absolute right-3 tb:right-6 top-1/2 -translate-y-1/2 z-20
-                     w-9 h-9 tb:w-11 tb:h-11 rounded-full bg-white/20 hover:bg-white/40
-                     backdrop-blur-sm flex items-center justify-center transition-colors duration-200"
+          style={{
+            position: "absolute",
+            right: "12px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 20,
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            backgroundColor: "rgba(255,255,255,0.2)",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
           aria-label="次のスライド"
         >
-          <ChevronRight size={20} className="text-white" strokeWidth={2} />
+          <ChevronRight size={20} color="white" strokeWidth={2} />
         </button>
       )}
 
       {/* ドットインジケーター */}
       {total > 1 && (
-        <div className="absolute bottom-4 tb:bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        <div
+          style={{
+            position: "absolute",
+            bottom: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 20,
+            display: "flex",
+            gap: "8px",
+          }}
+        >
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => handleManual(() => goTo(index))}
-              className="transition-all duration-300 rounded-full"
               style={{
                 width: index === current ? "24px" : "8px",
                 height: "8px",
+                borderRadius: "4px",
+                border: "none",
+                cursor: "pointer",
                 backgroundColor:
-                  index === current ? "#5BAD52" : "rgba(255,255,255,0.5)",
+                  index === current
+                    ? "#5BAD52"
+                    : "rgba(255,255,255,0.5)",
+                transition: "all 0.3s ease",
+                padding: 0,
               }}
               aria-label={`スライド ${index + 1}`}
             />
@@ -133,8 +175,12 @@ function SlideItem({
 }) {
   return (
     <div
-      className="absolute inset-0 transition-opacity duration-700"
-      style={{ opacity: isActive ? 1 : 0 }}
+      style={{
+        position: "absolute",
+        inset: 0,
+        opacity: isActive ? 1 : 0,
+        transition: "opacity 0.7s ease",
+      }}
     >
       {/* 背景（画像 or グラデーション） */}
       {slide.image ? (
@@ -142,39 +188,59 @@ function SlideItem({
           src={slide.image}
           alt={slide.catchCopy.replace("\n", " ")}
           fill
-          className="object-cover"
+          style={{ objectFit: "cover" }}
           priority
           sizes="100vw"
         />
       ) : (
         <div
-          className="absolute inset-0"
-          style={{ background: slide.gradient }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: slide.gradient,
+          }}
         />
       )}
 
       {/* オーバーレイ */}
-      <div className="absolute inset-0 bg-black/30" />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundColor: "rgba(0,0,0,0.3)",
+        }}
+      />
 
-      {/* キャプション（catchCopy または subCopy がある場合のみ表示） */}
+      {/* キャプション */}
       {(slide.catchCopy || slide.subCopy) && (
-        <div className="absolute inset-0 flex items-center z-10">
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            zIndex: 10,
+          }}
+        >
           <div className="container-content">
             <div
               style={{
                 maxWidth: "512px",
                 opacity: isActive ? 1 : 0,
                 transform: isActive ? "translateY(0)" : "translateY(16px)",
-                transition: "opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s",
+                transition:
+                  "opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s",
               }}
             >
-              {/* キャッチコピー */}
               {slide.catchCopy && (
                 <h1
-                  className="text-white font-bold leading-tight mb-3"
                   style={{
+                    color: "white",
                     fontFamily: "'Noto Sans JP', sans-serif",
                     fontSize: "clamp(22px, 3.5vw, 44px)",
+                    fontWeight: "bold",
+                    lineHeight: 1.3,
+                    marginBottom: "12px",
                     textShadow: "0 2px 8px rgba(0,0,0,0.4)",
                     whiteSpace: "pre-line",
                   }}
@@ -183,12 +249,12 @@ function SlideItem({
                 </h1>
               )}
 
-              {/* サブコピー */}
               {slide.subCopy && (
                 <p
-                  className="text-white/85 mb-6"
                   style={{
+                    color: "rgba(255,255,255,0.85)",
                     fontSize: "clamp(13px, 1.5vw, 17px)",
+                    marginBottom: "24px",
                     textShadow: "0 1px 4px rgba(0,0,0,0.4)",
                   }}
                 >
@@ -196,16 +262,29 @@ function SlideItem({
                 </p>
               )}
 
-              {/* ボタン */}
               {slide.buttonLabel && slide.buttonHref && (
                 <Link
                   href={slide.buttonHref}
-                  target={slide.linkTarget === "_blank" ? "_blank" : undefined}
-                  rel={slide.linkTarget === "_blank" ? "noopener noreferrer" : undefined}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded text-sm font-bold text-white transition-all duration-200 hover:scale-105"
+                  target={
+                    slide.linkTarget === "_blank" ? "_blank" : undefined
+                  }
+                  rel={
+                    slide.linkTarget === "_blank"
+                      ? "noopener noreferrer"
+                      : undefined
+                  }
                   style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "12px 24px",
+                    borderRadius: "6px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    color: "white",
                     backgroundColor: "#5BAD52",
                     boxShadow: "0 4px 12px rgba(91,173,82,0.4)",
+                    textDecoration: "none",
                   }}
                 >
                   {slide.buttonLabel}
