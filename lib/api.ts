@@ -69,6 +69,29 @@ export async function getNewsById(slug: string) {
   return fetchFromAdmin<NewsItem>(`/api/news/${slug}`);
 }
 
+// ---- ヒーローバナー ----
+
+export interface HeroBanner {
+  id: string;
+  title: string;
+  image_url: string;
+  link_url: string | null;
+  link_target: "_self" | "_blank";
+  sort_order: number;
+}
+
+export async function getHeroBanners(): Promise<HeroBanner[]> {
+  try {
+    const res = await fetchFromAdmin<{ banners: HeroBanner[] }>(
+      "/api/hp/hero-banners",
+      { next: { revalidate: 60 } }
+    );
+    return res.banners ?? [];
+  } catch {
+    return [];
+  }
+}
+
 // ---- 特集・バナー（Phase 2） ----
 
 export async function getFeatures() {

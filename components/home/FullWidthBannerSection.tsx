@@ -23,23 +23,20 @@ export async function FullWidthBannerSection() {
 }
 
 function FullWidthBanner({ banner }: { banner: Banner }) {
-  const content = (
-    <div
-      className="relative w-full overflow-hidden"
-      style={{ cursor: banner.href ? "pointer" : "default" }}
-    >
+  const inner = (
+    <div className="relative w-full overflow-hidden" style={{ display: "block" }}>
       <Image
         src={banner.image}
         alt={banner.alt || "バナー"}
         width={1920}
         height={400}
-        className="w-full h-auto object-cover"
+        className="w-full h-auto"
         style={{ display: "block" }}
       />
     </div>
   );
 
-  if (!banner.href) return content;
+  if (!banner.href) return inner;
 
   return (
     <Link
@@ -47,7 +44,7 @@ function FullWidthBanner({ banner }: { banner: Banner }) {
       target={banner.alt === "_blank" ? "_blank" : undefined}
       rel={banner.alt === "_blank" ? "noopener noreferrer" : undefined}
     >
-      {content}
+      {inner}
     </Link>
   );
 }
