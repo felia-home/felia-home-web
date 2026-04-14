@@ -1,4 +1,6 @@
 // app/page.tsx
+export const dynamic = "force-dynamic";
+
 import { HeroSlider } from "@/components/home/HeroSlider";
 import { FeliaSectionSelection } from "@/components/home/FeliaSectionSelection";
 import { RecommendSection } from "@/components/home/RecommendSection";
