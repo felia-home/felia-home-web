@@ -100,7 +100,9 @@ export async function getFeatures() {
 }
 
 export async function getBanners() {
-  const res = await fetchFromAdmin<{ banners: Banner[] }>("/api/hp/banners");
+  const res = await fetchFromAdmin<{ banners: Banner[] }>(
+    "/api/hp/search-banners"
+  );
   return res.banners ?? [];
 }
 

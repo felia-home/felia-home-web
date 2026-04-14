@@ -100,10 +100,11 @@ export async function NewAndNewsSection() {
 
 // 新着物件の1行
 function NewPropertyRow({ property }: { property: Property }) {
-  const date = new Date(property.createdAt).toLocaleDateString("ja-JP", {
-    month: "2-digit",
-    day: "2-digit",
-  });
+  const rawDate = property.createdAt ?? (property as any).created_at ?? "";
+  const dateObj = rawDate ? new Date(rawDate) : null;
+  const date = dateObj && !isNaN(dateObj.getTime())
+    ? dateObj.toLocaleDateString("ja-JP", { month: "2-digit", day: "2-digit" })
+    : "";
 
   return (
     <Link
@@ -129,11 +130,11 @@ function NewPropertyRow({ property }: { property: Property }) {
 
 // お知らせの1行
 function NewsRow({ item }: { item: NewsItem }) {
-  const date = new Date(item.publishedAt).toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  const rawDate = item.publishedAt ?? (item as any).published_at ?? "";
+  const dateObj = rawDate ? new Date(rawDate) : null;
+  const date = dateObj && !isNaN(dateObj.getTime())
+    ? dateObj.toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" })
+    : "";
 
   return (
     <Link
