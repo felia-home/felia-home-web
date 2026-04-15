@@ -2,9 +2,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { SectionTitle } from "@/components/ui/SectionTitle";
-import { tokyoWards } from "@/lib/tokyoMapData";
+import { TokyoWardMap } from "./TokyoWardMap";
 import { Train } from "lucide-react";
 
 const lineGroups = [
@@ -51,45 +50,62 @@ const lineGroups = [
 ];
 
 export function SearchSection() {
-  const router = useRouter();
-
   return (
-    <section className="section-padding" style={{ backgroundColor: "#F8F8F8" }}>
+    <section style={{ padding: "64px 0", backgroundColor: "#F8F8F8" }}>
       <div className="container-content">
         <SectionTitle en="Search" ja="物件検索" />
 
-        <div className="grid grid-cols-1 tb:grid-cols-2 gap-8 tb:gap-12 items-start">
-
+        <div
+          className="grid grid-cols-1 tb:grid-cols-2"
+          style={{ gap: "32px", alignItems: "start" }}
+        >
           {/* 左: SVGクリッカブルマップ */}
           <div>
-            <h3 className="text-sm font-bold text-gray-500 tracking-widest mb-4 text-center">
-              エリアから探す
-            </h3>
-            <TokyoSVGMap onWardClick={(href) => router.push(href)} />
+            <TokyoWardMap />
           </div>
 
           {/* 右: 路線テキストリンク */}
           <div>
-            <h3 className="text-sm font-bold text-gray-500 tracking-widest mb-4 text-center">
+            <p style={{
+              fontSize: "12px", fontWeight: "bold", color: "#999",
+              letterSpacing: "0.1em", marginBottom: "20px", textAlign: "center",
+            }}>
               路線から探す
-            </h3>
-            <div className="space-y-5">
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
               {lineGroups.map((group) => (
                 <div key={group.group}>
-                  <div className="flex items-center gap-2 mb-2">
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
                     <Train size={14} style={{ color: "#5BAD52" }} />
-                    <span className="text-xs font-bold text-gray-400 tracking-widest">
+                    <span style={{
+                      fontSize: "11px", fontWeight: "bold", color: "#999", letterSpacing: "0.1em",
+                    }}>
                       {group.group}
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
                     {group.lines.map((line) => (
                       <Link
                         key={line.name}
                         href={line.href}
-                        className="text-sm px-3 py-1.5 rounded border border-gray-200 text-gray-600
-                                   hover:border-felia-green hover:text-felia-green
-                                   transition-colors duration-200 bg-white"
+                        style={{
+                          fontSize: "13px",
+                          padding: "6px 12px",
+                          borderRadius: "6px",
+                          border: "1px solid #E5E5E5",
+                          color: "#555",
+                          backgroundColor: "white",
+                          textDecoration: "none",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = "#5BAD52";
+                          e.currentTarget.style.color = "#5BAD52";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = "#E5E5E5";
+                          e.currentTarget.style.color = "#555";
+                        }}
                       >
                         {line.name}
                       </Link>
@@ -102,78 +118,5 @@ export function SearchSection() {
         </div>
       </div>
     </section>
-  );
-}
-
-// SVGマップコンポーネント
-function TokyoSVGMap({ onWardClick }: { onWardClick: (href: string) => void }) {
-  return (
-    <div className="relative w-full">
-      <svg
-        viewBox="0 0 500 430"
-        xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-auto"
-        style={{ maxHeight: "420px" }}
-      >
-        {tokyoWards.map((ward) => (
-          <g key={ward.id}>
-            {/* パス（区の形） */}
-            <path
-              d={ward.path}
-              fill={ward.clickable ? "#EBF7EA" : "#EEEEEE"}
-              stroke="#FFFFFF"
-              strokeWidth="1.5"
-              className={ward.clickable ? "cursor-pointer" : "cursor-default"}
-              style={{ transition: "fill 0.2s ease" }}
-              onMouseEnter={(e) => {
-                if (ward.clickable) {
-                  (e.target as SVGPathElement).setAttribute("fill", "#5BAD52");
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (ward.clickable) {
-                  (e.target as SVGPathElement).setAttribute("fill", "#EBF7EA");
-                }
-              }}
-              onClick={() => {
-                if (ward.clickable && ward.href) {
-                  onWardClick(ward.href);
-                }
-              }}
-            />
-
-            {/* 区名ラベル */}
-            <text
-              x={ward.labelX}
-              y={ward.labelY}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill={ward.clickable ? "#333333" : "#AAAAAA"}
-              fontSize="7"
-              fontFamily="'Noto Sans JP', sans-serif"
-              fontWeight={ward.clickable ? "700" : "400"}
-              style={{ pointerEvents: "none", userSelect: "none" }}
-            >
-              {ward.name}
-            </text>
-          </g>
-        ))}
-      </svg>
-
-      {/* 凡例 */}
-      <div className="flex items-center gap-4 mt-3 justify-center text-xs text-gray-500">
-        <span className="flex items-center gap-1.5">
-          <span
-            className="inline-block w-3 h-3 rounded"
-            style={{ backgroundColor: "#EBF7EA", border: "1px solid #5BAD52" }}
-          />
-          対応エリア
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block w-3 h-3 rounded bg-gray-200" />
-          対応エリア外
-        </span>
-      </div>
-    </div>
   );
 }
