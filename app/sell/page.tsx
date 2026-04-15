@@ -235,18 +235,18 @@ export default function SellPage() {
             ))}
           </div>
 
-          {/* 下段3つ（上段4つと同じカラム幅で中央3カラム） */}
+          {/* 上段と同じ4カラムgridを使い、左右に空白を半分ずつ配置 */}
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateColumns: "1fr repeat(3, clamp(130px, 17vw, 165px)) 1fr",
             gap: "20px",
+            justifyItems: "center",
           }}>
-            <div /> {/* 左空白 */}
-            {strengths.slice(4, 7).map((s) => (
-              <div key={s.num} style={{ display: "flex", justifyContent: "center" }}>
-                <StrengthCircle s={s} />
-              </div>
+            <div />
+            {strengths.slice(4).map((s) => (
+              <StrengthCircle key={s.num} s={s} />
             ))}
+            <div />
           </div>
         </div>
       </section>
