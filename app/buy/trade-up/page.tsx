@@ -1,121 +1,13 @@
 // app/buy/trade-up/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronRight, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { ChevronRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "物件の買い替えをお考えの方へ",
   description: "今が買い替えのチャンスです！5つのメリットと弊社の実際のお客様実例をご紹介します。",
 };
-
-// 実例コンポーネント
-function CaseStudy({
-  tag, title, client, voice, sellYear, sellType,
-  sellPrice, sellArea, sellLayout, sellMonthly, sellMonthlyBreakdown,
-  soldPrice, soldYear, soldNet,
-  buyTitle, buyPrice, buyArea, buyAreaM2, buyLayout,
-  buyLoan, buyMonthly, buyNote,
-  beforeMonthly, beforeArea, beforeLayout,
-  afterMonthly, afterArea, afterLayout, arrowLabel,
-  result,
-}: any) {
-  return (
-    <div style={{ marginBottom: "64px" }}>
-      {/* タグ */}
-      <p style={{ fontSize: "12px", color: "#5BAD52", fontWeight: "bold", marginBottom: "6px" }}>
-        {tag}
-      </p>
-      <h3 style={{ fontSize: "clamp(16px, 2vw, 20px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "4px" }}>
-        {title}　<span style={{ fontWeight: "normal", fontSize: "14px", color: "#888" }}>{client}</span>
-      </h3>
-      <p style={{ fontSize: "13px", color: "#666", marginBottom: "24px" }}>「{voice}」</p>
-
-      {/* 1. 売却物件 */}
-      <p style={{ fontSize: "13px", fontWeight: "bold", color: "#5BAD52", marginBottom: "8px", textAlign: "center" }}>
-        1．売却物件
-      </p>
-      <p style={{ fontSize: "14px", fontWeight: "bold", color: "#333", marginBottom: "12px", textAlign: "center" }}>
-        {sellYear}年築　{sellType}
-      </p>
-      <div style={{ backgroundColor: "#F8F8F8", borderRadius: "8px", padding: "20px", marginBottom: "8px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "16px", alignItems: "start" }}
-          className="grid-cols-1 tb:grid-cols-[1fr_auto]">
-          <div>
-            <p style={{ fontWeight: "bold", fontSize: "15px", color: "#333", marginBottom: "4px" }}>購入価格 {sellPrice}万円</p>
-            <p style={{ fontSize: "12px", color: "#5BAD52", fontWeight: "bold", marginBottom: "8px" }}>専有面積 {sellArea}㎡（{sellLayout}）</p>
-            {sellMonthlyBreakdown.map((item: string, i: number) => (
-              <p key={i} style={{ fontSize: "12px", color: "#666", lineHeight: 1.8 }}>・{item}</p>
-            ))}
-            <p style={{ fontWeight: "bold", fontSize: "14px", color: "#333", marginTop: "8px", borderTop: "1px solid #E0E0E0", paddingTop: "8px" }}>
-              合計 {sellMonthly}万円／月
-            </p>
-          </div>
-          <div style={{ textAlign: "center" }}>
-            <div style={{
-              backgroundColor: "#5BAD52", color: "white", fontSize: "12px",
-              fontWeight: "bold", padding: "6px 16px", borderRadius: "4px", marginBottom: "8px",
-            }}>売却</div>
-            <ArrowRight size={24} style={{ color: "#5BAD52", display: "block", margin: "0 auto 8px" }} />
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#333" }}>成約価格 {soldPrice}万円</p>
-            <p style={{ fontSize: "11px", color: "#888" }}>{soldYear}</p>
-            <div style={{ fontSize: "11px", color: "#666", margin: "8px 0", lineHeight: 1.6 }}>
-              残債返済<br />仲介手数料支払い
-            </div>
-            <div style={{
-              backgroundColor: "#E8F0E8", borderRadius: "6px", padding: "8px 12px",
-              fontSize: "13px", fontWeight: "bold", color: "#2d5a2d",
-            }}>
-              手残資金 約{soldNet}万円
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. 購入物件 */}
-      <p style={{ fontSize: "13px", fontWeight: "bold", color: "#5BAD52", margin: "20px 0 8px", textAlign: "center" }}>
-        2．購入物件
-      </p>
-      <p style={{ fontSize: "14px", fontWeight: "bold", color: "#333", marginBottom: "12px", textAlign: "center" }}>
-        {buyTitle}
-      </p>
-      <div style={{ backgroundColor: "#F8F8F8", borderRadius: "8px", padding: "20px", marginBottom: "8px" }}>
-        <p style={{ fontWeight: "bold", fontSize: "15px", color: "#333", marginBottom: "4px" }}>価格 {buyPrice}万円</p>
-        <p style={{ fontSize: "12px", color: "#666", marginBottom: "4px" }}>土地面積 {buyArea}㎡</p>
-        <p style={{ fontSize: "12px", color: "#5BAD52", fontWeight: "bold", marginBottom: "8px" }}>建物面積 {buyAreaM2}㎡（{buyLayout}）</p>
-        <p style={{ fontSize: "13px", color: "#666" }}>ローン金額 {buyLoan}万円</p>
-        <p style={{ fontWeight: "bold", fontSize: "14px", color: "#333", marginTop: "4px" }}>住宅ローン返済 {buyMonthly}万円／月</p>
-        {buyNote && <p style={{ fontSize: "11px", color: "#888", marginTop: "4px" }}>※{buyNote}</p>}
-      </div>
-
-      {/* 3. 結果 */}
-      <p style={{ fontSize: "13px", fontWeight: "bold", color: "#5BAD52", margin: "20px 0 12px", textAlign: "center" }}>
-        3．結果
-      </p>
-      <div style={{ backgroundColor: "#F0F5F0", borderRadius: "8px", padding: "20px", textAlign: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
-          <div style={{ border: "1px solid #ccc", borderRadius: "4px", padding: "10px 16px", backgroundColor: "white" }}>
-            <p style={{ fontSize: "11px", color: "#888", marginBottom: "2px" }}>{sellYear}年築{sellType}</p>
-            <p style={{ fontSize: "14px", fontWeight: "bold" }}>合計 {sellMonthly}万円／月</p>
-            <p style={{ fontSize: "11px", color: "#666" }}>{sellArea}㎡　{sellLayout}</p>
-          </div>
-          <div style={{ textAlign: "center" }}>
-            {arrowLabel && <p style={{ fontSize: "11px", color: "#5BAD52", fontWeight: "bold" }}>{arrowLabel}</p>}
-            <div style={{ fontSize: "24px", color: "#5BAD52" }}>→</div>
-            <p style={{ fontSize: "11px", color: "#5BAD52", fontWeight: "bold" }}>広い</p>
-          </div>
-          <div style={{ border: "2px solid #5BAD52", borderRadius: "4px", padding: "10px 16px", backgroundColor: "white" }}>
-            <p style={{ fontSize: "11px", color: "#888", marginBottom: "2px" }}>{buyTitle}</p>
-            <p style={{ fontSize: "14px", fontWeight: "bold" }}>{buyMonthly}万円／月</p>
-            <p style={{ fontSize: "11px", color: "#666" }}>{buyAreaM2}㎡　{buyLayout}</p>
-          </div>
-        </div>
-        <p style={{ fontSize: "clamp(14px, 1.8vw, 17px)", fontWeight: "bold", color: "#2d5a2d", lineHeight: 1.7, whiteSpace: "pre-line" }}>
-          {result}
-        </p>
-      </div>
-    </div>
-  );
-}
 
 export default function TradeUpPage() {
   const merits = [
@@ -146,6 +38,90 @@ export default function TradeUpPage() {
     },
   ];
 
+  const cases = [
+    {
+      tag: "3,000万円の特別控除を利用",
+      title: "月々の支払いが安くなり、建物は広くなったケース",
+      client: "品川区在住K様",
+      voice: "現在5人家族、以前のマンションだと狭いため広いお家を探しておりました",
+      sellImg: "case011",
+      buyImg: "case012",
+      sell: {
+        year: 2015, type: "中古マンション",
+        price: 5580, area: 67, layout: "3LDK",
+        monthly: 19.5,
+        breakdown: ["住宅ローン返済 14万円／月", "管理費等 3万円／月", "駐車場代 2.5万円／月"],
+        soldPrice: 7580, soldYear: "2024年 築9年", soldNet: 3000,
+      },
+      buy: {
+        title: "品川区内新築戸建て",
+        price: "9,700", area: 60, areaM2: 100, layout: "4LDK＋車庫",
+        loan: 7200, monthly: 18.2,
+        note: "手残資金から一部（2,500万円）充当",
+      },
+      result: {
+        beforeMonthly: 19.5, beforeArea: 67, beforeLayout: "3LDK",
+        afterMonthly: 18.2, afterArea: 100, afterLayout: "4LDK＋車庫",
+        arrowLabel: "安い",
+        text: "月々の支払いは安く、広いお家に買い替えることができました。",
+      },
+    },
+    {
+      tag: "3,000万円の特別控除を利用",
+      title: "月々の支払いが安くなり、建物は広くなったケース",
+      client: "文京区在住T様",
+      voice: "子どもが産まれ、以前の住まいが手狭になったため買い替えを考えておりました",
+      sellImg: "case021",
+      buyImg: "case022",
+      sell: {
+        year: 2018, type: "中古マンション",
+        price: 7450, area: 57, layout: "2LDK",
+        monthly: 21.4,
+        breakdown: ["住宅ローン返済 19万円／月", "管理費等 2.4万円／月"],
+        soldPrice: 11900, soldYear: "2024年 築6年", soldNet: 4000,
+      },
+      buy: {
+        title: "文京区内土地",
+        price: "土地7,480万円 ＋ 建物3,300万円", area: 50, areaM2: 90, layout: "3LDK",
+        loan: 7480, monthly: 19,
+        note: "手残資金から一部（3,300万円）充当",
+      },
+      result: {
+        beforeMonthly: 21.4, beforeArea: 57, beforeLayout: "2LDK",
+        afterMonthly: 19, afterArea: 90, afterLayout: "3LDK",
+        arrowLabel: "安い",
+        text: "月々の支払いは安く、広いお家に買い替えることができました。",
+      },
+    },
+    {
+      tag: "住宅ローン控除を利用",
+      title: "月々の支払いは大きく増えずに、建物が広くなり、手持ち資金もできたケース",
+      client: "杉並区在住A様",
+      voice: "3人の子どもの成長に伴い、手狭になったため買い替えを希望しておりました",
+      sellImg: "case031",
+      buyImg: "case032",
+      sell: {
+        year: 2017, type: "中古マンション",
+        price: 6600, area: 68, layout: "3LDK",
+        monthly: 21.8,
+        breakdown: ["住宅ローン返済 17万円／月", "管理費等 2.7万円／月", "駐車場代 2.1万円／月"],
+        soldPrice: 7580, soldYear: "2023年 築6年", soldNet: 1500,
+      },
+      buy: {
+        title: "杉並区内新築戸建て",
+        price: "8,980", area: 60, areaM2: 110, layout: "3LDK",
+        loan: 8980, monthly: 23,
+        note: "住宅ローン控除を利用",
+      },
+      result: {
+        beforeMonthly: 21.8, beforeArea: 68, beforeLayout: "3LDK",
+        afterMonthly: 23, afterArea: 110, afterLayout: "3LDK",
+        arrowLabel: "+約1万円",
+        text: "月々の支払いは大きく増やさずに広いお家に買い替えることができ、\n手持ち資金を1,500万円つくることができました。\nさらに13年間のローン控除の恩恵も受けることができています。",
+      },
+    },
+  ];
+
   return (
     <div style={{ backgroundColor: "#ffffff" }}>
 
@@ -161,41 +137,42 @@ export default function TradeUpPage() {
       </div>
 
       {/* タイトル */}
-      <div className="container-content" style={{ padding: "32px 0 24px" }}>
+      <div className="container-content" style={{ padding: "24px 0 0" }}>
         <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", fontFamily: "'Noto Serif JP', serif" }}>
           物件の買い替えをお考えの方へ
         </h1>
       </div>
 
-      {/* ヒーロー画像 */}
-      <div className="container-content" style={{ paddingBottom: "48px" }}>
-        <div style={{
-          width: "100%", height: "clamp(200px, 35vw, 360px)", borderRadius: "8px",
-          background: "linear-gradient(135deg, #2d5a2d, #5BAD52)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>ヒーロー画像</p>
-        </div>
+      {/* ヒーロー画像（フルワイド） */}
+      <div style={{ position: "relative", width: "100%", height: "clamp(240px, 40vw, 460px)", overflow: "hidden", marginTop: "24px" }}>
+        <Image
+          src="/images/buy/trade-up/trade-uphero.jpg"
+          alt="物件の買い替えをお考えの方へ"
+          fill
+          style={{ objectFit: "cover", objectPosition: "center" }}
+          priority
+          sizes="100vw"
+        />
       </div>
 
       {/* 今が買い替えのチャンス */}
-      <section style={{ padding: "0 0 64px" }}>
+      <section style={{ padding: "56px 0 0" }}>
         <div className="container-content">
-          <p style={{ fontSize: "13px", color: "#5BAD52", fontWeight: "bold", marginBottom: "8px" }}>
+          <p style={{ fontSize: "13px", color: "#5BAD52", fontWeight: "bold", marginBottom: "6px" }}>
             買い替えのメリット多数アリ！
           </p>
-          <h2 style={{ fontSize: "clamp(20px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "32px", fontFamily: "'Noto Serif JP', serif" }}>
+          <h2 style={{ fontSize: "clamp(20px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "40px", fontFamily: "'Noto Serif JP', serif" }}>
             今が買い替えのチャンスです!!
           </h2>
 
           {/* 現在の不動産市場 */}
-          <h3 style={{ fontSize: "16px", fontWeight: "bold", color: "#1a1a1a", marginBottom: "16px" }}>
+          <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "#1a1a1a", marginBottom: "20px" }}>
             現在の不動産市場
           </h3>
-          <div style={{ display: "grid", gap: "24px", marginBottom: "48px" }}
-            className="grid-cols-1 tb:grid-cols-[200px_1fr]">
-            <div style={{ width: "100%", maxWidth: "200px", aspectRatio: "4/3", borderRadius: "8px", backgroundColor: "#E8F0E8", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: "11px", color: "#aaa" }}>写真</span>
+          <div style={{ display: "grid", gap: "24px", marginBottom: "56px" }}
+            className="grid-cols-1 tb:grid-cols-[220px_1fr]">
+            <div style={{ position: "relative", width: "100%", maxWidth: "220px", aspectRatio: "4/3", borderRadius: "8px", overflow: "hidden" }}>
+              <Image src="/images/buy/trade-up/img01.jpg" alt="不動産市場" fill style={{ objectFit: "cover" }} sizes="220px" />
             </div>
             <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.9 }}>
               2008年、米投資銀行の経営破綻に端を発し、世界的な金融危機・不況に発展しました。その後、横ばいだった日本の不動産市場は、2002年以降日本とアメリカの金利に寄り添んだ円安、それにより活性化した海外投資家の資金流入により、日本の不動産は現在に至るまで上がり続けております。都市部と郊外の二極化が叫ばれておりますが、都市部の地価は依然低堅い状態が継続しております。
@@ -206,162 +183,150 @@ export default function TradeUpPage() {
           <h3 style={{ fontSize: "20px", fontWeight: "bold", color: "#1a1a1a", marginBottom: "24px", fontFamily: "'Noto Serif JP', serif" }}>
             5つのメリット
           </h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "16px" }}
+          <div style={{ display: "grid", gap: "16px", marginBottom: "16px" }}
             className="grid-cols-1 tb:grid-cols-3">
             {merits.slice(0, 3).map((m) => (
               <div key={m.title} style={{ backgroundColor: "#F0F5F0", borderRadius: "8px", padding: "20px" }}>
                 <p style={{ fontWeight: "bold", fontSize: "15px", color: "#2d5a2d", marginBottom: "4px" }}>{m.title}</p>
-                {m.sub && <p style={{ fontSize: "12px", color: "#5BAD52", marginBottom: "8px" }}>{m.sub}</p>}
+                {m.sub && <p style={{ fontSize: "11px", color: "#5BAD52", marginBottom: "8px" }}>{m.sub}</p>}
                 <p style={{ fontSize: "12px", color: "#555", lineHeight: 1.8 }}>{m.text}</p>
               </div>
             ))}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}
+          <div style={{ display: "grid", gap: "16px", marginBottom: "56px" }}
             className="grid-cols-1 tb:grid-cols-3">
             {merits.slice(3, 5).map((m) => (
               <div key={m.title} style={{ backgroundColor: "#F0F5F0", borderRadius: "8px", padding: "20px" }}>
                 <p style={{ fontWeight: "bold", fontSize: "15px", color: "#2d5a2d", marginBottom: "4px" }}>{m.title}</p>
-                {m.sub && <p style={{ fontSize: "12px", color: "#5BAD52", marginBottom: "8px" }}>{m.sub}</p>}
+                {m.sub && <p style={{ fontSize: "11px", color: "#5BAD52", marginBottom: "8px" }}>{m.sub}</p>}
                 <p style={{ fontSize: "12px", color: "#555", lineHeight: 1.8 }}>{m.text}</p>
               </div>
             ))}
-            <div style={{ backgroundColor: "#F0F5F0", borderRadius: "8px", padding: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: "11px", color: "#aaa" }}>家のイメージ図</span>
+            <div style={{ position: "relative", borderRadius: "8px", overflow: "hidden", aspectRatio: "4/3" }}>
+              <Image src="/images/buy/trade-up/img02.jpg" alt="住宅イメージ" fill style={{ objectFit: "cover" }} sizes="33vw" />
             </div>
           </div>
         </div>
       </section>
 
       {/* 弊社のお客様実例 */}
-      <section style={{ padding: "64px 0", backgroundColor: "#F8F8F8" }}>
+      <section style={{ padding: "56px 0", backgroundColor: "#F8F8F8" }}>
         <div className="container-content">
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "48px", fontFamily: "'Noto Serif JP', serif" }}>
             弊社のお客様実例
           </h2>
 
-          {/* 実例1 */}
-          <CaseStudy
-            tag="3,000万円の特別控除を利用"
-            title="月々の支払いが安くなり、建物は広くなったケース"
-            client="品川区在住K様"
-            voice="現在5人家族、以前のマンションだと狭いため広いお家を探しておりました"
-            sellYear={2015}
-            sellType="中古マンション"
-            sellPrice={5580}
-            sellArea={67}
-            sellLayout="3LDK"
-            sellMonthly={19.5}
-            sellMonthlyBreakdown={["住宅ローン返済 14万円／月", "管理費等 3万円／月", "駐車場代 2.5万円／月"]}
-            soldPrice={7580}
-            soldYear="2024年 築9年"
-            soldNet={3000}
-            buyTitle="品川区内新築戸建て"
-            buyPrice={9700}
-            buyArea={60}
-            buyAreaM2={100}
-            buyLayout="4LDK＋車庫"
-            buyLoan={7200}
-            buyMonthly={18.2}
-            buyNote="手残資金から一部（2,500万円）充当"
-            beforeMonthly={19.5}
-            beforeArea={67}
-            beforeLayout="3LDK"
-            afterMonthly={18.2}
-            afterArea={100}
-            afterLayout="4LDK＋車庫"
-            arrowLabel="安い"
-            result="月々の支払いは安く、広いお家に買い替えることができました。"
-          />
+          {cases.map((c, ci) => (
+            <div key={ci} style={{ marginBottom: ci < cases.length - 1 ? "64px" : 0 }}>
+              <p style={{ fontSize: "12px", color: "#5BAD52", fontWeight: "bold", marginBottom: "4px" }}>{c.tag}</p>
+              <h3 style={{ fontSize: "clamp(15px, 2vw, 19px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "4px" }}>
+                {c.title}　<span style={{ fontWeight: "normal", fontSize: "13px", color: "#888" }}>{c.client}</span>
+              </h3>
+              <p style={{ fontSize: "13px", color: "#666", marginBottom: "24px" }}>「{c.voice}」</p>
 
-          {/* 実例2 */}
-          <CaseStudy
-            tag="3,000万円の特別控除を利用"
-            title="月々の支払いが安くなり、建物は広くなったケース"
-            client="文京区在住T様"
-            voice="子どもが産まれ、以前の住まいが手狭になったため買い替えを考えておりました"
-            sellYear={2018}
-            sellType="中古マンション"
-            sellPrice={7450}
-            sellArea={57}
-            sellLayout="2LDK"
-            sellMonthly={21.4}
-            sellMonthlyBreakdown={["住宅ローン返済 19万円／月", "管理費等 2.4万円／月"]}
-            soldPrice={11900}
-            soldYear="2024年 築6年"
-            soldNet={4000}
-            buyTitle="文京区内土地"
-            buyPrice="土地7,480万円 ＋ 建物3,300万円"
-            buyArea={50}
-            buyAreaM2={90}
-            buyLayout="3LDK"
-            buyLoan={7480}
-            buyMonthly={19}
-            buyNote="手残資金から一部（3,300万円）充当"
-            beforeMonthly={21.4}
-            beforeArea={57}
-            beforeLayout="2LDK"
-            afterMonthly={19}
-            afterArea={90}
-            afterLayout="3LDK"
-            arrowLabel="安い"
-            result="月々の支払いは安く、広いお家に買い替えることができました。"
-          />
+              {/* 1. 売却物件 */}
+              <p style={{ fontSize: "13px", fontWeight: "bold", color: "#666", textAlign: "center", marginBottom: "8px" }}>1．売却物件</p>
+              <p style={{ fontSize: "14px", fontWeight: "bold", color: "#333", textAlign: "center", marginBottom: "16px" }}>
+                {c.sell.year}年築　{c.sell.type}
+              </p>
+              <div style={{ backgroundColor: "white", borderRadius: "8px", padding: "20px", marginBottom: "24px", border: "1px solid #E5E5E5" }}>
+                <div style={{ display: "grid", gap: "16px" }}
+                  className="grid-cols-1 tb:grid-cols-[180px_1fr]">
+                  <div style={{ position: "relative", width: "100%", maxWidth: "180px", aspectRatio: "4/3", borderRadius: "6px", overflow: "hidden" }}>
+                    <Image src={`/images/buy/trade-up/${c.sellImg}.jpg`} alt="売却物件" fill style={{ objectFit: "cover" }} sizes="180px" />
+                  </div>
+                  <div style={{ display: "grid", gap: "12px" }}
+                    className="grid-cols-1 tb:grid-cols-[1fr_auto]">
+                    <div>
+                      <p style={{ fontWeight: "bold", fontSize: "15px", color: "#333" }}>購入価格 {c.sell.price.toLocaleString()}万円</p>
+                      <p style={{ fontSize: "12px", color: "#5BAD52", fontWeight: "bold", margin: "4px 0 8px" }}>専有面積 {c.sell.area}㎡（{c.sell.layout}）</p>
+                      {c.sell.breakdown.map((b, i) => (
+                        <p key={i} style={{ fontSize: "12px", color: "#666" }}>・{b}</p>
+                      ))}
+                      <p style={{ fontWeight: "bold", fontSize: "14px", color: "#333", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid #E5E5E5" }}>
+                        合計 {c.sell.monthly}万円／月
+                      </p>
+                    </div>
+                    <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                      <div style={{ backgroundColor: "#5BAD52", color: "white", fontSize: "11px", fontWeight: "bold", padding: "4px 12px", borderRadius: "4px" }}>売却</div>
+                      <div style={{ fontSize: "24px", color: "#5BAD52" }}>→</div>
+                      <p style={{ fontSize: "13px", fontWeight: "bold", color: "#333" }}>成約価格 {c.sell.soldPrice.toLocaleString()}万円</p>
+                      <p style={{ fontSize: "11px", color: "#888" }}>{c.sell.soldYear}</p>
+                      <div style={{ backgroundColor: "#EBF7EA", borderRadius: "6px", padding: "8px 12px", fontSize: "12px", fontWeight: "bold", color: "#2d5a2d" }}>
+                        手残資金 約{c.sell.soldNet.toLocaleString()}万円
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-          {/* 実例3 */}
-          <CaseStudy
-            tag="住宅ローン控除を利用"
-            title="月々の支払いは大きく増えずに、建物が広くなり、手持ち資金もできたケース"
-            client="杉並区在住A様"
-            voice="3人の子どもの成長に伴い、手狭になったため買い替えを希望しておりました"
-            sellYear={2017}
-            sellType="中古マンション"
-            sellPrice={6600}
-            sellArea={68}
-            sellLayout="3LDK"
-            sellMonthly={21.8}
-            sellMonthlyBreakdown={["住宅ローン返済 17万円／月", "管理費等 2.7万円／月", "駐車場代 2.1万円／月"]}
-            soldPrice={7580}
-            soldYear="2023年 築6年"
-            soldNet={1500}
-            buyTitle="杉並区内新築戸建て"
-            buyPrice={8980}
-            buyArea={60}
-            buyAreaM2={110}
-            buyLayout="3LDK"
-            buyLoan={8980}
-            buyMonthly={23}
-            buyNote="住宅ローン控除を利用"
-            beforeMonthly={21.8}
-            beforeArea={68}
-            beforeLayout="3LDK"
-            afterMonthly={23}
-            afterArea={110}
-            afterLayout="3LDK"
-            arrowLabel="+約1万円"
-            result={"月々の支払いは大きく増やさずに広いお家に買い替えることができ、\n手持ち資金を1,500万円つくることができました。\nさらに13年間のローン控除の恩恵も受けることができています。"}
-          />
+              {/* 2. 購入物件 */}
+              <p style={{ fontSize: "13px", fontWeight: "bold", color: "#666", textAlign: "center", marginBottom: "8px" }}>2．購入物件</p>
+              <p style={{ fontSize: "14px", fontWeight: "bold", color: "#333", textAlign: "center", marginBottom: "16px" }}>{c.buy.title}</p>
+              <div style={{ backgroundColor: "white", borderRadius: "8px", padding: "20px", marginBottom: "24px", border: "1px solid #E5E5E5" }}>
+                <div style={{ display: "grid", gap: "16px" }}
+                  className="grid-cols-1 tb:grid-cols-[1fr_180px]">
+                  <div>
+                    <p style={{ fontWeight: "bold", fontSize: "15px", color: "#333" }}>価格 {c.buy.price}万円</p>
+                    <p style={{ fontSize: "12px", color: "#666", margin: "4px 0" }}>土地面積 {c.buy.area}㎡</p>
+                    <p style={{ fontSize: "12px", color: "#5BAD52", fontWeight: "bold", marginBottom: "8px" }}>建物面積 {c.buy.areaM2}㎡（{c.buy.layout}）</p>
+                    <div style={{ backgroundColor: "#EBF7EA", borderRadius: "6px", padding: "8px 12px", display: "inline-block", marginBottom: "8px" }}>
+                      <p style={{ fontSize: "11px", color: "#2d5a2d" }}>↓ {c.buy.note}</p>
+                    </div>
+                    <p style={{ fontSize: "13px", color: "#555" }}>ローン金額 {c.buy.loan.toLocaleString()}万円</p>
+                    <p style={{ fontWeight: "bold", fontSize: "14px", color: "#333", marginTop: "4px" }}>住宅ローン返済 {c.buy.monthly}万円／月</p>
+                  </div>
+                  <div style={{ position: "relative", width: "100%", maxWidth: "180px", aspectRatio: "4/3", borderRadius: "6px", overflow: "hidden" }}>
+                    <Image src={`/images/buy/trade-up/${c.buyImg}.jpg`} alt="購入物件" fill style={{ objectFit: "cover" }} sizes="180px" />
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. 結果 */}
+              <p style={{ fontSize: "13px", fontWeight: "bold", color: "#666", textAlign: "center", marginBottom: "16px" }}>3．結果</p>
+              <div style={{ backgroundColor: "#F0F5F0", borderRadius: "8px", padding: "24px", textAlign: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", marginBottom: "16px" }}>
+                  <div style={{ border: "1px solid #ccc", borderRadius: "4px", padding: "10px 20px", backgroundColor: "white", textAlign: "center" }}>
+                    <p style={{ fontSize: "11px", color: "#888", marginBottom: "2px" }}>{c.sell.year}年築{c.sell.type}</p>
+                    <p style={{ fontSize: "14px", fontWeight: "bold" }}>合計 {c.result.beforeMonthly}万円／月</p>
+                    <p style={{ fontSize: "11px", color: "#666" }}>{c.result.beforeArea}㎡　{c.result.beforeLayout}</p>
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    <p style={{ fontSize: "11px", color: "#5BAD52", fontWeight: "bold" }}>{c.result.arrowLabel}</p>
+                    <div style={{ fontSize: "28px", color: "#5BAD52" }}>→</div>
+                    <p style={{ fontSize: "11px", color: "#5BAD52", fontWeight: "bold" }}>広い</p>
+                  </div>
+                  <div style={{ border: "2px solid #5BAD52", borderRadius: "4px", padding: "10px 20px", backgroundColor: "white", textAlign: "center" }}>
+                    <p style={{ fontSize: "11px", color: "#888", marginBottom: "2px" }}>{c.buy.title}</p>
+                    <p style={{ fontSize: "14px", fontWeight: "bold" }}>{c.result.afterMonthly}万円／月</p>
+                    <p style={{ fontSize: "11px", color: "#666" }}>{c.result.afterArea}㎡　{c.result.afterLayout}</p>
+                  </div>
+                </div>
+                <p style={{ fontSize: "clamp(13px, 1.8vw, 16px)", fontWeight: "bold", color: "#2d5a2d", lineHeight: 1.8, whiteSpace: "pre-line" }}>
+                  {c.result.text}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* CTA */}
-      <section style={{ padding: "64px 0" }}>
+      <section style={{ padding: "56px 0" }}>
         <div className="container-content" style={{ maxWidth: "640px", margin: "0 auto", textAlign: "center" }}>
-          <h2 style={{ fontSize: "clamp(16px, 2.5vw, 22px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "16px", fontFamily: "'Noto Serif JP', serif" }}>
+          <h2 style={{ fontSize: "clamp(15px, 2vw, 20px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "16px", fontFamily: "'Noto Serif JP', serif" }}>
             現在のご自宅からの買い替えにメリットがあるのか、まずはお気軽にご相談を！
           </h2>
           <p style={{ fontSize: "13px", color: "#666", lineHeight: 1.9, marginBottom: "32px" }}>
             フェリアホームでは買い替えのご相談も無料で承っております。<br />
             今買い替えを考えている方、買い替えを考え始めた方、まずはお気軽にお問い合わせください。
           </p>
-          <Link
-            href="/contact"
-            style={{
-              display: "inline-flex", alignItems: "center", justifyContent: "center",
-              padding: "16px 40px", border: "2px solid #4a8a8a", borderRadius: "4px",
-              color: "#4a8a8a", fontWeight: "bold", fontSize: "15px",
-              textDecoration: "none",
-            }}
-          >
+          <Link href="/contact" style={{
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            padding: "16px 40px", border: "2px solid #4a8a8a",
+            borderRadius: "4px", color: "#4a8a8a",
+            fontWeight: "bold", fontSize: "15px", textDecoration: "none",
+          }}>
             買い替えに関するご相談はこちらから
           </Link>
         </div>
