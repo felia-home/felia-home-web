@@ -15,7 +15,7 @@ export async function HeroSlider() {
         id: banner.id,
         image: banner.image_url,
         gradient: undefined,
-        catchCopy: banner.title,
+        catchCopy: "",
         subCopy: "",
         buttonLabel: undefined as string | undefined,
         buttonHref: banner.link_url ?? undefined,

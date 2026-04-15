@@ -211,6 +211,17 @@ function SlideItem({
         }}
       />
 
+      {/* 画像全体リンク（link_url がある場合） */}
+      {slide.buttonHref && (
+        <Link
+          href={slide.buttonHref}
+          target={slide.linkTarget === "_blank" ? "_blank" : undefined}
+          rel={slide.linkTarget === "_blank" ? "noopener noreferrer" : undefined}
+          style={{ position: "absolute", inset: 0, zIndex: 5 }}
+          aria-label={slide.catchCopy || "バナーリンク"}
+        />
+      )}
+
       {/* キャプション */}
       {(slide.catchCopy || slide.subCopy) && (
         <div
