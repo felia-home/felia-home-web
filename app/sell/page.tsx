@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import { SellFAQ } from "@/components/sell/SellFAQ";
+import { SellNav } from "@/components/sell/SellNav";
 
 export const metadata: Metadata = {
   title: "不動産売却について",
@@ -44,6 +45,27 @@ function MediateTable() {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function StrengthCircle({ s }: { s: { num: string; text: string } }) {
+  return (
+    <div style={{
+      width: "clamp(130px, 17vw, 165px)",
+      height: "clamp(130px, 17vw, 165px)",
+      borderRadius: "50%",
+      backgroundColor: "#4a8a8a",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+      padding: "14px",
+    }}>
+      <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "8px", letterSpacing: "0.15em" }}>Strong Point</p>
+      <p style={{ color: "white", fontSize: "20px", fontWeight: "bold", fontFamily: "'Montserrat', sans-serif", margin: "1px 0" }}>{s.num}</p>
+      <p style={{ color: "white", fontSize: "9.5px", lineHeight: 1.5, whiteSpace: "pre-line" }}>{s.text}</p>
     </div>
   );
 }
@@ -178,123 +200,51 @@ export default function SellPage() {
         </h1>
       </div>
 
-      {/* ヒーロー画像 */}
-      <div className="container-content" style={{ paddingBottom: "0" }}>
-        <div style={{ position: "relative", width: "100%", height: "clamp(240px, 35vw, 400px)", borderRadius: "8px", overflow: "hidden" }}>
-          <Image
-            src="/images/sell/sellhero.jpg"
-            alt="不動産売却について"
-            fill
-            style={{ objectFit: "cover" }}
-            priority
-            sizes="100vw"
-          />
-        </div>
+      {/* ヒーロー画像（フルワイド） */}
+      <div style={{ position: "relative", width: "100%", height: "clamp(280px, 45vw, 520px)", overflow: "hidden" }}>
+        <Image
+          src="/images/sell/sellhero.jpg"
+          alt="不動産売却について"
+          fill
+          style={{ objectFit: "cover", objectPosition: "center" }}
+          priority
+          sizes="100vw"
+        />
       </div>
 
       {/* ページ内ナビ */}
-      <div style={{ backgroundColor: "#efefef", borderTop: "1px solid #ddd", borderBottom: "1px solid #ddd" }}>
-        <div className="container-content">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
-            {[
-              { label: "不動産売却の\n7つの強み", href: "#strengths" },
-              { label: "不動産売却の流れ", href: "#flow" },
-              { label: "「仲介」と\n「買取」の違い", href: "#difference" },
-              { label: "よくある質問", href: "#faq" },
-              { label: "諸費用", href: "#costs" },
-              { label: "少しでも高くなる\nポイント", href: "#points" },
-              { label: "売却査定", href: "#assessment" },
-            ].map((item, i, arr) => (
-              <a
-                key={i}
-                href={item.href}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "10px 4px",
-                  fontSize: "10px",
-                  color: "#555",
-                  textDecoration: "none",
-                  whiteSpace: "pre-line",
-                  textAlign: "center",
-                  lineHeight: 1.4,
-                  borderRight: i < arr.length - 1 ? "1px solid #ddd" : "none",
-                }}
-              >
-                {item.label}
-                <span style={{ marginTop: "3px", color: "#5BAD52", fontSize: "9px" }}>▼</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
+      <SellNav />
 
       {/* ── 7つの強み ────────────────────────────── */}
       <section id="strengths" style={{ padding: "64px 0" }}>
         <div className="container-content">
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "48px", fontFamily: "'Noto Serif JP', serif" }}>
-            フェリアの不動産売却7つの強み
+            フェリアホームの不動産売却　7つの強み
           </h2>
-          {/* 上段4つ */}
+          {/* 上段4つ：均等4カラム */}
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "24px",
-            maxWidth: "720px",
-            margin: "0 auto 24px",
+            gap: "20px",
+            marginBottom: "20px",
           }}>
             {strengths.slice(0, 4).map((s) => (
               <div key={s.num} style={{ display: "flex", justifyContent: "center" }}>
-                <div style={{
-                  width: "clamp(120px, 16vw, 160px)",
-                  height: "clamp(120px, 16vw, 160px)",
-                  borderRadius: "50%",
-                  backgroundColor: "#4a8a8a",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textAlign: "center",
-                  padding: "12px",
-                }}>
-                  <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "8px", letterSpacing: "0.15em" }}>Strong Point</p>
-                  <p style={{ color: "white", fontSize: "20px", fontWeight: "bold", fontFamily: "'Montserrat', sans-serif", margin: "1px 0" }}>{s.num}</p>
-                  <p style={{ color: "white", fontSize: "9.5px", lineHeight: 1.5, whiteSpace: "pre-line" }}>{s.text}</p>
-                </div>
+                <StrengthCircle s={s} />
               </div>
             ))}
           </div>
 
-          {/* 下段3つ（中央寄せ、上段と同じカラム幅で中央3カラム分） */}
+          {/* 下段3つ：4カラムグリッドで左右に空白 */}
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "24px",
-            maxWidth: "720px",
-            margin: "0 auto",
+            gap: "20px",
           }}>
-            {/* 左に空白1つ */}
-            <div />
+            <div /> {/* 左空白 */}
             {strengths.slice(4).map((s) => (
               <div key={s.num} style={{ display: "flex", justifyContent: "center" }}>
-                <div style={{
-                  width: "clamp(120px, 16vw, 160px)",
-                  height: "clamp(120px, 16vw, 160px)",
-                  borderRadius: "50%",
-                  backgroundColor: "#4a8a8a",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textAlign: "center",
-                  padding: "12px",
-                }}>
-                  <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "8px", letterSpacing: "0.15em" }}>Strong Point</p>
-                  <p style={{ color: "white", fontSize: "20px", fontWeight: "bold", fontFamily: "'Montserrat', sans-serif", margin: "1px 0" }}>{s.num}</p>
-                  <p style={{ color: "white", fontSize: "9.5px", lineHeight: 1.5, whiteSpace: "pre-line" }}>{s.text}</p>
-                </div>
+                <StrengthCircle s={s} />
               </div>
             ))}
           </div>
@@ -304,13 +254,20 @@ export default function SellPage() {
       {/* ── 不動産売却の流れ ──────────────────────── */}
       <section id="flow" style={{ padding: "64px 0", backgroundColor: "#F8F8F8" }}>
         <div className="container-content">
-          <div style={{ backgroundColor: "white", borderRadius: "12px", padding: "clamp(24px, 4vw, 48px)", border: "1px solid #E5E5E5" }}>
-            <h2 style={{ fontSize: "clamp(18px, 2.5vw, 22px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "40px", fontFamily: "'Noto Serif JP', serif" }}>
-              不動産売却の流れ
-            </h2>
-            {steps.map((item, idx) => (
-              <div key={item.step}>
-                <div style={{ display: "grid", gap: "20px", marginBottom: "8px" }}
+          <h2 style={{ fontSize: "clamp(18px, 2.5vw, 22px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "40px", fontFamily: "'Noto Serif JP', serif" }}>
+            不動産売却の流れ
+          </h2>
+          {steps.map((item, idx) => (
+            <div key={item.step}>
+              {/* カード */}
+              <div style={{
+                backgroundColor: "white",
+                borderRadius: "12px",
+                border: "1px solid #E5E5E5",
+                padding: "24px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+              }}>
+                <div style={{ display: "grid", gap: "20px" }}
                   className="grid-cols-1 tb:grid-cols-[160px_1fr]">
                   <div style={{ position: "relative", width: "100%", maxWidth: "160px", aspectRatio: "4/3", borderRadius: "8px", overflow: "hidden" }}>
                     <Image
@@ -322,20 +279,32 @@ export default function SellPage() {
                     />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: "15px", fontWeight: "bold", color: "#1a1a1a", marginBottom: "8px" }}>
-                      Step.{item.step}　{item.title}
-                    </h3>
+                    {/* ステップ番号バッジ */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                      <span style={{
+                        display: "inline-flex", alignItems: "center", justifyContent: "center",
+                        width: "36px", height: "36px", borderRadius: "50%",
+                        backgroundColor: "#4a8a8a", color: "white",
+                        fontSize: "12px", fontWeight: "bold", flexShrink: 0,
+                      }}>
+                        {item.step}
+                      </span>
+                      <h3 style={{ fontSize: "16px", fontWeight: "bold", color: "#1a1a1a" }}>
+                        {item.title}
+                      </h3>
+                    </div>
                     <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.9 }}>{item.text}</p>
                     {item.note && <p style={{ fontSize: "12px", color: "#888", marginTop: "6px" }}>{item.note}</p>}
                     {item.hasTable && <MediateTable />}
                   </div>
                 </div>
-                {idx < steps.length - 1 && (
-                  <div style={{ textAlign: "center", margin: "8px 0 20px", color: "#5BAD52", fontSize: "18px" }}>▼</div>
-                )}
               </div>
-            ))}
-          </div>
+              {/* ステップ間の矢印 */}
+              {idx < steps.length - 1 && (
+                <div style={{ textAlign: "center", padding: "8px 0", color: "#5BAD52", fontSize: "20px" }}>▼</div>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 
