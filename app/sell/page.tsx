@@ -48,16 +48,6 @@ function MediateTable() {
 }
 
 export default function SellPage() {
-  const navItems = [
-    { label: "不動産売却の\n7つの強み", href: "#strengths" },
-    { label: "不動産売却の流れ", href: "#flow" },
-    { label: "「仲介」と\n「買取」の違い", href: "#difference" },
-    { label: "よくある質問", href: "#faq" },
-    { label: "諸費用", href: "#costs" },
-    { label: "少しでも高くなる\nポイント", href: "#points" },
-    { label: "売却査定", href: "#assessment" },
-  ];
-
   const strengths = [
     { num: "01", text: "ご相談・査定無料！\n弊社で買取も\n可能です" },
     { num: "02", text: "自社ホームページ\nで優先表示！" },
@@ -181,8 +171,8 @@ export default function SellPage() {
       </div>
 
       {/* タイトル */}
-      <div className="container-content" style={{ padding: "32px 0 24px" }}>
-        <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", fontFamily: "'Noto Serif JP', serif" }}>
+      <div className="container-content" style={{ padding: "24px 0 20px" }}>
+        <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", fontFamily: "'Noto Serif JP', serif", margin: 0 }}>
           不動産売却について
         </h1>
       </div>
@@ -199,24 +189,38 @@ export default function SellPage() {
       </div>
 
       {/* ページ内ナビ */}
-      <div style={{ backgroundColor: "#efefef", borderTop: "1px solid #ddd", borderBottom: "1px solid #ddd", overflowX: "auto" }}>
+      <div style={{ backgroundColor: "#efefef", borderTop: "1px solid #ddd", borderBottom: "1px solid #ddd" }}>
         <div className="container-content">
-          <div style={{ display: "flex", minWidth: "max-content" }}>
-            {navItems.map((item, i) => (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
+            {[
+              { label: "不動産売却の\n7つの強み", href: "#strengths" },
+              { label: "不動産売却の流れ", href: "#flow" },
+              { label: "「仲介」と\n「買取」の違い", href: "#difference" },
+              { label: "よくある質問", href: "#faq" },
+              { label: "諸費用", href: "#costs" },
+              { label: "少しでも高くなる\nポイント", href: "#points" },
+              { label: "売却査定", href: "#assessment" },
+            ].map((item, i, arr) => (
               <a
                 key={i}
                 href={item.href}
                 style={{
-                  display: "flex", flexDirection: "column", alignItems: "center",
-                  justifyContent: "center", padding: "10px 14px",
-                  fontSize: "11px", color: "#555", textDecoration: "none",
-                  whiteSpace: "pre-line", textAlign: "center", lineHeight: 1.4,
-                  borderRight: i < navItems.length - 1 ? "1px solid #ddd" : "none",
-                  minWidth: "90px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 4px",
+                  fontSize: "10px",
+                  color: "#555",
+                  textDecoration: "none",
+                  whiteSpace: "pre-line",
+                  textAlign: "center",
+                  lineHeight: 1.4,
+                  borderRight: i < arr.length - 1 ? "1px solid #ddd" : "none",
                 }}
               >
                 {item.label}
-                <span style={{ marginTop: "3px", color: "#5BAD52", fontSize: "10px" }}>▼</span>
+                <span style={{ marginTop: "3px", color: "#5BAD52", fontSize: "9px" }}>▼</span>
               </a>
             ))}
           </div>
@@ -230,34 +234,63 @@ export default function SellPage() {
             フェリアの不動産売却7つの強み
           </h2>
           {/* 上段4つ */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px", marginBottom: "20px", justifyItems: "center" }}
-            className="grid-cols-2 tb:grid-cols-4">
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "24px",
+            maxWidth: "720px",
+            margin: "0 auto 24px",
+          }}>
             {strengths.slice(0, 4).map((s) => (
-              <div key={s.num} style={{
-                width: "clamp(130px, 18vw, 170px)", height: "clamp(130px, 18vw, 170px)",
-                borderRadius: "50%", backgroundColor: "#4a8a8a",
-                display: "flex", flexDirection: "column", alignItems: "center",
-                justifyContent: "center", textAlign: "center", padding: "16px",
-              }}>
-                <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "9px", letterSpacing: "0.15em" }}>Strong Point</p>
-                <p style={{ color: "white", fontSize: "22px", fontWeight: "bold", fontFamily: "'Montserrat', sans-serif", margin: "2px 0" }}>{s.num}</p>
-                <p style={{ color: "white", fontSize: "10px", lineHeight: 1.5, whiteSpace: "pre-line" }}>{s.text}</p>
+              <div key={s.num} style={{ display: "flex", justifyContent: "center" }}>
+                <div style={{
+                  width: "clamp(120px, 16vw, 160px)",
+                  height: "clamp(120px, 16vw, 160px)",
+                  borderRadius: "50%",
+                  backgroundColor: "#4a8a8a",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  padding: "12px",
+                }}>
+                  <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "8px", letterSpacing: "0.15em" }}>Strong Point</p>
+                  <p style={{ color: "white", fontSize: "20px", fontWeight: "bold", fontFamily: "'Montserrat', sans-serif", margin: "1px 0" }}>{s.num}</p>
+                  <p style={{ color: "white", fontSize: "9.5px", lineHeight: 1.5, whiteSpace: "pre-line" }}>{s.text}</p>
+                </div>
               </div>
             ))}
           </div>
-          {/* 下段3つ（中央寄せ） */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", maxWidth: "560px", margin: "0 auto", justifyItems: "center" }}
-            className="grid-cols-3">
+
+          {/* 下段3つ（中央寄せ、上段と同じカラム幅で中央3カラム分） */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "24px",
+            maxWidth: "720px",
+            margin: "0 auto",
+          }}>
+            {/* 左に空白1つ */}
+            <div />
             {strengths.slice(4).map((s) => (
-              <div key={s.num} style={{
-                width: "clamp(130px, 18vw, 170px)", height: "clamp(130px, 18vw, 170px)",
-                borderRadius: "50%", backgroundColor: "#4a8a8a",
-                display: "flex", flexDirection: "column", alignItems: "center",
-                justifyContent: "center", textAlign: "center", padding: "16px",
-              }}>
-                <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "9px", letterSpacing: "0.15em" }}>Strong Point</p>
-                <p style={{ color: "white", fontSize: "22px", fontWeight: "bold", fontFamily: "'Montserrat', sans-serif", margin: "2px 0" }}>{s.num}</p>
-                <p style={{ color: "white", fontSize: "10px", lineHeight: 1.5, whiteSpace: "pre-line" }}>{s.text}</p>
+              <div key={s.num} style={{ display: "flex", justifyContent: "center" }}>
+                <div style={{
+                  width: "clamp(120px, 16vw, 160px)",
+                  height: "clamp(120px, 16vw, 160px)",
+                  borderRadius: "50%",
+                  backgroundColor: "#4a8a8a",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  padding: "12px",
+                }}>
+                  <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "8px", letterSpacing: "0.15em" }}>Strong Point</p>
+                  <p style={{ color: "white", fontSize: "20px", fontWeight: "bold", fontFamily: "'Montserrat', sans-serif", margin: "1px 0" }}>{s.num}</p>
+                  <p style={{ color: "white", fontSize: "9.5px", lineHeight: 1.5, whiteSpace: "pre-line" }}>{s.text}</p>
+                </div>
               </div>
             ))}
           </div>
