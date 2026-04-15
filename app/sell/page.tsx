@@ -1,6 +1,7 @@
 // app/sell/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import { SellFAQ } from "@/components/sell/SellFAQ";
 
@@ -60,33 +61,33 @@ export default function SellPage() {
 
   const steps = [
     {
-      step: "01", title: "売却相談",
+      step: "01", title: "売却相談", imageFile: "sale_flow_01",
       text: "不動産は高額であるため、容易には売れません。そこで、不動産売買を満知した売却専門のコンシェルジュが在籍する弊社にご相談ください。迅速かつ正確に適正価格を査定いたします。",
       hasTable: false,
     },
     {
-      step: "02", title: "価格査定",
+      step: "02", title: "価格査定", imageFile: "sale_flow_02",
       text: "売却する不動産の近隣相場や接道状況、築年月、広さ、形状等から査定を行い、適正な売却価格をご提示。査定書を作成し、算出した価格の根拠をご説明いたします。",
       hasTable: false,
     },
     {
-      step: "03", title: "媒介契約",
+      step: "03", title: "媒介契約", imageFile: "sale_flow_03",
       text: "不動産の査定が終了し、ご提示した価格またはお客様ご希望の売却価格で弊社に売却をご依頼される場合には、弊社と媒介契約を結んでいただきます。",
       note: "※媒介契約には3つの種類（下記参照）があります。",
       hasTable: true,
     },
     {
-      step: "04", title: "販売活動",
+      step: "04", title: "販売活動", imageFile: "sale_flow_04",
       text: "お客様から売却をご依頼された物件について、ホームページやポータルサイト、チラシ、現地販売会等の広報を通して販売活動を行います（契約に結び付くまで断続的に実施）。",
       hasTable: false,
     },
     {
-      step: "05", title: "売買契約",
+      step: "05", title: "売買契約", imageFile: "sale_flow_05",
       text: "不動産を購入したい方が見つかった場合、購入申し込み、希望購入価格等の条件交渉がなされます。売却するかご検討いただき、売却契約へ進みます。契約書や重要事項説明書等の書類は弊社が作成いたします。",
       hasTable: false,
     },
     {
-      step: "06", title: "お引き渡し",
+      step: "06", title: "お引き渡し", imageFile: "sale_flow_06",
       text: "売買契約を結んだ後、残代金決済を行います。残代金受領後に鍵（戸建ての場合）の引き渡しと法務局に所有権移転申請を行い、これで不動産の売却は完了です。",
       hasTable: false,
     },
@@ -140,17 +141,17 @@ export default function SellPage() {
 
   const points = [
     {
-      num: "01",
+      num: "01", imageFile: "sale_point_01",
       title: "現在の自分の状況を把握し、\n売却する理由を考える。",
       text: "現在の手元資金や住宅ローン残債、月々の返済状況等、経済状況を確認しましょう。売主様の状況や、どのぐらいの期間以内に売却したいかによっても売却方法が変わってきます。",
     },
     {
-      num: "02",
+      num: "02", imageFile: "sale_point_02",
       title: "信頼できる不動産会社（担当者）を選ぶ。",
       text: "信頼できる不動産会社（担当者）を選ぶ。売却を依頼する不動産会社を選ぶ際に、査定価格だけで選んでしまっては失敗するケースがあります。売却に対してアドバイスしてくれ、信頼できる担当者に依頼することが大事です。",
     },
     {
-      num: "03",
+      num: "03", imageFile: "sale_point_03",
       title: "売り出し価格を設定し、\n段階ごとの売却価格を決める。",
       text: "「売却価格」をいくらに設定するかも大切です。具体的な売却価格の決め方は、売却査定価格等を基準にして、ある程度売り易い価格を目安となる価格を設定するとよいでしょう。",
     },
@@ -177,14 +178,17 @@ export default function SellPage() {
         </h1>
       </div>
 
-      {/* ヒーロー画像（プレースホルダー） */}
+      {/* ヒーロー画像 */}
       <div className="container-content" style={{ paddingBottom: "0" }}>
-        <div style={{
-          width: "100%", height: "clamp(180px, 30vw, 320px)", borderRadius: "8px",
-          background: "linear-gradient(135deg, #2d4a4a 0%, #4a8a8a 50%, #5BAD52 100%)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>ヒーロー画像</p>
+        <div style={{ position: "relative", width: "100%", height: "clamp(240px, 35vw, 400px)", borderRadius: "8px", overflow: "hidden" }}>
+          <Image
+            src="/images/sell/sellhero.jpg"
+            alt="不動産売却について"
+            fill
+            style={{ objectFit: "cover" }}
+            priority
+            sizes="100vw"
+          />
         </div>
       </div>
 
@@ -308,12 +312,14 @@ export default function SellPage() {
               <div key={item.step}>
                 <div style={{ display: "grid", gap: "20px", marginBottom: "8px" }}
                   className="grid-cols-1 tb:grid-cols-[160px_1fr]">
-                  <div style={{
-                    width: "100%", maxWidth: "160px", aspectRatio: "4/3",
-                    borderRadius: "8px", backgroundColor: "#E8F0E8",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    <span style={{ fontSize: "11px", color: "#aaa" }}>写真</span>
+                  <div style={{ position: "relative", width: "100%", maxWidth: "160px", aspectRatio: "4/3", borderRadius: "8px", overflow: "hidden" }}>
+                    <Image
+                      src={`/images/sell/${item.imageFile}.jpg`}
+                      alt={item.title}
+                      fill
+                      style={{ objectFit: "cover" }}
+                      sizes="160px"
+                    />
                   </div>
                   <div>
                     <h3 style={{ fontSize: "15px", fontWeight: "bold", color: "#1a1a1a", marginBottom: "8px" }}>
@@ -457,12 +463,14 @@ export default function SellPage() {
             {points.map((point) => (
               <div key={point.num} style={{ display: "grid", gap: "24px", alignItems: "start" }}
                 className="grid-cols-1 tb:grid-cols-[200px_1fr]">
-                <div style={{
-                  width: "100%", maxWidth: "200px", aspectRatio: "4/3",
-                  borderRadius: "8px", backgroundColor: "rgba(255,255,255,0.15)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "12px" }}>写真</span>
+                <div style={{ position: "relative", width: "100%", maxWidth: "200px", aspectRatio: "4/3", borderRadius: "8px", overflow: "hidden" }}>
+                  <Image
+                    src={`/images/sell/${point.imageFile}.jpg`}
+                    alt={point.title}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes="200px"
+                  />
                 </div>
                 <div>
                   <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "17px", color: "rgba(255,255,255,0.85)", fontStyle: "italic", marginBottom: "6px" }}>
