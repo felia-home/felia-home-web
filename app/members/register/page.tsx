@@ -79,7 +79,7 @@ export default function RegisterPage() {
 
   // STEP1 フォーム
   const [basic, setBasic] = useState({
-    name: "", email: "", password: "", confirmPassword: "", phone: "",
+    name: "", nameKana: "", email: "", password: "", confirmPassword: "", phone: "",
   });
   const [showPwd, setShowPwd]         = useState(false);
   const [step1Error, setStep1Error]   = useState("");
@@ -129,8 +129,11 @@ export default function RegisterPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: basic.name, email: basic.email,
-          password: basic.password, phone: basic.phone || undefined,
+          name:      basic.name,
+          name_kana: basic.nameKana,
+          email:     basic.email,
+          password:  basic.password,
+          phone:     basic.phone || undefined,
         }),
       });
       const data = await res.json();
@@ -310,6 +313,11 @@ export default function RegisterPage() {
                 <RegField label="お名前" required icon={<User size={14} />}
                   type="text" value={basic.name} placeholder="山田 太郎"
                   onChange={(v) => setBasic((b) => ({ ...b, name: v }))} />
+
+                {/* ふりがな */}
+                <RegField label="ふりがな" required icon={<User size={14} />}
+                  type="text" value={basic.nameKana} placeholder="やまだ たろう"
+                  onChange={(v) => setBasic((b) => ({ ...b, nameKana: v }))} />
 
                 {/* メール */}
                 <RegField label="メールアドレス" required icon={<Mail size={14} />}

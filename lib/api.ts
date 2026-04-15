@@ -133,8 +133,16 @@ export async function getBanners() {
 
 // ---- 会社情報 ----
 
-export async function getCompanyInfo() {
-  return fetchFromAdmin<CompanyInfo>("/api/company");
+export async function getCompanyInfo(): Promise<CompanyInfo | null> {
+  try {
+    const res = await fetchFromAdmin<{ company: CompanyInfo }>(
+      "/api/hp/company",
+      { next: { revalidate: 300 } }
+    );
+    return res.company ?? null;
+  } catch {
+    return null;
+  }
 }
 
 // ---- 物件一覧（絞り込み） ----
@@ -251,14 +259,16 @@ export interface Banner {
 
 export interface CompanyInfo {
   name: string;
+  postal_code?: string | null;
   address: string;
   phone: string;
+  fax?: string | null;
+  email?: string | null;
   hours: string;
   holiday: string;
-  access: string;
-  lat: number;
-  lng: number;
-  licenseNumber: string;
+  license: string;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 // ---- 未公開物件 ----

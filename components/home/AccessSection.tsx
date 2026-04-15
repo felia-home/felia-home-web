@@ -1,164 +1,141 @@
 // components/home/AccessSection.tsx
-import { MapPin, Phone, Clock, CalendarX } from "lucide-react";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { getCompanyInfo } from "@/lib/api";
-
-// Google Maps が未設定の場合のフォールバック用デフォルト値
-const DEFAULT_COMPANY = {
-  name: "株式会社フェリアホーム",
-  address: "東京都 ※住所を設定してください",
-  phone: "03-XXXX-XXXX",
-  hours: "10:00〜18:00",
-  holiday: "水曜日・年末年始",
-  access: "※アクセス方法を設定してください",
-  lat: 35.6762,
-  lng: 139.6503,
-  licenseNumber: "東京都知事（X）第XXXXX号",
-};
+import { MapPin, Phone, Clock, Calendar, Building2 } from "lucide-react";
 
 export async function AccessSection() {
-  let company = DEFAULT_COMPANY;
-  try {
-    const data = await getCompanyInfo();
-    if (data) company = { ...DEFAULT_COMPANY, ...data };
-  } catch {
-    // Admin APIが未起動の場合はデフォルト値を使用
-  }
+  const company = await getCompanyInfo();
 
-  const mapsEmbedUrl = `https://maps.google.com/maps?q=${company.lat},${company.lng}&z=16&output=embed`;
+  const name    = company?.name    ?? "株式会社フェリアホーム";
+  const address = company?.address ?? "東京都 ※住所を設定してください";
+  const phone   = company?.phone   ?? "03-XXXX-XXXX";
+  const hours   = company?.hours   ?? "10:00〜18:00";
+  const holiday = company?.holiday ?? "水曜日・年末年始";
+  const license = company?.license ?? "";
+  const lat     = company?.lat     ?? 35.6773;
+  const lng     = company?.lng     ?? 139.6858;
+
+  const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const mapSrc  = mapsKey
+    ? `https://www.google.com/maps/embed/v1/place?key=${mapsKey}&q=${lat},${lng}&zoom=16`
+    : null;
 
   return (
-    <section className="section-padding" style={{ backgroundColor: "#F8F8F8" }}>
+    <section style={{ padding: "64px 0", backgroundColor: "#F8F8F8" }}>
       <div className="container-content">
         <SectionTitle en="Access" ja="会社情報・アクセス" />
-
-        <div className="grid grid-cols-1 tb:grid-cols-2 gap-8 tb:gap-12 items-start">
-
-          {/* 左: 店舗情報 */}
-          <div>
-            <div
-              className="bg-white rounded-xl p-6 tb:p-8 border"
-              style={{ borderColor: "#E5E5E5" }}
-            >
-              {/* 会社名 */}
-              <h3
-                className="font-bold text-xl tb:text-2xl mb-6 pb-4 border-b"
-                style={{ color: "#333333", borderColor: "#E5E5E5" }}
-              >
-                {company.name}
-              </h3>
-
-              {/* 情報リスト */}
-              <dl className="space-y-4">
-                <InfoRow icon={MapPin} label="所在地" value={company.address} />
-                <InfoRow icon={Phone} label="電話番号" value={company.phone} isPhone />
-                <InfoRow icon={Clock} label="営業時間" value={company.hours} />
-                <InfoRow icon={CalendarX} label="定休日" value={company.holiday} />
-              </dl>
-
-              {/* アクセス */}
-              {company.access && company.access !== DEFAULT_COMPANY.access && (
-                <div className="mt-5 pt-5 border-t" style={{ borderColor: "#E5E5E5" }}>
-                  <p className="text-xs font-bold text-gray-400 tracking-widest mb-2">ACCESS</p>
-                  <p className="text-sm text-gray-600 leading-relaxed">{company.access}</p>
-                </div>
+        <div
+          className="grid grid-cols-1 tb:grid-cols-2"
+          style={{ gap: "32px", alignItems: "start" }}
+        >
+          {/* 会社情報カード */}
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "16px",
+            padding: "32px",
+            border: "1px solid #E5E5E5",
+          }}>
+            <h3 style={{
+              fontSize: "18px",
+              fontWeight: "bold",
+              color: "#1a1a1a",
+              marginBottom: "24px",
+              paddingBottom: "12px",
+              borderBottom: "1px solid #F0F0F0",
+            }}>
+              {name}
+            </h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <InfoRow icon={<MapPin size={16} style={{ color: "#5BAD52" }} />} label="所在地" value={address} />
+              <InfoRow icon={<Phone size={16} style={{ color: "#5BAD52" }} />} label="電話番号" value={phone} isPhone />
+              <InfoRow icon={<Clock size={16} style={{ color: "#5BAD52" }} />} label="営業時間" value={hours} />
+              <InfoRow icon={<Calendar size={16} style={{ color: "#5BAD52" }} />} label="定休日" value={holiday} />
+              {license && (
+                <InfoRow icon={<Building2 size={16} style={{ color: "#5BAD52" }} />} label="宅建業免許" value={license} />
               )}
-
-              {/* 免許番号 */}
-              <p className="mt-5 pt-4 border-t text-xs text-gray-400" style={{ borderColor: "#F0F0F0" }}>
-                宅地建物取引業 {company.licenseNumber}
-              </p>
             </div>
 
-            {/* 電話CTA */}
             <a
-              href={`tel:${company.phone.replace(/-/g, "")}`}
-              className="mt-4 flex items-center justify-center gap-3 w-full py-4 rounded-xl font-bold text-white transition-all hover:scale-[1.02]"
+              href={`tel:${phone.replace(/-/g, "")}`}
               style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                marginTop: "24px",
+                padding: "14px",
+                borderRadius: "12px",
                 backgroundColor: "#5BAD52",
-                boxShadow: "0 4px 12px rgba(91,173,82,0.3)",
+                color: "white",
+                fontWeight: "bold",
+                fontSize: "18px",
+                textDecoration: "none",
               }}
             >
               <Phone size={20} />
-              <span className="text-lg tracking-wider">{company.phone}</span>
+              {phone}
             </a>
           </div>
 
-          {/* 右: Google Maps */}
-          <div
-            className="rounded-xl overflow-hidden border"
-            style={{ borderColor: "#E5E5E5", aspectRatio: "4/3" }}
-          >
-            {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? (
+          {/* Google Maps */}
+          <div style={{
+            borderRadius: "16px",
+            overflow: "hidden",
+            border: "1px solid #E5E5E5",
+            aspectRatio: "4/3",
+            backgroundColor: "#EBF7EA",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+            {mapSrc ? (
               <iframe
-                src={mapsEmbedUrl}
+                src={mapSrc}
                 width="100%"
                 height="100%"
-                style={{ border: 0 }}
+                style={{ border: 0, display: "block" }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title={`${company.name}の地図`}
               />
             ) : (
-              // APIキー未設定時のプレースホルダー
-              <div
-                className="w-full h-full flex flex-col items-center justify-center gap-3"
-                style={{ backgroundColor: "#E8F5E8" }}
-              >
-                <MapPin size={40} style={{ color: "#5BAD52" }} />
-                <p className="text-sm text-gray-500 text-center">
-                  Google Maps を表示するには<br />
-                  <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">
-                    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-                  </code><br />
-                  を .env.local に設定してください
-                </p>
+              <div style={{ textAlign: "center", color: "#666", fontSize: "13px", padding: "24px" }}>
+                <MapPin size={32} style={{ color: "#5BAD52", margin: "0 auto 8px", display: "block" }} />
+                <p>Google Maps を表示するには</p>
+                <code style={{ fontSize: "11px", display: "block", margin: "4px 0" }}>
+                  NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+                </code>
+                <p>を .env.local に設定してください</p>
               </div>
             )}
           </div>
-
         </div>
       </div>
     </section>
   );
 }
 
-// 情報行コンポーネント
-function InfoRow({
-  icon: Icon,
-  label,
-  value,
-  isPhone = false,
-}: {
-  icon: React.ElementType;
+function InfoRow({ icon, label, value, isPhone }: {
+  icon: React.ReactNode;
   label: string;
   value: string;
   isPhone?: boolean;
 }) {
   return (
-    <div className="flex items-start gap-3">
-      <div
-        className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5"
-        style={{ backgroundColor: "#EBF7EA" }}
-      >
-        <Icon size={14} style={{ color: "#5BAD52" }} />
-      </div>
+    <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+      <div style={{ marginTop: "2px", flexShrink: 0 }}>{icon}</div>
       <div>
-        <dt className="text-xs text-gray-400 tracking-widest mb-0.5">{label}</dt>
-        <dd className="text-sm font-medium text-gray-700">
-          {isPhone ? (
-            <a
-              href={`tel:${value.replace(/-/g, "")}`}
-              className="hover:underline"
-              style={{ color: "#5BAD52" }}
-            >
-              {value}
-            </a>
-          ) : (
-            value
-          )}
-        </dd>
+        <p style={{ fontSize: "11px", color: "#999", marginBottom: "2px" }}>{label}</p>
+        {isPhone ? (
+          <a
+            href={`tel:${value.replace(/-/g, "")}`}
+            style={{ fontSize: "15px", fontWeight: "600", color: "#5BAD52", textDecoration: "none" }}
+          >
+            {value}
+          </a>
+        ) : (
+          <p style={{ fontSize: "14px", color: "#333", fontWeight: "500" }}>{value}</p>
+        )}
       </div>
     </div>
   );
