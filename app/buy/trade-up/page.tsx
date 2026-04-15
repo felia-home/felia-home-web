@@ -230,31 +230,44 @@ export default function TradeUpPage() {
                 {c.sell.year}年築　{c.sell.type}
               </p>
               <div style={{ backgroundColor: "white", borderRadius: "8px", padding: "20px", marginBottom: "24px", border: "1px solid #E5E5E5" }}>
-                <div style={{ display: "grid", gap: "16px" }}
-                  className="grid-cols-1 tb:grid-cols-[180px_1fr]">
-                  <div style={{ position: "relative", width: "100%", maxWidth: "180px", aspectRatio: "4/3", borderRadius: "6px", overflow: "hidden" }}>
+                {/* 上段：物件情報 + 矢印 + 売却結果 の3カラム */}
+                <div style={{ display: "grid", gridTemplateColumns: "180px 1fr 60px 1fr", gap: "16px", alignItems: "center" }}
+                  className="grid-cols-1 tb:grid-cols-[180px_1fr_60px_1fr]">
+
+                  {/* 物件写真 */}
+                  <div style={{ position: "relative", width: "180px", aspectRatio: "4/3", borderRadius: "6px", overflow: "hidden" }}>
                     <Image src={`/images/buy/trade-up/${c.sellImg}.jpg`} alt="売却物件" fill style={{ objectFit: "cover" }} sizes="180px" />
                   </div>
-                  <div style={{ display: "grid", gap: "12px" }}
-                    className="grid-cols-1 tb:grid-cols-[1fr_auto]">
-                    <div>
-                      <p style={{ fontWeight: "bold", fontSize: "15px", color: "#333" }}>購入価格 {c.sell.price.toLocaleString()}万円</p>
-                      <p style={{ fontSize: "12px", color: "#5BAD52", fontWeight: "bold", margin: "4px 0 8px" }}>専有面積 {c.sell.area}㎡（{c.sell.layout}）</p>
-                      {c.sell.breakdown.map((b, i) => (
-                        <p key={i} style={{ fontSize: "12px", color: "#666" }}>・{b}</p>
-                      ))}
-                      <p style={{ fontWeight: "bold", fontSize: "14px", color: "#333", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid #E5E5E5" }}>
-                        合計 {c.sell.monthly}万円／月
-                      </p>
-                    </div>
-                    <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-                      <div style={{ backgroundColor: "#5BAD52", color: "white", fontSize: "11px", fontWeight: "bold", padding: "4px 12px", borderRadius: "4px" }}>売却</div>
-                      <div style={{ fontSize: "24px", color: "#5BAD52" }}>→</div>
-                      <p style={{ fontSize: "13px", fontWeight: "bold", color: "#333" }}>成約価格 {c.sell.soldPrice.toLocaleString()}万円</p>
-                      <p style={{ fontSize: "11px", color: "#888" }}>{c.sell.soldYear}</p>
-                      <div style={{ backgroundColor: "#EBF7EA", borderRadius: "6px", padding: "8px 12px", fontSize: "12px", fontWeight: "bold", color: "#2d5a2d" }}>
+
+                  {/* 売却前の情報 */}
+                  <div>
+                    <p style={{ fontWeight: "bold", fontSize: "15px", color: "#333" }}>購入価格 {c.sell.price.toLocaleString()}万円</p>
+                    <p style={{ fontSize: "12px", color: "#5BAD52", fontWeight: "bold", margin: "4px 0 8px" }}>専有面積 {c.sell.area}㎡（{c.sell.layout}）</p>
+                    {c.sell.breakdown.map((b, i) => (
+                      <p key={i} style={{ fontSize: "12px", color: "#666", lineHeight: 1.8 }}>・{b}</p>
+                    ))}
+                    <p style={{ fontWeight: "bold", fontSize: "14px", color: "#333", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid #E5E5E5" }}>
+                      合計 {c.sell.monthly}万円／月
+                    </p>
+                  </div>
+
+                  {/* 矢印 + 売却バッジ */}
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ backgroundColor: "#5BAD52", color: "white", fontSize: "11px", fontWeight: "bold", padding: "4px 8px", borderRadius: "4px", marginBottom: "8px" }}>売却</div>
+                    <div style={{ fontSize: "28px", color: "#5BAD52", lineHeight: 1 }}>→</div>
+                  </div>
+
+                  {/* 売却結果 */}
+                  <div style={{ backgroundColor: "#F0F5F0", borderRadius: "8px", padding: "16px" }}>
+                    <p style={{ fontSize: "12px", color: "#666", marginBottom: "6px" }}>{c.sell.soldYear}</p>
+                    <p style={{ fontSize: "16px", fontWeight: "bold", color: "#2d5a2d", marginBottom: "12px" }}>
+                      成約価格 {c.sell.soldPrice.toLocaleString()}万円
+                    </p>
+                    <div style={{ borderTop: "1px dashed #ccc", paddingTop: "10px" }}>
+                      <p style={{ fontSize: "11px", color: "#888", marginBottom: "4px" }}>残債返済・仲介手数料支払い後</p>
+                      <p style={{ fontSize: "15px", fontWeight: "bold", color: "#2d5a2d" }}>
                         手残資金 約{c.sell.soldNet.toLocaleString()}万円
-                      </div>
+                      </p>
                     </div>
                   </div>
                 </div>
