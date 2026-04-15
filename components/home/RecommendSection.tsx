@@ -1,101 +1,165 @@
 // components/home/RecommendSection.tsx
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 import { SectionTitle } from "@/components/ui/SectionTitle";
-import { areaGroups, otherArea, type AreaItem } from "@/lib/areaData";
+import { getAreas } from "@/lib/api";
+import type { AreaSetting } from "@/lib/api";
 import { getAreaContent } from "@/lib/areaContents";
-import { ArrowRight } from "lucide-react";
 
-export function RecommendSection() {
+export async function RecommendSection() {
+  const areas = await getAreas();
+
+  if (areas.length === 0) return null;
+
+  // 4件ずつグループに分割
+  const groups: AreaSetting[][] = [];
+  for (let i = 0; i < areas.length; i += 4) {
+    groups.push(areas.slice(i, i + 4));
+  }
+
   return (
-    <section className="section-padding bg-white">
+    <section style={{ padding: "64px 0", backgroundColor: "#ffffff" }}>
       <div className="container-content">
         <SectionTitle en="Recommend" ja="エリア別おすすめ物件" />
-
-        <div className="space-y-4">
-          {/* グループ1〜4（4枚ずつ） */}
-          {areaGroups.map((group, gi) => (
-            <div key={gi} className="grid grid-cols-2 tb:grid-cols-4 gap-3 tb:gap-4">
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {groups.map((group, gi) => (
+            <div
+              key={gi}
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${Math.min(group.length, 4)}, 1fr)`,
+                gap: "12px",
+              }}
+            >
               {group.map((area) => (
                 <AreaCard key={area.id} area={area} />
               ))}
             </div>
           ))}
-
-          {/* その他エリア（1枚・幅広） */}
-          <div>
-            <Link
-              href={otherArea.href}
-              className="group relative block w-full overflow-hidden rounded-lg"
-              style={{ paddingBottom: "20%" }}
-            >
-              <div className="absolute inset-0">
-                <AreaBackground area={otherArea} />
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
-                <div className="absolute inset-0 flex items-center justify-center gap-3">
-                  <span className="text-white font-bold text-xl tb:text-2xl tracking-widest">
-                    {otherArea.name}（東京都内）
-                  </span>
-                  <span className="flex items-center gap-1 text-white/80 text-sm border border-white/50 rounded px-2 py-0.5">
-                    view more <ArrowRight size={12} />
-                  </span>
-                </div>
-              </div>
-            </Link>
-          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function AreaCard({ area }: { area: AreaItem }) {
-  const content = getAreaContent(area.name);
+function AreaCard({ area }: { area: AreaSetting }) {
+  const content = getAreaContent(area.area_name);
+  const href = area.link_url || `/areas/${encodeURIComponent(area.area_name)}`;
 
   return (
     <Link
-      href={area.href}
-      className="group relative block overflow-hidden rounded-lg"
-      style={{ paddingBottom: "70%" }}
+      href={href}
+      style={{
+        position: "relative",
+        display: "block",
+        overflow: "hidden",
+        borderRadius: "8px",
+        paddingBottom: "70%",
+        textDecoration: "none",
+      }}
+      className="group"
     >
-      <div className="absolute inset-0">
+      <div style={{ position: "absolute", inset: 0 }}>
+        {/* 背景 */}
         <AreaBackground area={area} />
 
         {/* 通常オーバーレイ */}
-        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/60 transition-colors duration-300" />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.3)",
+            transition: "background-color 0.3s ease",
+          }}
+          className="group-hover:bg-black/50"
+        />
 
-        {/* 通常表示テキスト */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-2
-                        group-hover:opacity-0 transition-opacity duration-300">
+        {/* 通常テキスト */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "8px",
+            transition: "opacity 0.3s ease",
+          }}
+          className="group-hover:opacity-0"
+        >
           <span
-            className="text-white font-bold tracking-widest text-center drop-shadow-md"
-            style={{ fontSize: "clamp(13px, 2vw, 18px)" }}
+            style={{
+              color: "white",
+              fontWeight: "bold",
+              letterSpacing: "0.1em",
+              textAlign: "center",
+              fontSize: "clamp(13px, 2vw, 18px)",
+              textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+            }}
           >
-            {area.name}
+            {area.area_name}
           </span>
-          <span className="mt-1.5 text-white/70 text-xs tracking-widest">
+          <span
+            style={{
+              marginTop: "6px",
+              color: "rgba(255,255,255,0.7)",
+              fontSize: "11px",
+              letterSpacing: "0.1em",
+            }}
+          >
             view more
           </span>
         </div>
 
-        {/* ホバー時：説明文オーバーレイ */}
-        <div className="absolute inset-0 flex flex-col justify-end p-3
-                        opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <p className="text-white font-bold text-sm mb-1 leading-snug">
-            {area.name}
+        {/* ホバー時テキスト */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-end",
+            padding: "12px",
+            opacity: 0,
+            transition: "opacity 0.3s ease",
+          }}
+          className="group-hover:opacity-100"
+        >
+          <p
+            style={{
+              color: "white",
+              fontWeight: "bold",
+              fontSize: "13px",
+              marginBottom: "4px",
+            }}
+          >
+            {area.area_name}
           </p>
-          <p className="text-white/80 text-[11px] leading-relaxed line-clamp-3">
+          <p
+            style={{
+              color: "rgba(255,255,255,0.8)",
+              fontSize: "11px",
+              lineHeight: 1.5,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
             {content.catchCopy}
           </p>
-          <div className="mt-2 flex flex-wrap gap-1">
+          <div style={{ marginTop: "6px", display: "flex", flexWrap: "wrap", gap: "4px" }}>
             {content.highlights.slice(0, 2).map((h, i) => (
               <span
                 key={i}
-                className="text-[9px] px-1.5 py-0.5 rounded"
-                style={{ backgroundColor: "rgba(91,173,82,0.7)", color: "white" }}
+                style={{
+                  fontSize: "9px",
+                  padding: "2px 6px",
+                  borderRadius: "4px",
+                  backgroundColor: "rgba(91,173,82,0.7)",
+                  color: "white",
+                }}
               >
                 {h.length > 12 ? h.slice(0, 12) + "…" : h}
               </span>
@@ -103,36 +167,59 @@ function AreaCard({ area }: { area: AreaItem }) {
           </div>
         </div>
 
-        {/* 下部グリーンライン */}
+        {/* グリーンライン */}
         <div
-          className="absolute bottom-0 left-0 h-0.5 transition-all duration-500 w-0 group-hover:w-full"
-          style={{ backgroundColor: "#5BAD52" }}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            height: "3px",
+            backgroundColor: "#5BAD52",
+            width: "0%",
+            transition: "width 0.5s ease",
+          }}
+          className="group-hover:w-full"
         />
       </div>
     </Link>
   );
 }
 
-function AreaBackground({ area }: { area: AreaItem }) {
-  const [imgError, setImgError] = useState(false);
+const GRADIENTS: Record<string, string> = {
+  "渋谷区": "linear-gradient(135deg,#2d4a2d,#5BAD52)",
+  "新宿区": "linear-gradient(135deg,#1a2a3a,#4a6fa5)",
+  "杉並区": "linear-gradient(135deg,#2d3a1a,#7a9a3a)",
+  "世田谷区": "linear-gradient(135deg,#1a3a2a,#3a8a5a)",
+  "文京区": "linear-gradient(135deg,#2a1a3a,#6a4a9a)",
+  "豊島区": "linear-gradient(135deg,#3a2a1a,#9a6a3a)",
+  "中野区": "linear-gradient(135deg,#1a3a3a,#3a8a8a)",
+  "目黒区": "linear-gradient(135deg,#2a2a1a,#7a7a2a)",
+  "北区": "linear-gradient(135deg,#1a2a1a,#4a7a4a)",
+  "板橋区": "linear-gradient(135deg,#2a1a2a,#7a4a7a)",
+  "練馬区": "linear-gradient(135deg,#1a3a1a,#5a9a5a)",
+  "品川区": "linear-gradient(135deg,#1a1a3a,#4a4a9a)",
+  "港区": "linear-gradient(135deg,#2a1a1a,#8a3a3a)",
+  "大田区": "linear-gradient(135deg,#1a2a3a,#3a5a7a)",
+  "千代田区": "linear-gradient(135deg,#2a2a2a,#6a6a6a)",
+  "中央区": "linear-gradient(135deg,#2a1a2a,#7a3a6a)",
+};
 
-  if (imgError || !area.image) {
+function AreaBackground({ area }: { area: AreaSetting }) {
+  if (area.image_url) {
     return (
-      <div
-        className="absolute inset-0"
-        style={{ background: area.gradient }}
+      <Image
+        src={area.image_url}
+        alt={`${area.area_name}のイメージ`}
+        fill
+        style={{ objectFit: "cover", transition: "transform 0.5s ease" }}
+        sizes="(max-width: 768px) 50vw, 25vw"
+        className="group-hover:scale-105"
       />
     );
   }
 
+  const gradient = GRADIENTS[area.area_name] || "linear-gradient(135deg,#2a2a2a,#5BAD52)";
   return (
-    <Image
-      src={area.image}
-      alt={`${area.name}のイメージ`}
-      fill
-      className="object-cover transition-transform duration-500 group-hover:scale-105"
-      sizes="(max-width: 768px) 50vw, 25vw"
-      onError={() => setImgError(true)}
-    />
+    <div style={{ position: "absolute", inset: 0, background: gradient }} />
   );
 }

@@ -92,6 +92,31 @@ export async function getHeroBanners(): Promise<HeroBanner[]> {
   }
 }
 
+// ---- エリア設定 ----
+
+export interface AreaSetting {
+  id: string;
+  area_name: string;
+  area_type: "ward" | "city";
+  image_url: string | null;
+  description?: string | null;
+  link_url?: string | null;
+  is_active: boolean;
+  sort_order: number;
+}
+
+export async function getAreas(): Promise<AreaSetting[]> {
+  try {
+    const res = await fetchFromAdmin<{ areas: AreaSetting[] }>(
+      "/api/hp/areas",
+      { next: { revalidate: 60 } }
+    );
+    return res.areas ?? [];
+  } catch {
+    return [];
+  }
+}
+
 // ---- 特集・バナー（Phase 2） ----
 
 export async function getFeatures() {
