@@ -13,12 +13,16 @@ export async function FullWidthBannerSection() {
   if (banners.length === 0) return null;
 
   return (
-    <section>
-      {banners
-        .sort((a, b) => a.sort_order - b.sort_order)
-        .map((banner) => (
-          <FullWidthBanner key={banner.id} banner={banner} />
-        ))}
+    <section style={{ backgroundColor: "#F8F8F8", padding: "24px 0" }}>
+      <div className="container-content">
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {banners
+            .sort((a, b) => a.sort_order - b.sort_order)
+            .map((banner) => (
+              <FullWidthBanner key={banner.id} banner={banner} />
+            ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -28,7 +32,7 @@ function FullWidthBanner({ banner }: { banner: Banner }) {
   if (!banner.image_url) return null;
 
   const inner = (
-    <div style={{ display: "block", width: "100%", overflow: "hidden" }}>
+    <div style={{ display: "block", width: "100%", overflow: "hidden", borderRadius: "12px" }}>
       <Image
         src={banner.image_url}
         alt={banner.title || "バナー"}
