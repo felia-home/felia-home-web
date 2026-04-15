@@ -513,3 +513,80 @@ export async function getMemberProfileData(
     return null;
   }
 }
+
+// ---- 売却実績 ----
+
+export interface SaleResult {
+  id: string;
+  year_month: string;
+  area: string;
+  property_type: string;
+  comment?: string | null;
+  image_url_1?: string | null;
+  image_url_2?: string | null;
+  image_url_3?: string | null;
+  sort_order: number;
+}
+
+export async function getSaleResults(): Promise<SaleResult[]> {
+  try {
+    const res = await fetchFromAdmin<{ results: SaleResult[] }>(
+      "/api/hp/sale-results",
+      { next: { revalidate: 60 } }
+    );
+    return res.results ?? [];
+  } catch {
+    return [];
+  }
+}
+
+// ---- お客様の声 ----
+
+export interface Testimonial {
+  id: string;
+  display_name: string;
+  image_url?: string | null;
+  title: string;
+  trigger_text?: string | null;
+  decision_text?: string | null;
+  impression_text?: string | null;
+  advice_text?: string | null;
+  final_text?: string | null;
+  staff?: { name: string } | null;
+}
+
+export async function getTestimonials(): Promise<Testimonial[]> {
+  try {
+    const res = await fetchFromAdmin<{ testimonials: Testimonial[] }>(
+      "/api/hp/testimonials",
+      { next: { revalidate: 60 } }
+    );
+    return res.testimonials ?? [];
+  } catch {
+    return [];
+  }
+}
+
+// ---- WEBチラシ ----
+
+export interface WebFlyer {
+  id: string;
+  name: string;
+  distribute_month: string;
+  front_image_url?: string | null;
+  back_image_url?: string | null;
+  pdf_url?: string | null;
+  sort_order: number;
+}
+
+export async function getWebFlyers(): Promise<WebFlyer[]> {
+  try {
+    const res = await fetchFromAdmin<{ flyers: WebFlyer[] }>(
+      "/api/hp/web-flyers",
+      { next: { revalidate: 60 } }
+    );
+    return res.flyers ?? [];
+  } catch {
+    return [];
+  }
+}
