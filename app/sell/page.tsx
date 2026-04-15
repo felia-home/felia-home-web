@@ -235,13 +235,14 @@ export default function SellPage() {
             ))}
           </div>
 
-          {/* 下段3つ：flexboxで中央揃え */}
+          {/* 下段3つ（上段4つと同じカラム幅で中央3カラム） */}
           <div style={{
-            display: "flex",
-            justifyContent: "center",
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
             gap: "20px",
           }}>
-            {strengths.slice(4).map((s) => (
+            <div /> {/* 左空白 */}
+            {strengths.slice(4, 7).map((s) => (
               <div key={s.num} style={{ display: "flex", justifyContent: "center" }}>
                 <StrengthCircle s={s} />
               </div>
