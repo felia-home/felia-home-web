@@ -10,39 +10,42 @@ export async function FullWidthBannerSection() {
     banners = await getBanners();
   } catch {}
 
-  // バナーが0件の場合は何も表示しない
   if (banners.length === 0) return null;
 
   return (
     <section>
-      {banners.map((banner) => (
-        <FullWidthBanner key={banner.id} banner={banner} />
-      ))}
+      {banners
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((banner) => (
+          <FullWidthBanner key={banner.id} banner={banner} />
+        ))}
     </section>
   );
 }
 
 function FullWidthBanner({ banner }: { banner: Banner }) {
+  // image_url が空の場合は表示しない
+  if (!banner.image_url) return null;
+
   const inner = (
-    <div className="relative w-full overflow-hidden" style={{ display: "block" }}>
+    <div style={{ display: "block", width: "100%", overflow: "hidden" }}>
       <Image
-        src={banner.image}
-        alt={banner.alt || "バナー"}
+        src={banner.image_url}
+        alt={banner.title || "バナー"}
         width={1920}
         height={400}
-        className="w-full h-auto"
-        style={{ display: "block" }}
+        style={{ display: "block", width: "100%", height: "auto" }}
       />
     </div>
   );
 
-  if (!banner.href) return inner;
+  if (!banner.link_url) return inner;
 
   return (
     <Link
-      href={banner.href}
-      target={banner.alt === "_blank" ? "_blank" : undefined}
-      rel={banner.alt === "_blank" ? "noopener noreferrer" : undefined}
+      href={banner.link_url}
+      target={banner.link_target === "_blank" ? "_blank" : undefined}
+      rel={banner.link_target === "_blank" ? "noopener noreferrer" : undefined}
     >
       {inner}
     </Link>

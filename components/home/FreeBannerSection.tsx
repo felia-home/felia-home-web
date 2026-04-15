@@ -10,22 +10,52 @@ export async function FreeBannerSection() {
     // Admin API 未起動時はスキップ
   }
 
-  if (banners.length === 0) return null;
+  const visible = banners
+    .filter((b) => !!b.image_url)
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .slice(0, 4);
+
+  if (visible.length === 0) return null;
 
   return (
-    <section className="section-padding" style={{ backgroundColor: "#F8F8F8" }}>
+    <section style={{ backgroundColor: "#F8F8F8", padding: "40px 0" }}>
       <div className="container-content">
-        <div className="grid grid-cols-1 tb:grid-cols-2 gap-4">
-          {banners.slice(0, 4).map((banner) => (
-            <Link key={banner.id} href={banner.href} className="block group">
-              <div className="relative overflow-hidden rounded-lg" style={{ paddingBottom: "40%" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
+          {visible.map((banner) =>
+            banner.link_url ? (
+              <Link
+                key={banner.id}
+                href={banner.link_url}
+                target={banner.link_target === "_blank" ? "_blank" : undefined}
+                rel={banner.link_target === "_blank" ? "noopener noreferrer" : undefined}
+                style={{ display: "block" }}
+              >
+                <div style={{ position: "relative", overflow: "hidden", borderRadius: "8px", paddingBottom: "40%" }}>
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      backgroundImage: `url(${banner.image_url})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  />
+                </div>
+              </Link>
+            ) : (
+              <div key={banner.id} style={{ position: "relative", overflow: "hidden", borderRadius: "8px", paddingBottom: "40%" }}>
                 <div
-                  className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
-                  style={{ backgroundImage: `url(${banner.image})` }}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    backgroundImage: `url(${banner.image_url})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
                 />
               </div>
-            </Link>
-          ))}
+            )
+          )}
         </div>
       </div>
     </section>

@@ -217,10 +217,11 @@ export interface Feature {
 
 export interface Banner {
   id: string;
-  image: string;
-  href: string;
-  alt: string;
-  order: number;
+  title: string;
+  image_url: string;
+  link_url: string | null;
+  link_target: "_self" | "_blank";
+  sort_order: number;
 }
 
 export interface CompanyInfo {
