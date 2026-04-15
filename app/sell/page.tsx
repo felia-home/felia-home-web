@@ -221,24 +221,23 @@ export default function SellPage() {
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "48px", fontFamily: "'Noto Serif JP', serif" }}>
             フェリアホームの不動産売却　7つの強み
           </h2>
-          {/* 上段4つ：均等4カラム */}
+          {/* 上段4つ */}
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
             gap: "20px",
             marginBottom: "20px",
+            justifyItems: "center",
           }}>
             {strengths.slice(0, 4).map((s) => (
-              <div key={s.num} style={{ display: "flex", justifyContent: "center" }}>
-                <StrengthCircle s={s} />
-              </div>
+              <StrengthCircle key={s.num} s={s} />
             ))}
           </div>
 
-          {/* 上段と同じ4カラムgridを使い、左右に空白を半分ずつ配置 */}
+          {/* 下段3つ：0.5fr で左右に空白を作り中央揃え・上段と同じ1frカラム幅 */}
           <div style={{
             display: "grid",
-            gridTemplateColumns: "1fr repeat(3, clamp(130px, 17vw, 165px)) 1fr",
+            gridTemplateColumns: "0.5fr 1fr 1fr 1fr 0.5fr",
             gap: "20px",
             justifyItems: "center",
           }}>
