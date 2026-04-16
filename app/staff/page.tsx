@@ -1,217 +1,106 @@
+// app/staff/page.tsx
 import type { Metadata } from "next";
+import Link from "next/link";
 import Image from "next/image";
+import { ChevronRight, User } from "lucide-react";
+import { getStaffList } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "スタッフ紹介",
-  description: "フェリアホームのスタッフをご紹介します。千駄ヶ谷本店・幡ヶ谷支店・コンサルティング事業部のメンバー一覧。",
+  description: "フェリアホームのスタッフをご紹介します。",
 };
 
-type Staff = {
-  name: string;
-  nameKana: string;
-  position: string;
-  store: string;
-  image: string;
-};
+export default async function StaffPage() {
+  const staffList = await getStaffList();
 
-const SENDAGAYA_STAFF: Staff[] = [
-  {
-    name: "北原 啓輔",
-    nameKana: "キタハラ ケイスケ",
-    position: "代表取締役",
-    store: "千駄ヶ谷本店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/kitahara.jpg",
-  },
-  {
-    name: "伊藤 貴洋",
-    nameKana: "イトウ タカヒロ",
-    position: "営業部",
-    store: "千駄ヶ谷本店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/t.ito.jpg",
-  },
-  {
-    name: "長田 光平",
-    nameKana: "ナガタ コウヘイ",
-    position: "営業部",
-    store: "千駄ヶ谷本店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/k.nagata.jpg",
-  },
-  {
-    name: "表 来希",
-    nameKana: "オモテ ライキ",
-    position: "営業部",
-    store: "千駄ヶ谷本店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/r.omote.jpg",
-  },
-  {
-    name: "齋藤 大空",
-    nameKana: "サイトウ タク",
-    position: "営業部",
-    store: "千駄ヶ谷本店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/t.saito.jpg",
-  },
-  {
-    name: "安井 孝輔",
-    nameKana: "ヤスイ コウスケ",
-    position: "営業部",
-    store: "千駄ヶ谷本店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/k.yasui.jpg",
-  },
-  {
-    name: "中田 真矢",
-    nameKana: "ナカダ マサヤ",
-    position: "営業部",
-    store: "千駄ヶ谷本店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/m.nakada.jpg",
-  },
-  {
-    name: "加藤 遼太朗",
-    nameKana: "カトウ リョウタロウ",
-    position: "営業部",
-    store: "千駄ヶ谷本店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/r.kato.jpg",
-  },
-  {
-    name: "松本 祐輔",
-    nameKana: "マツモト ユウスケ",
-    position: "",
-    store: "千駄ヶ谷本店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/y.matsumoto.jpg",
-  },
-];
+  // 店舗ごとにグループ分け
+  const groups: Record<string, typeof staffList> = {};
+  staffList.forEach((s) => {
+    const store = s.store_name ?? "その他";
+    if (!groups[store]) groups[store] = [];
+    groups[store].push(s);
+  });
 
-const HATAGAYA_STAFF: Staff[] = [
-  {
-    name: "波多 隆二",
-    nameKana: "ハタ リュウジ",
-    position: "営業部 部長",
-    store: "幡ヶ谷支店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/hata.jpg",
-  },
-  {
-    name: "中塚 雅人",
-    nameKana: "ナカツカ マサト",
-    position: "営業部 次長",
-    store: "幡ヶ谷支店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/nakatsuka.jpg",
-  },
-  {
-    name: "渡邉 圭介",
-    nameKana: "ワタナベ ケイスケ",
-    position: "営業部",
-    store: "幡ヶ谷支店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/k.watanabe.jpg",
-  },
-  {
-    name: "阿部 楠央",
-    nameKana: "アベ ナオ",
-    position: "営業部",
-    store: "幡ヶ谷支店",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/n.abe.png",
-  },
-];
-
-const CONSULTING_STAFF: Staff[] = [
-  {
-    name: "星 俊彦",
-    nameKana: "ホシ トシヒコ",
-    position: "コンサルティング事業部 部長",
-    store: "コンサルティング事業部",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/hoshi.jpg",
-  },
-  {
-    name: "松 大輔",
-    nameKana: "マツ ダイスケ",
-    position: "コンサルティング事業部",
-    store: "コンサルティング事業部",
-    image: "https://img.hs.aws.multi-use.net/adm1/felia/images/staff/d.matsu.jpg",
-  },
-];
-
-function StaffCard({ staff }: { staff: Staff }) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-[#e8e6e0] hover:shadow-lg transition-shadow">
-      <div className="relative h-64 bg-[#e8e6e0]">
-        <Image
-          src={staff.image}
-          alt={staff.name}
-          fill
-          className="object-cover object-top"
-          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-        />
-      </div>
-      <div className="p-5">
-        {staff.position && (
-          <div className="text-xs text-[#c9a96e] font-bold tracking-wider mb-2">
-            {staff.position}
-          </div>
-        )}
-        <div className="font-serif text-xl font-bold text-[#1c1b18] mb-1">
-          {staff.name}
-        </div>
-        <div className="text-xs text-[#706e68] tracking-wider">
-          {staff.nameKana}
+    <div style={{ backgroundColor: "#ffffff" }}>
+      {/* パンくず */}
+      <div style={{ backgroundColor: "#F8F8F8", padding: "8px 0" }}>
+        <div className="container-content">
+          <nav style={{ fontSize: "12px", color: "#999", display: "flex", alignItems: "center", gap: "4px" }}>
+            <Link href="/" style={{ color: "#999", textDecoration: "none" }}>TOP</Link>
+            <ChevronRight size={12} />
+            <span style={{ color: "#333" }}>スタッフ紹介</span>
+          </nav>
         </div>
       </div>
-    </div>
-  );
-}
 
-export default function StaffPage() {
-  return (
-    <div className="bg-[#fafaf8] min-h-screen">
-      {/* ページヘッダー */}
-      <section className="pt-28 pb-16 bg-white border-b border-[#e8e6e0]">
-        <div className="container-xl">
-          <p className="text-[#c9a96e] text-xs tracking-[0.4em] mb-3 font-serif">STAFF</p>
-          <h1 className="font-serif text-4xl font-bold text-[#1c1b18]">スタッフ紹介</h1>
-        </div>
-      </section>
+      <div className="container-content" style={{ padding: "32px 0 64px" }}>
+        <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "48px", fontFamily: "'Noto Serif JP', serif" }}>
+          スタッフ紹介
+        </h1>
 
-      {/* 千駄ヶ谷本店 */}
-      <section className="py-16 bg-[#fafaf8]">
-        <div className="container-xl">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="w-1 h-8 bg-[#c9a96e]" />
-            <h2 className="font-serif text-2xl font-bold text-[#1c1b18]">千駄ヶ谷本店</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {SENDAGAYA_STAFF.map((staff) => (
-              <StaffCard key={staff.name} staff={staff} />
-            ))}
-          </div>
-        </div>
-      </section>
+        {Object.entries(groups).map(([storeName, members]) => (
+          <div key={storeName} style={{ marginBottom: "56px" }}>
+            {/* 店舗名 */}
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
+              <div style={{ width: "3px", height: "18px", backgroundColor: "#5BAD52", borderRadius: "2px" }} />
+              <h2 style={{ fontSize: "15px", fontWeight: "bold", color: "#555" }}>{storeName}</h2>
+            </div>
 
-      {/* 幡ヶ谷支店 */}
-      <section className="py-16 bg-white">
-        <div className="container-xl">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="w-1 h-8 bg-[#c9a96e]" />
-            <h2 className="font-serif text-2xl font-bold text-[#1c1b18]">幡ヶ谷支店</h2>
+            {/* グリッド */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "32px" }}
+              className="grid-cols-2 tb:grid-cols-3">
+              {members.map((staff) => (
+                <Link
+                  key={staff.id}
+                  href={`/staff/${staff.id}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <div className="group">
+                    {/* 写真 */}
+                    <div style={{
+                      position: "relative", width: "100%", aspectRatio: "3/4",
+                      borderRadius: "8px", overflow: "hidden",
+                      backgroundColor: "#F0F5F0", marginBottom: "12px",
+                    }}>
+                      {staff.photo_url ? (
+                        <Image
+                          src={staff.photo_url}
+                          alt={staff.name}
+                          fill
+                          style={{ objectFit: "cover", transition: "transform 0.4s ease" }}
+                          sizes="(max-width: 768px) 50vw, 33vw"
+                          className="group-hover:scale-105"
+                        />
+                      ) : (
+                        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <User size={48} style={{ color: "#ccc" }} />
+                        </div>
+                      )}
+                    </div>
+                    {/* テキスト */}
+                    <div>
+                      {(staff.department || staff.position) && (
+                        <p style={{ fontSize: "11px", color: "#888", marginBottom: "2px" }}>
+                          {staff.department || staff.position}
+                        </p>
+                      )}
+                      <p style={{ fontSize: "17px", fontWeight: "bold", color: "#1a1a1a", letterSpacing: "0.05em", fontFamily: "'Noto Serif JP', serif" }}>
+                        {staff.name}
+                      </p>
+                      {staff.name_kana && (
+                        <p style={{ fontSize: "11px", color: "#888", marginTop: "2px", letterSpacing: "0.05em" }}>
+                          {staff.name_kana}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {HATAGAYA_STAFF.map((staff) => (
-              <StaffCard key={staff.name} staff={staff} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* コンサルティング事業部 */}
-      <section className="py-16 bg-[#fafaf8]">
-        <div className="container-xl">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="w-1 h-8 bg-[#c9a96e]" />
-            <h2 className="font-serif text-2xl font-bold text-[#1c1b18]">コンサルティング事業部</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {CONSULTING_STAFF.map((staff) => (
-              <StaffCard key={staff.name} staff={staff} />
-            ))}
-          </div>
-        </div>
-      </section>
+        ))}
+      </div>
     </div>
   );
 }

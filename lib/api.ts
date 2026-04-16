@@ -541,6 +541,50 @@ export async function getMemberProfileData(
   }
 }
 
+// ---- スタッフ ----
+
+export interface StaffMember {
+  id: string;
+  name: string;
+  name_kana?: string | null;
+  position?: string | null;
+  department?: string | null;
+  store_name?: string | null;
+  photo_url?: string | null;
+  bio?: string | null;
+  catchphrase?: string | null;
+  qualification?: string | null;
+  favorite_word?: string | null;
+  hobby?: string | null;
+  memorable_client?: string | null;
+  sub_images?: string[];
+  sort_order: number;
+}
+
+export async function getStaffList(): Promise<StaffMember[]> {
+  try {
+    const res = await fetchFromAdmin<{ staff: StaffMember[] }>(
+      "/api/hp/staff",
+      { next: { revalidate: 60 } }
+    );
+    return res.staff ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getStaffById(id: string): Promise<StaffMember | null> {
+  try {
+    const res = await fetchFromAdmin<{ staff: StaffMember }>(
+      `/api/hp/staff/${id}`,
+      { next: { revalidate: 60 } }
+    );
+    return res.staff ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // ---- 売却実績 ----
 
 export interface SaleResult {
