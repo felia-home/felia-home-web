@@ -6,7 +6,6 @@ import { FeliaSectionSelection } from "@/components/home/FeliaSectionSelection";
 import { RecommendSection } from "@/components/home/RecommendSection";
 import { NewAndNewsSection } from "@/components/home/NewAndNewsSection";
 import { FullWidthBannerSection } from "@/components/home/FullWidthBannerSection";
-import { TradeUpBannerSection } from "@/components/home/TradeUpBannerSection";
 import { SearchSection } from "@/components/home/SearchSection";
 import { OpenHouseAndInfoSection } from "@/components/home/OpenHouseAndInfoSection";
 import { FeatureSection } from "@/components/home/FeatureSection";
@@ -36,9 +35,6 @@ export default function HomePage() {
 
       {/* 7. 現地販売会 ＋ お知らせ */}
       <OpenHouseAndInfoSection />
-
-      {/* 8. 買い替え誘導バナー */}
-      <TradeUpBannerSection />
 
       {/* 9. 特集 */}
       <FeatureSection />
