@@ -133,47 +133,56 @@ export function TokyoWardMap({ areas }: TokyoWardMapProps) {
   return (
     <div style={{ position: "relative", width: "100%" }}>
       <svg
-        viewBox="470 125 260 240"
+        viewBox="460 120 280 260"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ width: "100%", height: "auto", display: "block", backgroundColor: "#1B3A4B", borderRadius: "12px" }}
+        style={{ width: "100%", height: "auto", display: "block", backgroundColor: "#1B3A4B", borderRadius: "12px", overflow: "hidden" }}
       >
-        {/* 対応エリアのみ描画 */}
-        {PATHS.filter((ward) => isActive(ward.name)).map((ward) => {
-          const hovered = hoveredId === ward.id;
+        {/* クリップ定義 */}
+        <defs>
+          <clipPath id="mapClip">
+            <rect x="460" y="120" width="280" height="260" />
+          </clipPath>
+        </defs>
 
-          return (
-            <g
-              key={ward.id}
-              style={{ cursor: "pointer" }}
-              onClick={() => router.push(getHref(ward.name))}
-              onMouseEnter={() => setHoveredId(ward.id)}
-              onMouseLeave={() => setHoveredId(null)}
-            >
-              <path
-                d={ward.d}
-                fill={hovered ? "rgba(91,173,82,0.7)" : "rgba(91,173,82,0.3)"}
-                stroke={hovered ? "#5BAD52" : "rgba(255,255,255,0.6)"}
-                strokeWidth={hovered ? "1.5" : "1"}
-                style={{ transition: "all 0.15s ease" }}
-              />
-              {WARD_CENTERS[ward.name] && (
-                <text
-                  x={WARD_CENTERS[ward.name][0]}
-                  y={WARD_CENTERS[ward.name][1]}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fill={hovered ? "white" : "rgba(255,255,255,0.95)"}
-                  fontSize="9"
-                  fontWeight={hovered ? "700" : "500"}
-                  fontFamily="'Noto Sans JP', 'Hiragino Sans', sans-serif"
-                  style={{ pointerEvents: "none", userSelect: "none" }}
-                >
-                  {ward.name}
-                </text>
-              )}
-            </g>
-          );
-        })}
+        {/* 対応エリアのみ描画・clipPath適用 */}
+        <g clipPath="url(#mapClip)">
+          {PATHS.filter((ward) => isActive(ward.name)).map((ward) => {
+            const hovered = hoveredId === ward.id;
+
+            return (
+              <g
+                key={ward.id}
+                style={{ cursor: "pointer" }}
+                onClick={() => router.push(getHref(ward.name))}
+                onMouseEnter={() => setHoveredId(ward.id)}
+                onMouseLeave={() => setHoveredId(null)}
+              >
+                <path
+                  d={ward.d}
+                  fill={hovered ? "rgba(91,173,82,0.7)" : "rgba(91,173,82,0.3)"}
+                  stroke={hovered ? "#5BAD52" : "rgba(255,255,255,0.6)"}
+                  strokeWidth={hovered ? "1.5" : "1"}
+                  style={{ transition: "all 0.15s ease" }}
+                />
+                {WARD_CENTERS[ward.name] && (
+                  <text
+                    x={WARD_CENTERS[ward.name][0]}
+                    y={WARD_CENTERS[ward.name][1]}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill={hovered ? "white" : "rgba(255,255,255,0.95)"}
+                    fontSize="9"
+                    fontWeight={hovered ? "700" : "500"}
+                    fontFamily="'Noto Sans JP', 'Hiragino Sans', sans-serif"
+                    style={{ pointerEvents: "none", userSelect: "none" }}
+                  >
+                    {ward.name}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+        </g>
       </svg>
     </div>
   );
