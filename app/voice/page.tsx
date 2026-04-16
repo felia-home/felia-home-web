@@ -33,7 +33,7 @@ function TestimonialCard({ t }: { t: Testimonial }) {
           </div>
         )}
         <div>
-          <p style={{ fontWeight: "bold", fontSize: "16px", color: "#1a1a1a", marginBottom: "4px" }}>{t.display_name}</p>
+          <p style={{ fontWeight: "bold", fontSize: "16px", color: "#1a1a1a", marginBottom: "4px" }}>{t.display_name}様</p>
           <p style={{ fontSize: "13px", color: "#5BAD52", fontWeight: "bold" }}>{t.title}</p>
           {t.staff && <p style={{ fontSize: "11px", color: "#888", marginTop: "2px" }}>担当: {t.staff.name}</p>}
         </div>
