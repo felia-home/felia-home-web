@@ -44,7 +44,7 @@ const menuItems: MenuItem[] = [
     label: "私たちについて",
     children: [
       { label: "フェリアホームについて", href: "/about" },
-      { label: "スタッフ紹介", href: "/about/staff" },
+      { label: "スタッフ紹介", href: "/staff" },
     ],
   },
   { label: "お知らせ", href: "/news" },

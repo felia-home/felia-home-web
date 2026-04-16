@@ -33,7 +33,7 @@ const footerLinks = [
     group: "フェリアホーム",
     links: [
       { label: "会社概要", href: "/about" },
-      { label: "スタッフ紹介", href: "/about/staff" },
+      { label: "スタッフ紹介", href: "/staff" },
       { label: "採用情報", href: "/recruit" },
       { label: "よくある質問", href: "/faq" },
       { label: "お知らせ", href: "/news" },

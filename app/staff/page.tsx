@@ -59,7 +59,7 @@ export default async function StaffPage() {
                   <div className="group">
                     {/* 写真 */}
                     <div style={{
-                      position: "relative", width: "100%", aspectRatio: "3/4",
+                      position: "relative", width: "100%", aspectRatio: "16/9",
                       borderRadius: "8px", overflow: "hidden",
                       backgroundColor: "#F0F5F0", marginBottom: "12px",
                     }}>
@@ -68,7 +68,7 @@ export default async function StaffPage() {
                           src={staff.photo_url}
                           alt={staff.name}
                           fill
-                          style={{ objectFit: "cover", transition: "transform 0.4s ease" }}
+                          style={{ objectFit: "cover", objectPosition: "center", transition: "transform 0.4s ease" }}
                           sizes="(max-width: 768px) 50vw, 33vw"
                           className="group-hover:scale-105"
                         />
