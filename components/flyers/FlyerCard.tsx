@@ -3,111 +3,104 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { FlyerModal } from "./FlyerModal";
 import type { WebFlyer } from "@/lib/api";
 
 export function FlyerCard({ flyer }: { flyer: WebFlyer }) {
-  const [side, setSide] = useState<"front" | "back">("front");
-  const hasBack = !!flyer.back_image_url;
-  const currentImage =
-    side === "front"
-      ? flyer.front_image_url
-      : flyer.back_image_url;
+  const [modalOpen, setModalOpen] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  if (!flyer.front_image_url) return null;
 
   return (
-    <div style={{
-      backgroundColor: "#fff",
-      border: "1px solid #e8e8e8",
-      borderRadius: "8px",
-      overflow: "hidden",
-      boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-    }}>
-      {/* 表面・裏面タブ */}
-      {hasBack && (
-        <div style={{ display: "flex", borderBottom: "1px solid #e8e8e8" }}>
-          {(["front", "back"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setSide(s)}
-              style={{
-                flex: 1,
-                padding: "10px",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "13px",
-                fontWeight: side === s ? "bold" : "normal",
-                backgroundColor: side === s ? "#5BAD52" : "#f9f9f9",
-                color: side === s ? "#fff" : "#666",
-                transition: "all 0.2s ease",
-              }}
-            >
-              {s === "front" ? "表面" : "裏面"}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* チラシ画像（A4比率 1:√2） */}
-      <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1.414", backgroundColor: "#f5f5f5" }}>
-        {currentImage ? (
+    <>
+      {/* カード（横向きサムネイル） */}
+      <div
+        onClick={() => setModalOpen(true)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          backgroundColor: "#fff",
+          border: "1px solid #e8e8e8",
+          borderRadius: "8px",
+          overflow: "hidden",
+          boxShadow: hovered
+            ? "0 4px 16px rgba(0,0,0,0.12)"
+            : "0 2px 8px rgba(0,0,0,0.06)",
+          cursor: "pointer",
+          transition: "box-shadow 0.2s ease",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {/* サムネイル画像（横向き） */}
+        <div style={{
+          position: "relative",
+          width: "100%",
+          aspectRatio: "1.414 / 1",
+          backgroundColor: "#f5f5f5",
+        }}>
           <Image
-            src={currentImage}
+            src={flyer.front_image_url}
             alt={flyer.name}
             fill
-            quality={90}
-            style={{ objectFit: "contain" }}
-            sizes="(max-width: 599px) 100vw, (max-width: 1023px) 50vw, 33vw"
+            quality={85}
+            style={{ objectFit: "cover", objectPosition: "top" }}
+            sizes="(max-width: 767px) 100vw, 50vw"
           />
-        ) : (
+          {/* 拡大アイコン */}
           <div style={{
-            position: "absolute", inset: 0,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#ccc", fontSize: "13px",
+            position: "absolute",
+            bottom: "8px",
+            right: "8px",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            color: "#fff",
+            borderRadius: "4px",
+            padding: "4px 8px",
+            fontSize: "11px",
           }}>
-            画像なし
+            🔍 クリックで拡大
           </div>
-        )}
-      </div>
-
-      {/* チラシ情報 */}
-      <div style={{ padding: "16px" }}>
-        {flyer.distribute_month && (
-          <p style={{ fontSize: "12px", color: "#888", marginBottom: "4px" }}>
-            {flyer.distribute_month}
-          </p>
-        )}
-        <h3 style={{
-          fontSize: "15px",
-          fontWeight: "bold",
-          color: "#333",
-          marginBottom: "12px",
-          lineHeight: 1.4,
-        }}>
-          {flyer.name}
-        </h3>
-
-        {/* PDFダウンロードボタン */}
-        {flyer.pdf_url && (
-          <a
-            href={flyer.pdf_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "4px",
-              padding: "8px 16px",
+          {/* 裏面あり表示 */}
+          {flyer.back_image_url && (
+            <div style={{
+              position: "absolute",
+              top: "8px",
+              right: "8px",
               backgroundColor: "#5BAD52",
               color: "#fff",
               borderRadius: "4px",
-              fontSize: "13px",
-              textDecoration: "none",
-              fontWeight: "bold",
-            }}
-          >
-            📄 PDFダウンロード
-          </a>
-        )}
+              padding: "3px 8px",
+              fontSize: "11px",
+            }}>
+              表裏あり
+            </div>
+          )}
+        </div>
+
+        {/* 情報 */}
+        <div style={{ padding: "12px 16px" }}>
+          {flyer.distribute_month && (
+            <p style={{ fontSize: "12px", color: "#888", margin: "0 0 4px" }}>
+              {flyer.distribute_month}
+            </p>
+          )}
+          <p style={{
+            fontSize: "14px",
+            fontWeight: "bold",
+            color: "#333",
+            margin: 0,
+            lineHeight: 1.4,
+          }}>
+            {flyer.name}
+          </p>
+        </div>
       </div>
-    </div>
+
+      {/* モーダル */}
+      {modalOpen && (
+        <FlyerModal flyer={flyer} onClose={() => setModalOpen(false)} />
+      )}
+    </>
   );
 }
