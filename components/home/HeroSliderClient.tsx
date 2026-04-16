@@ -60,20 +60,20 @@ export function HeroSliderClient({ slides }: HeroSliderClientProps) {
       style={{
         position: "relative",
         width: "100%",
-        backgroundColor: "#1a1a1a",
+        height: "clamp(300px, 56vw, 650px)",
         overflow: "hidden",
+        backgroundColor: "#1a1a1a",
       }}
     >
-      {/* スライド群（gridで重ねて高さはimageに合わせる） */}
-      <div style={{ display: "grid", maxHeight: "600px", overflow: "hidden" }}>
-        {slides.map((slide, index) => (
-          <SlideItem
-            key={slide.id}
-            slide={slide}
-            isActive={index === current}
-          />
-        ))}
-      </div>
+      {/* スライド群 */}
+      {slides.map((slide, index) => (
+        <SlideItem
+          key={slide.id}
+          slide={slide}
+          isActive={index === current}
+          isPriority={index === 0}
+        />
+      ))}
 
       {/* 左矢印 */}
       {total > 1 && (
@@ -151,9 +151,7 @@ export function HeroSliderClient({ slides }: HeroSliderClientProps) {
                 border: "none",
                 cursor: "pointer",
                 backgroundColor:
-                  index === current
-                    ? "#5BAD52"
-                    : "rgba(255,255,255,0.5)",
+                  index === current ? "#5BAD52" : "rgba(255,255,255,0.5)",
                 transition: "all 0.3s ease",
                 padding: 0,
               }}
@@ -170,18 +168,21 @@ export function HeroSliderClient({ slides }: HeroSliderClientProps) {
 function SlideItem({
   slide,
   isActive,
+  isPriority,
 }: {
   slide: SlideData;
   isActive: boolean;
+  isPriority: boolean;
 }) {
   return (
     <div
       style={{
-        gridRow: "1",
-        gridColumn: "1",
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
         opacity: isActive ? 1 : 0,
         transition: "opacity 0.7s ease",
-        position: "relative",
       }}
     >
       {/* 背景（画像 or グラデーション） */}
@@ -189,18 +190,18 @@ function SlideItem({
         <Image
           src={slide.image}
           alt={slide.catchCopy.replace("\n", " ")}
-          width={1920}
-          height={1080}
+          fill
           quality={100}
-          style={{ display: "block", width: "100%", height: "auto" }}
-          priority
+          style={{ objectFit: "cover", objectPosition: "center" }}
+          priority={isPriority}
           sizes="100vw"
         />
       ) : (
         <div
           style={{
-            aspectRatio: "16/7",
-            background: slide.gradient,
+            position: "absolute",
+            inset: 0,
+            background: slide.gradient ?? "#1a1a1a",
           }}
         />
       )}
@@ -225,28 +226,29 @@ function SlideItem({
             display: "flex",
             alignItems: "center",
             zIndex: 10,
+            backgroundColor: "transparent",
           }}
         >
           <div className="container-content">
             <div
               style={{
                 maxWidth: "512px",
+                backgroundColor: "transparent",
                 opacity: isActive ? 1 : 0,
                 transform: isActive ? "translateY(0)" : "translateY(16px)",
-                transition:
-                  "opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s",
+                transition: "opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s",
               }}
             >
               {slide.catchCopy && (
                 <h1
                   style={{
-                    color: "white",
+                    color: "#fff",
                     fontFamily: "'Noto Sans JP', sans-serif",
                     fontSize: "clamp(22px, 3.5vw, 44px)",
                     fontWeight: "bold",
                     lineHeight: 1.3,
                     marginBottom: "12px",
-                    textShadow: "0 2px 8px rgba(0,0,0,0.4)",
+                    textShadow: "0 1px 4px rgba(0,0,0,0.6)",
                     whiteSpace: "pre-line",
                   }}
                 >
@@ -257,10 +259,10 @@ function SlideItem({
               {slide.subCopy && (
                 <p
                   style={{
-                    color: "rgba(255,255,255,0.85)",
+                    color: "#fff",
                     fontSize: "clamp(13px, 1.5vw, 17px)",
                     marginBottom: "24px",
-                    textShadow: "0 1px 4px rgba(0,0,0,0.4)",
+                    textShadow: "0 1px 4px rgba(0,0,0,0.6)",
                   }}
                 >
                   {slide.subCopy}
@@ -270,9 +272,7 @@ function SlideItem({
               {slide.buttonLabel && slide.buttonHref && (
                 <Link
                   href={slide.buttonHref}
-                  target={
-                    slide.linkTarget === "_blank" ? "_blank" : undefined
-                  }
+                  target={slide.linkTarget === "_blank" ? "_blank" : undefined}
                   rel={
                     slide.linkTarget === "_blank"
                       ? "noopener noreferrer"
