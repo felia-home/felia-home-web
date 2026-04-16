@@ -99,12 +99,13 @@ export default async function AboutPage() {
       </section>
 
       {/* ── 代表写真（フルワイド） ──────────────── */}
-      <div style={{ position: "relative", width: "100%", height: "clamp(240px, 40vw, 480px)", overflow: "hidden" }}>
+      <div style={{ width: "100%", textAlign: "center" }}>
         <Image
           src="/images/about/ceohero.jpg"
           alt="代表取締役 北原啓輔"
-          fill
-          style={{ objectFit: "cover", objectPosition: "center top" }}
+          width={1920}
+          height={1080}
+          style={{ display: "block", width: "100%", height: "auto" }}
           sizes="100vw"
         />
       </div>
