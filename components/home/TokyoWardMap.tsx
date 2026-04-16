@@ -114,10 +114,9 @@ const PATHS = [
 
 interface TokyoWardMapProps {
   areas?: { area_name: string; href?: string | null }[];
-  showLegend?: boolean;
 }
 
-export function TokyoWardMap({ areas, showLegend = true }: TokyoWardMapProps) {
+export function TokyoWardMap({ areas }: TokyoWardMapProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const router = useRouter();
 
@@ -134,67 +133,38 @@ export function TokyoWardMap({ areas, showLegend = true }: TokyoWardMapProps) {
   return (
     <div style={{ position: "relative", width: "100%" }}>
       <svg
-        viewBox="0 0 820 440"
+        viewBox="470 125 260 240"
         xmlns="http://www.w3.org/2000/svg"
         style={{ width: "100%", height: "auto", display: "block", backgroundColor: "#1B3A4B", borderRadius: "12px" }}
       >
-        {/* タイトル */}
-        <text x="16" y="28" fill="rgba(255,255,255,0.9)"
-          fontSize="14" fontWeight="bold"
-          fontFamily="'Noto Sans JP', 'Hiragino Sans', sans-serif">
-          エリアから探す
-        </text>
-
-        {/* 全エリア一覧リンク */}
-        <a href="/properties" style={{ cursor: "pointer" }}>
-          <text x="700" y="28" fill="rgba(255,255,255,0.6)"
-            fontSize="11" fontFamily="'Noto Sans JP', sans-serif">
-            全エリア一覧
-          </text>
-          <polygon points="772,23 778,27 772,31" fill="rgba(255,255,255,0.6)" />
-        </a>
-
-        {/* 区・市を描画 */}
-        {PATHS.map((ward) => {
-          const active = isActive(ward.name);
+        {/* 対応エリアのみ描画 */}
+        {PATHS.filter((ward) => isActive(ward.name)).map((ward) => {
           const hovered = hoveredId === ward.id;
 
           return (
             <g
               key={ward.id}
-              style={{ cursor: active ? "pointer" : "default" }}
-              onClick={() => active && router.push(getHref(ward.name))}
-              onMouseEnter={() => active && setHoveredId(ward.id)}
+              style={{ cursor: "pointer" }}
+              onClick={() => router.push(getHref(ward.name))}
+              onMouseEnter={() => setHoveredId(ward.id)}
               onMouseLeave={() => setHoveredId(null)}
             >
               <path
                 d={ward.d}
-                fill={
-                  hovered
-                    ? "rgba(91,173,82,0.6)"
-                    : active
-                    ? "rgba(91,173,82,0.25)"
-                    : "rgba(255,255,255,0.05)"
-                }
-                stroke={
-                  hovered
-                    ? "#5BAD52"
-                    : active
-                    ? "rgba(255,255,255,0.5)"
-                    : "rgba(255,255,255,0.15)"
-                }
-                strokeWidth={hovered ? "1.5" : "0.8"}
+                fill={hovered ? "rgba(91,173,82,0.7)" : "rgba(91,173,82,0.3)"}
+                stroke={hovered ? "#5BAD52" : "rgba(255,255,255,0.6)"}
+                strokeWidth={hovered ? "1.5" : "1"}
                 style={{ transition: "all 0.15s ease" }}
               />
-              {active && WARD_CENTERS[ward.name] && (
+              {WARD_CENTERS[ward.name] && (
                 <text
                   x={WARD_CENTERS[ward.name][0]}
                   y={WARD_CENTERS[ward.name][1]}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  fill={hovered ? "white" : "rgba(255,255,255,0.9)"}
-                  fontSize="7"
-                  fontWeight={hovered ? "700" : "400"}
+                  fill={hovered ? "white" : "rgba(255,255,255,0.95)"}
+                  fontSize="9"
+                  fontWeight={hovered ? "700" : "500"}
                   fontFamily="'Noto Sans JP', 'Hiragino Sans', sans-serif"
                   style={{ pointerEvents: "none", userSelect: "none" }}
                 >
@@ -205,20 +175,6 @@ export function TokyoWardMap({ areas, showLegend = true }: TokyoWardMapProps) {
           );
         })}
       </svg>
-
-      {/* 凡例 */}
-      {showLegend && (
-        <div style={{ display: "flex", gap: "16px", marginTop: "8px", paddingLeft: "4px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <div style={{ width: "12px", height: "12px", borderRadius: "2px", backgroundColor: "rgba(91,173,82,0.4)", border: "1px solid #5BAD52" }} />
-            <span style={{ fontSize: "11px", color: "#555" }}>対応エリア</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <div style={{ width: "12px", height: "12px", borderRadius: "2px", backgroundColor: "rgba(255,255,255,0.1)", border: "1px solid rgba(0,0,0,0.15)" }} />
-            <span style={{ fontSize: "11px", color: "#888" }}>対応エリア外</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
