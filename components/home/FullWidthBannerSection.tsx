@@ -1,6 +1,5 @@
 // components/home/FullWidthBannerSection.tsx
 import Image from "next/image";
-import Link from "next/link";
 import { getBanners } from "@/lib/api";
 import type { Banner } from "@/lib/api";
 
@@ -28,11 +27,10 @@ export async function FullWidthBannerSection() {
 }
 
 function FullWidthBanner({ banner }: { banner: Banner }) {
-  // image_url が空の場合は表示しない
   if (!banner.image_url) return null;
 
   const inner = (
-    <div style={{ display: "block", width: "100%", overflow: "hidden", borderRadius: "12px" }}>
+    <div style={{ display: "block", width: "100%", overflow: "hidden" }}>
       <Image
         src={banner.image_url}
         alt={banner.title || "バナー"}
@@ -46,12 +44,17 @@ function FullWidthBanner({ banner }: { banner: Banner }) {
   if (!banner.link_url) return inner;
 
   return (
-    <Link
+    <a
       href={banner.link_url}
       target={banner.link_target === "_blank" ? "_blank" : undefined}
       rel={banner.link_target === "_blank" ? "noopener noreferrer" : undefined}
+      style={{
+        display: "block",
+        cursor: "pointer",
+        textDecoration: "none",
+      }}
     >
       {inner}
-    </Link>
+    </a>
   );
 }
