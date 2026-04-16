@@ -341,7 +341,7 @@ export default function BuyPage() {
                   <p style={{ fontSize: "11px", color: "#5BAD52", fontWeight: "bold" }}>Step.{s.num}</p>
                   <p style={{ fontSize: "13px", fontWeight: "bold", color: "#1a1a1a" }}>{s.title}</p>
                 </div>
-                <div style={{ position: "relative", height: "80px", overflow: "hidden" }}>
+                <div style={{ position: "relative", width: "100%", height: "140px", overflow: "hidden" }}>
                   <Image
                     src={`/images/buy/buy_online_0${s.num}.jpg`}
                     alt={s.title}
@@ -360,11 +360,11 @@ export default function BuyPage() {
           <div style={{ backgroundColor: "#F8F8F8", borderRadius: "8px", padding: "20px" }}>
             <p style={{ fontSize: "13px", fontWeight: "bold", color: "#333", marginBottom: "8px" }}>＜事前準備＞</p>
             <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.8, marginBottom: "12px" }}>
-              お客様がお使いのパソコン・タブレットに『Skype』『facetime』等のテレビ電話アプリをインストールする必要があります。
+              お客様がお使いのパソコン・スマートフォン・タブレットに『Zoom』『Google Meet』『LINE』等のビデオ通話アプリをインストールする必要があります。
             </p>
             <ul style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
               {[
-                "『SKYPE』のご連絡はこちらから　※『facetime』のご連絡はこちらから",
+                "ご利用のビデオ通話アプリ（Zoom・Google Meet・LINE等）のご連絡先は担当スタッフよりお伝えいたします。",
                 "本サービス利用の際はネットワーク接続された機器およびブラウザ・アプリケーションが必要になります。通信状況・端末によってはテレビ電話の画質が悪くなる場合がございます。",
                 "本不動産見学サービスは東京23区内の物件に限られます。",
                 "当物件室内の手配が必要となりますので、ご希望日程に添えない事もございます。ご了承ください。",
