@@ -269,6 +269,33 @@ export interface CompanyInfo {
   license: string;
   lat?: number | null;
   lng?: number | null;
+  access_text?: string | null;
+}
+
+export interface CompanyBranch {
+  id: string;
+  name: string;
+  postal_code?: string | null;
+  address: string;
+  phone?: string | null;
+  fax?: string | null;
+  access_text?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  is_active: boolean;
+  sort_order: number;
+}
+
+export async function getCompanyBranches(): Promise<CompanyBranch[]> {
+  try {
+    const res = await fetchFromAdmin<{ branches: CompanyBranch[] }>(
+      "/api/hp/company-branches",
+      { next: { revalidate: 300 } }
+    );
+    return res.branches ?? [];
+  } catch {
+    return [];
+  }
 }
 
 // ---- 未公開物件 ----
