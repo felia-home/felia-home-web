@@ -13,6 +13,9 @@ export const metadata: Metadata = {
 export default async function StaffPage() {
   const staffList = await getStaffList();
 
+  // 店舗の表示順を定義
+  const STORE_ORDER = ["千駄ヶ谷本店", "幡ヶ谷店", "コンサルティング事業部"];
+
   // 店舗ごとにグループ分け
   const groups: Record<string, typeof staffList> = {};
   staffList.forEach((s) => {
@@ -20,6 +23,17 @@ export default async function StaffPage() {
     if (!groups[store]) groups[store] = [];
     groups[store].push(s);
   });
+
+  // 各グループ内をsort_order昇順でソート
+  Object.keys(groups).forEach((store) => {
+    groups[store].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  });
+
+  // 店舗を定義順にソート
+  const sortedStores = [
+    ...STORE_ORDER.filter((s) => groups[s]),
+    ...Object.keys(groups).filter((s) => !STORE_ORDER.includes(s)),
+  ];
 
   return (
     <div style={{ backgroundColor: "#ffffff" }}>
@@ -39,7 +53,9 @@ export default async function StaffPage() {
           スタッフ紹介
         </h1>
 
-        {Object.entries(groups).map(([storeName, members]) => (
+        {sortedStores.map((storeName) => {
+          const members = groups[storeName];
+          return (
           <div key={storeName} style={{ marginBottom: "56px" }}>
             {/* 店舗名 */}
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
@@ -99,7 +115,8 @@ export default async function StaffPage() {
               ))}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
