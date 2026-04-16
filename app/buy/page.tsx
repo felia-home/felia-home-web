@@ -343,7 +343,7 @@ export default function BuyPage() {
                 </div>
                 <div style={{ position: "relative", width: "100%", height: "140px", overflow: "hidden" }}>
                   <Image
-                    src={`/images/buy/buy_online_0${s.num}.jpg`}
+                    src={`/images/buy/buy_online_${s.num}.jpg`}
                     alt={s.title}
                     fill
                     style={{ objectFit: "cover" }}
