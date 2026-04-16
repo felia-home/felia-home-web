@@ -1,5 +1,6 @@
 // app/about/page.tsx
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, MapPin } from "lucide-react";
 import { getCompanyInfo, getCompanyBranches } from "@/lib/api";
@@ -57,8 +58,15 @@ export default async function AboutPage() {
       </div>
 
       {/* ヒーロー画像（フルワイド） */}
-      <div style={{ position: "relative", width: "100%", height: "clamp(200px, 35vw, 400px)", overflow: "hidden", marginTop: "24px", backgroundColor: "#E8F0E8", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: "#aaa", fontSize: "13px" }}>ヒーロー画像（/images/about/abouthero.jpg）</p>
+      <div style={{ position: "relative", width: "100%", height: "clamp(200px, 35vw, 400px)", overflow: "hidden", marginTop: "24px" }}>
+        <Image
+          src="/images/about/abouthero.jpg"
+          alt="フェリアホームについて"
+          fill
+          style={{ objectFit: "cover", objectPosition: "center" }}
+          priority
+          sizes="100vw"
+        />
       </div>
 
       {/* ── フェリアホームが選ばれる理由 ─────────── */}
@@ -107,8 +115,14 @@ export default async function AboutPage() {
       </section>
 
       {/* ── 代表写真（フルワイド） ──────────────── */}
-      <div style={{ position: "relative", width: "100%", height: "clamp(240px, 40vw, 480px)", overflow: "hidden", backgroundColor: "#E8E8E8", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: "#aaa", fontSize: "13px" }}>代表写真（/images/about/president.jpg）</p>
+      <div style={{ position: "relative", width: "100%", height: "clamp(240px, 40vw, 480px)", overflow: "hidden" }}>
+        <Image
+          src="/images/about/ceohero.jpg"
+          alt="代表取締役 北原啓輔"
+          fill
+          style={{ objectFit: "cover", objectPosition: "center top" }}
+          sizes="100vw"
+        />
       </div>
 
       {/* ── ごあいさつ ──────────────────────────── */}
@@ -176,8 +190,14 @@ export default async function AboutPage() {
               </table>
             </div>
             {/* 会社写真 */}
-            <div style={{ position: "relative", width: "100%", aspectRatio: "4/3", borderRadius: "8px", overflow: "hidden", backgroundColor: "#E8E8E8", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <p style={{ color: "#aaa", fontSize: "12px" }}>会社写真（/images/about/office.jpg）</p>
+            <div style={{ position: "relative", width: "100%", aspectRatio: "4/3", borderRadius: "8px", overflow: "hidden" }}>
+              <Image
+                src="/images/about/company-info.jpg"
+                alt="フェリアホーム オフィス"
+                fill
+                style={{ objectFit: "cover" }}
+                sizes="50vw"
+              />
             </div>
           </div>
         </div>
