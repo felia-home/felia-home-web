@@ -457,6 +457,30 @@ export default function SellPage() {
         </div>
       </section>
 
+      {/* ── 売却実績リンク ───────────────────────── */}
+      <section style={{ padding: "48px 0", backgroundColor: "#F8F8F8" }}>
+        <div className="container-content" style={{ textAlign: "center" }}>
+          <h2 style={{ fontSize: "clamp(18px, 2.5vw, 24px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "8px", fontFamily: "'Noto Serif JP', serif" }}>
+            売却実績
+          </h2>
+          <p style={{ fontSize: "14px", color: "#666", marginBottom: "24px" }}>
+            フェリアホームがサポートした成約実績をご覧いただけます
+          </p>
+          <Link
+            href="/sell/results"
+            style={{
+              display: "inline-flex", alignItems: "center", gap: "8px",
+              padding: "12px 32px", borderRadius: "8px",
+              border: "2px solid #5BAD52", color: "#5BAD52",
+              fontWeight: "bold", fontSize: "14px", textDecoration: "none",
+            }}
+          >
+            売却実績を見る
+            <ChevronRight size={16} />
+          </Link>
+        </div>
+      </section>
+
       {/* ── 売却査定CTA ──────────────────────────── */}
       <section id="assessment" style={{ padding: "64px 0" }}>
         <div className="container-content" style={{ textAlign: "center" }}>

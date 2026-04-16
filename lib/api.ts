@@ -144,6 +144,36 @@ export async function getFreeBanners(): Promise<Banner[]> {
   }
 }
 
+// ---- 売却実績 ----
+
+export interface SaleResult {
+  id: string;
+  sale_year: number;
+  sale_month: number | null;
+  area_ward: string;
+  area_town: string;
+  property_type: string;
+  floor_plan_image_url: string | null;
+  comment: string | null;
+  sort_order: number;
+  staff: {
+    id: string;
+    name: string;
+    photo_url: string | null;
+  } | null;
+}
+
+export async function getSaleResults(): Promise<SaleResult[]> {
+  try {
+    const res = await fetchFromAdmin<{ sale_results: SaleResult[] }>(
+      "/api/hp/sale-results"
+    );
+    return res.sale_results ?? [];
+  } catch {
+    return [];
+  }
+}
+
 // ---- 会社情報 ----
 
 export async function getCompanyInfo(): Promise<CompanyInfo | null> {
@@ -595,32 +625,6 @@ export async function getStaffById(id: string): Promise<StaffMember | null> {
     return res.staff ?? null;
   } catch {
     return null;
-  }
-}
-
-// ---- 売却実績 ----
-
-export interface SaleResult {
-  id: string;
-  year_month: string;
-  area: string;
-  property_type: string;
-  comment?: string | null;
-  image_url_1?: string | null;
-  image_url_2?: string | null;
-  image_url_3?: string | null;
-  sort_order: number;
-}
-
-export async function getSaleResults(): Promise<SaleResult[]> {
-  try {
-    const res = await fetchFromAdmin<{ results: SaleResult[] }>(
-      "/api/hp/sale-results",
-      { next: { revalidate: 60 } }
-    );
-    return res.results ?? [];
-  } catch {
-    return [];
   }
 }
 
