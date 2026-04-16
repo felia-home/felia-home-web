@@ -207,7 +207,7 @@ function SlideItem({
         style={{
           position: "absolute",
           inset: 0,
-          backgroundColor: "rgba(0,0,0,0.3)",
+          backgroundColor: "rgba(0,0,0,0.15)",
         }}
       />
 

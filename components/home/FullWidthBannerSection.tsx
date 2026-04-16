@@ -46,7 +46,7 @@ function FullWidthBanner({ banner }: { banner: Banner }) {
   return (
     <a
       href={banner.link_url}
-      target={banner.link_target === "_blank" ? "_blank" : undefined}
+      target={banner.link_target === "_blank" ? "_blank" : "_self"}
       rel={banner.link_target === "_blank" ? "noopener noreferrer" : undefined}
       style={{
         display: "block",

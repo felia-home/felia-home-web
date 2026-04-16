@@ -1,11 +1,11 @@
 // components/home/FreeBannerSection.tsx
 import Link from "next/link";
-import { getBanners, type Banner } from "@/lib/api";
+import { getFreeBanners, type Banner } from "@/lib/api";
 
 export async function FreeBannerSection() {
   let banners: Banner[] = [];
   try {
-    banners = await getBanners();
+    banners = await getFreeBanners();
   } catch {
     // Admin API 未起動時はスキップ
   }

@@ -131,6 +131,18 @@ export async function getBanners() {
   return res.banners ?? [];
 }
 
+export async function getFreeBanners(): Promise<Banner[]> {
+  try {
+    const res = await fetchFromAdmin<{ banners: Banner[] }>(
+      "/api/hp/banners",
+      { next: { revalidate: 60 } }
+    );
+    return res.banners ?? [];
+  } catch {
+    return [];
+  }
+}
+
 // ---- 会社情報 ----
 
 export async function getCompanyInfo(): Promise<CompanyInfo | null> {
