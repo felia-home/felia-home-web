@@ -4,6 +4,30 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+// 区名ラベルの中心座標
+const WARD_CENTERS: Record<string, [number, number]> = {
+  "千代田区": [649, 212],
+  "中央区": [665, 225],
+  "港区": [638, 246],
+  "新宿区": [609, 199],
+  "文京区": [642, 182],
+  "台東区": [666, 185],
+  "墨田区": [694, 191],
+  "江東区": [692, 239],
+  "品川区": [631, 283],
+  "目黒区": [597, 269],
+  "大田区": [630, 315],
+  "世田谷区": [552, 256],
+  "渋谷区": [606, 230],
+  "中野区": [578, 188],
+  "杉並区": [536, 225],
+  "豊島区": [623, 178],
+  "北区": [658, 158],
+  "荒川区": [684, 171],
+  "板橋区": [557, 157],
+  "練馬区": [510, 147],
+};
+
 // 対応エリア（クリッカブル）
 const ACTIVE_WARDS = new Set([
   "千代田区", "中央区", "港区", "新宿区", "文京区",
@@ -162,10 +186,10 @@ export function TokyoWardMap({ areas, showLegend = true }: TokyoWardMapProps) {
                 strokeWidth={hovered ? "1.5" : "0.8"}
                 style={{ transition: "all 0.15s ease" }}
               />
-              {active && (
+              {active && WARD_CENTERS[ward.name] && (
                 <text
-                  x={0}
-                  y={0}
+                  x={WARD_CENTERS[ward.name][0]}
+                  y={WARD_CENTERS[ward.name][1]}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill={hovered ? "white" : "rgba(255,255,255,0.9)"}
