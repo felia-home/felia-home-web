@@ -60,19 +60,20 @@ export function HeroSliderClient({ slides }: HeroSliderClientProps) {
       style={{
         position: "relative",
         width: "100%",
-        height: "clamp(280px, 50vw, 600px)",
-        overflow: "hidden",
         backgroundColor: "#1a1a1a",
+        overflow: "hidden",
       }}
     >
-      {/* スライド群 */}
-      {slides.map((slide, index) => (
-        <SlideItem
-          key={slide.id}
-          slide={slide}
-          isActive={index === current}
-        />
-      ))}
+      {/* スライド群（gridで重ねて高さはimageに合わせる） */}
+      <div style={{ display: "grid" }}>
+        {slides.map((slide, index) => (
+          <SlideItem
+            key={slide.id}
+            slide={slide}
+            isActive={index === current}
+          />
+        ))}
+      </div>
 
       {/* 左矢印 */}
       {total > 1 && (
@@ -176,10 +177,11 @@ function SlideItem({
   return (
     <div
       style={{
-        position: "absolute",
-        inset: 0,
+        gridRow: "1",
+        gridColumn: "1",
         opacity: isActive ? 1 : 0,
         transition: "opacity 0.7s ease",
+        position: "relative",
       }}
     >
       {/* 背景（画像 or グラデーション） */}
@@ -187,29 +189,20 @@ function SlideItem({
         <Image
           src={slide.image}
           alt={slide.catchCopy.replace("\n", " ")}
-          fill
-          style={{ objectFit: "cover" }}
+          width={1920}
+          height={1080}
+          style={{ display: "block", width: "100%", height: "auto" }}
           priority
           sizes="100vw"
         />
       ) : (
         <div
           style={{
-            position: "absolute",
-            inset: 0,
+            aspectRatio: "16/7",
             background: slide.gradient,
           }}
         />
       )}
-
-      {/* オーバーレイ */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundColor: "rgba(0,0,0,0.15)",
-        }}
-      />
 
       {/* 画像全体リンク（link_url がある場合） */}
       {slide.buttonHref && (

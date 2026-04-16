@@ -10,6 +10,8 @@ export async function FreeBannerSection() {
     // Admin API 未起動時はスキップ
   }
 
+  console.log("FreeBanners:", banners);
+
   const visible = banners
     .filter((b) => !!b.image_url)
     .sort((a, b) => a.sort_order - b.sort_order)
