@@ -76,38 +76,22 @@ export default async function AboutPage() {
             フェリアホームが選ばれる理由
           </h2>
           <div style={{ display: "grid", gap: "48px" }}>
-            {reasons.map((r, i) => (
+            {reasons.map((r) => (
               <div key={r.num} style={{
                 display: "grid",
-                gridTemplateColumns: i % 2 === 0 ? "200px 1fr" : "1fr 200px",
+                gridTemplateColumns: "200px 1fr",
                 gap: "48px",
                 alignItems: "start",
               }} className="grid-cols-1 tb:grid-cols-[200px_1fr]">
-                {i % 2 === 0 ? (
-                  <>
-                    <div>
-                      <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "48px", color: "#E5E5E5", fontWeight: "bold", lineHeight: 1, marginBottom: "8px" }}>
-                        {r.num}
-                      </p>
-                      <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "#1a1a1a", lineHeight: 1.5, whiteSpace: "pre-line", fontFamily: "'Noto Serif JP', serif" }}>
-                        {r.title}
-                      </h3>
-                    </div>
-                    <p style={{ fontSize: "14px", color: "#555", lineHeight: 2, paddingTop: "12px" }}>{r.text}</p>
-                  </>
-                ) : (
-                  <>
-                    <p style={{ fontSize: "14px", color: "#555", lineHeight: 2, paddingTop: "12px" }}>{r.text}</p>
-                    <div style={{ textAlign: "right" }}>
-                      <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "48px", color: "#E5E5E5", fontWeight: "bold", lineHeight: 1, marginBottom: "8px" }}>
-                        {r.num}
-                      </p>
-                      <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "#1a1a1a", lineHeight: 1.5, whiteSpace: "pre-line", fontFamily: "'Noto Serif JP', serif" }}>
-                        {r.title}
-                      </h3>
-                    </div>
-                  </>
-                )}
+                <div>
+                  <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "48px", color: "#E5E5E5", fontWeight: "bold", lineHeight: 1, marginBottom: "8px" }}>
+                    {r.num}
+                  </p>
+                  <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "#1a1a1a", lineHeight: 1.5, whiteSpace: "pre-line", fontFamily: "'Noto Serif JP', serif" }}>
+                    {r.title}
+                  </h3>
+                </div>
+                <p style={{ fontSize: "14px", color: "#555", lineHeight: 2, paddingTop: "12px" }}>{r.text}</p>
               </div>
             ))}
           </div>
