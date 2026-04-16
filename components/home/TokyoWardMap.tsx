@@ -4,263 +4,197 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-interface Ward {
-  id: string;
-  name: string;
-  path: string;
-  labelX: number;
-  labelY: number;
-  clickable: boolean;
-  href?: string;
-}
+// 対応エリア（クリッカブル）
+const ACTIVE_WARDS = new Set([
+  "千代田区", "中央区", "港区", "新宿区", "文京区",
+  "台東区", "品川区", "目黒区", "大田区", "世田谷区",
+  "渋谷区", "中野区", "杉並区", "豊島区", "北区",
+  "荒川区", "板橋区", "練馬区",
+]);
 
-// ── 対象17区（クリッカブル） ─────────────────────────────────
-const WARDS: Ward[] = [
-  {
-    id: "itabashi", name: "板橋区", clickable: true,
-    href: "/areas/板橋区", labelX: 192, labelY: 90,
-    path: "M 108,48 L 148,42 L 198,40 L 248,43 L 268,55 L 272,75 L 268,100 L 252,118 L 230,130 L 205,136 L 178,138 L 152,130 L 130,118 L 112,98 L 105,72 Z",
-  },
-  {
-    id: "kita", name: "北区", clickable: true,
-    href: "/areas/北区", labelX: 318, labelY: 92,
-    path: "M 268,55 L 305,48 L 342,44 L 372,50 L 388,65 L 390,92 L 382,115 L 360,130 L 335,138 L 308,140 L 282,132 L 268,118 L 265,92 Z",
-  },
-  {
-    id: "nerima", name: "練馬区", clickable: true,
-    href: "/areas/練馬区", labelX: 105, labelY: 180,
-    path: "M 32,115 L 105,72 L 112,98 L 130,118 L 152,130 L 148,158 L 138,180 L 120,202 L 95,215 L 68,220 L 42,212 L 28,192 L 28,152 Z",
-  },
-  {
-    id: "toshima", name: "豊島区", clickable: true,
-    href: "/areas/豊島区", labelX: 262, labelY: 162,
-    path: "M 205,136 L 230,130 L 252,118 L 278,124 L 302,136 L 310,158 L 302,178 L 280,188 L 256,190 L 232,182 L 215,168 L 210,148 Z",
-  },
-  {
-    id: "bunkyo", name: "文京区", clickable: true,
-    href: "/areas/文京区", labelX: 348, labelY: 168,
-    path: "M 308,140 L 335,138 L 360,132 L 382,146 L 390,165 L 385,185 L 368,198 L 345,202 L 322,194 L 308,178 L 306,158 Z",
-  },
-  {
-    id: "nakano", name: "中野区", clickable: true,
-    href: "/areas/中野区", labelX: 180, labelY: 228,
-    path: "M 120,202 L 138,180 L 162,168 L 188,170 L 210,180 L 220,202 L 215,228 L 198,245 L 172,252 L 145,244 L 128,228 Z",
-  },
-  {
-    id: "shinjuku", name: "新宿区", clickable: true,
-    href: "/areas/新宿区", labelX: 275, labelY: 228,
-    path: "M 232,182 L 256,190 L 280,188 L 305,192 L 322,208 L 325,232 L 315,254 L 292,265 L 264,265 L 240,255 L 228,235 L 232,208 Z",
-  },
-  {
-    id: "chiyoda", name: "千代田区", clickable: true,
-    href: "/areas/千代田区", labelX: 360, labelY: 232,
-    path: "M 345,202 L 368,198 L 392,210 L 400,230 L 396,254 L 378,268 L 352,268 L 332,254 L 326,232 L 332,212 Z",
-  },
-  {
-    id: "chuo", name: "中央区", clickable: true,
-    href: "/areas/中央区", labelX: 420, labelY: 262,
-    path: "M 396,230 L 428,234 L 445,252 L 442,275 L 428,290 L 405,290 L 380,275 L 378,262 L 395,252 Z",
-  },
-  {
-    id: "suginami", name: "杉並区", clickable: true,
-    href: "/areas/杉並区", labelX: 105, labelY: 278,
-    path: "M 38,228 L 68,220 L 95,224 L 128,234 L 145,255 L 142,285 L 125,310 L 98,322 L 65,318 L 38,300 L 30,272 Z",
-  },
-  {
-    id: "shibuya", name: "渋谷区", clickable: true,
-    href: "/areas/渋谷区", labelX: 238, labelY: 298,
-    path: "M 215,268 L 240,265 L 268,270 L 285,288 L 278,315 L 258,332 L 230,335 L 208,320 L 204,295 Z",
-  },
-  {
-    id: "minato", name: "港区", clickable: true,
-    href: "/areas/港区", labelX: 362, labelY: 318,
-    path: "M 352,268 L 378,268 L 402,280 L 410,305 L 406,340 L 386,358 L 358,362 L 335,345 L 328,318 L 335,288 Z",
-  },
-  {
-    id: "setagaya", name: "世田谷区", clickable: true,
-    href: "/areas/世田谷区", labelX: 108, labelY: 378,
-    path: "M 35,330 L 65,320 L 98,328 L 128,345 L 148,368 L 142,405 L 122,430 L 90,438 L 56,430 L 30,408 L 28,368 Z",
-  },
-  {
-    id: "meguro", name: "目黒区", clickable: true,
-    href: "/areas/目黒区", labelX: 232, labelY: 365,
-    path: "M 204,335 L 230,338 L 260,338 L 280,355 L 275,385 L 252,400 L 224,404 L 202,388 L 198,360 Z",
-  },
-  {
-    id: "shinagawa", name: "品川区", clickable: true,
-    href: "/areas/品川区", labelX: 322, labelY: 395,
-    path: "M 318,362 L 348,358 L 372,368 L 382,395 L 374,428 L 352,440 L 320,440 L 296,422 L 292,395 Z",
-  },
-  {
-    id: "ota", name: "大田区", clickable: true,
-    href: "/areas/大田区", labelX: 158, labelY: 475,
-    path: "M 90,440 L 125,434 L 158,440 L 188,455 L 208,478 L 218,510 L 206,538 L 168,548 L 132,540 L 100,518 L 80,490 L 80,462 Z",
-  },
-];
+// 区名→URLマッピング
+const WARD_HREF: Record<string, string> = {
+  "千代田区": "/areas/千代田区",
+  "中央区": "/areas/中央区",
+  "港区": "/areas/港区",
+  "新宿区": "/areas/新宿区",
+  "文京区": "/areas/文京区",
+  "台東区": "/areas/台東区",
+  "品川区": "/areas/品川区",
+  "目黒区": "/areas/目黒区",
+  "大田区": "/areas/大田区",
+  "世田谷区": "/areas/世田谷区",
+  "渋谷区": "/areas/渋谷区",
+  "中野区": "/areas/中野区",
+  "杉並区": "/areas/杉並区",
+  "豊島区": "/areas/豊島区",
+  "北区": "/areas/北区",
+  "荒川区": "/areas/荒川区",
+  "板橋区": "/areas/板橋区",
+  "練馬区": "/areas/練馬区",
+};
 
-// ── 城東エリア（非クリッカブル・薄く表示） ──────────────────
-const INACTIVE_WARDS: Omit<Ward, "clickable" | "href">[] = [
-  {
-    id: "adachi", name: "足立区",
-    labelX: 452, labelY: 92,
-    path: "M 390,50 L 432,44 L 472,42 L 510,48 L 525,65 L 522,98 L 505,122 L 478,135 L 448,140 L 415,134 L 388,118 L 382,95 Z",
-  },
-  {
-    id: "arakawa", name: "荒川区",
-    labelX: 415, labelY: 162,
-    path: "M 382,140 L 415,135 L 440,142 L 448,162 L 438,182 L 412,188 L 385,180 L 375,162 Z",
-  },
-  {
-    id: "taito", name: "台東区",
-    labelX: 418, labelY: 225,
-    path: "M 392,200 L 420,196 L 442,205 L 448,228 L 440,248 L 418,254 L 396,248 L 386,228 Z",
-  },
-  {
-    id: "sumida", name: "墨田区",
-    labelX: 472, labelY: 212,
-    path: "M 442,175 L 472,170 L 498,178 L 508,202 L 502,232 L 475,242 L 448,235 L 435,218 Z",
-  },
-  {
-    id: "katsushika", name: "葛飾区",
-    labelX: 530, labelY: 98,
-    path: "M 510,48 L 548,44 L 568,58 L 568,95 L 550,122 L 520,135 L 495,130 L 478,110 L 480,80 Z",
-  },
-  {
-    id: "koto", name: "江東区",
-    labelX: 485, labelY: 298,
-    path: "M 448,240 L 478,245 L 512,252 L 530,272 L 528,315 L 510,342 L 482,352 L 452,345 L 430,322 L 425,290 L 432,262 Z",
-  },
-  {
-    id: "edogawa", name: "江戸川区",
-    labelX: 542, labelY: 215,
-    path: "M 525,135 L 558,130 L 572,148 L 570,198 L 555,245 L 532,268 L 512,268 L 500,245 L 505,205 L 520,168 Z",
-  },
+// SVGの全pathデータ（tokyo.svgから抽出）
+const PATHS = [
+  { id: "13101", name: "千代田区", d: "m 636,223 7,5 8,1 9,-12 -2,-6 11,-8 -9,-8 -2,5 -17,-3 -11,13 v 7 z" },
+  { id: "13102", name: "中央区", d: "m 656,245 7,7 12,-10 -2,-18 4,-10 -2,-4 -1,-4 v -1 l -5,-2 -11,8 2,6 -9,12 3,3 -2,6 5,4 z" },
+  { id: "13103", name: "港区", d: "m 614,232 2,7 8,2 v 9 l -3,5 -1,6 h 6 l 3,3 4,8 17,-1 2,-3 v -6 l -5,-1 1,-4 5,2 -1,-8 1,-6 h 3 l 1,-3 -5,-4 2,-6 -3,-3 -8,-1 -7,-5 -6,-6 -8,2 -3,6 z m 47,40 8,-6 -4,-6 -4,3 3,-2 2,3 -7,5 z" },
+  { id: "13104", name: "新宿区", d: "m 641,197 -2,-5 -8,1 -8,-5 -12,-1 -1,-9 -16,1 -5,-7 -3,10 4,1 2,5 1,2 9,-1 -5,4 -3,14 1,7 2,3 9,-7 5,1 7,7 -2,6 3,1 3,-6 8,-2 v -7 z" },
+  { id: "13105", name: "文京区", d: "m 658,184 -4,-5 v -8 l -1,-2 -7,-2 -2,2 -4,-3 -6,6 v 4 l -9,-1 v 6 l -5,2 1,4 2,1 8,5 8,-1 2,5 17,3 2,-5 1,-3 -4,-1 -2,-8 z" },
+  { id: "13106", name: "台東区", d: "m 669,203 5,2 14,-23 2,-9 -14,-3 -9,6 -13,-5 v 8 l 4,5 -3,-1 2,8 4,1 -1,3 z" },
+  { id: "13107", name: "墨田区", d: "m 674,206 1,4 15,2 2,-5 6,-1 -1,-14 13,5 3,-7 -5,-5 7,-4 -17,-22 -4,4 -4,10 -2,9 -14,23 z" },
+  { id: "13108", name: "江東区", d: "m 663,252 10,16 4,-2 5,7 3,-4 -2,-9 5,-1 v -3 l 21,-4 v 9 l -10,3 15,-2 1,-19 3,-3 1,-36 -9,-7 -13,-5 1,14 -6,1 -2,5 -15,-2 2,4 -4,10 2,18 z m 36,5 v 5 l 3,-1 v -3 l 6,-2 h -6 l 1,-2 z m 4,8 1,10 3,-1 3,8 4,-18 z m -34,1 -8,6 2,3 10,17 4,-7 -9,-14 3,-2 z m 3,4 7,11 2,-4 -6,-9 z" },
+  { id: "13109", name: "品川区", d: "m 609,293 9,1 3,8 7,-3 2,7 13,-3 6,1 v 4 h 5 v -9 l 4,2 5,-3 -11,-19 v -11 l -2,3 -17,1 -4,-8 -3,-3 h -6 l 1,-6 h -1 l -4,4 2,8 -15,4 6,2 -6,8 v 6 z m 54,-18 -2,-3 -2,-3 h -1 l 2,7 z" },
+  { id: "13110", name: "目黒区", d: "m 603,287 v -6 l 6,-8 -6,-2 15,-4 -2,-8 4,-4 -7,-1 -17,-18 -9,-2 7,11 2,12 -5,13 -14,-6 4,13 -3,9 h 11 l 2,7 v -3 l 4,-1 v -7 z" },
+  { id: "13111", name: "大田区", d: "m 663,298 -5,3 -4,-2 v 9 h -5 v -4 l -6,-1 -13,3 -2,-7 -7,3 -3,-8 -9,-1 -6,-6 -8,-5 v 7 l -4,1 v 3 l -2,8 -6,-6 -7,-1 -6,4 4,2 -2,3 9,3 11,24 17,9 -4,8 4,7 11,-2 7,-5 5,3 5,-4 14,1 31,20 8,-16 -18,-29 -11,1 -6,8 -4,-4 -4,2 -8,-7 v -4 h -16 l 31,-3 4,-4 v 4 h 12 l 3,-2 -4,-6 -10,3 6,-7 z m -22,23 4,4 5,-2 -3,-6 z m 9,0 7,6 6,-9 h -12 z" },
+  { id: "13112", name: "世田谷区", d: "m 522,273 v 4 h 5 l 17,4 19,15 9,7 2,-3 -4,-2 6,-4 7,1 6,6 2,-8 -2,-7 h -11 l 3,-9 -4,-13 14,6 5,-13 -2,-12 -7,-11 -4,-8 h -6 l -18,6 -11,-5 -10,-5 4,6 h -6 l -2,-8 -9,-3 h -2 -5 l 2,7 -4,1 5,4 v 3 l -2,2 5,12 v 5 h -4 l -2,5 7,13 z" },
+  { id: "13113", name: "渋谷区", d: "m 587,234 9,2 17,18 7,1 h 1 l 3,-5 v -9 l -8,-2 -2,-7 5,-7 -3,-1 2,-6 -7,-7 -5,-1 -9,7 -2,-3 -1,-7 -15,15 -2,4 h 6 z" },
+  { id: "13114", name: "中野区", d: "m 581,208 -6,4 4,10 15,-15 3,-14 5,-4 -9,1 -1,-2 -2,-5 -4,-1 3,-10 v -1 l -5,-3 -9,8 h -12 l -9,-9 h -4 l -2,5 6,12 15,7 h 5 l 2,13 5,1 z" },
+  { id: "13115", name: "杉並区", d: "m 516,212 -4,5 6,8 -2,10 -4,12 2,7 9,3 h 2 h 5 l 9,-8 h 4 l 2,-5 6,7 5,-1 -2,-13 h -5 l -15,-7 -6,-12 2,-5 h 4 l 9,9 h 12 l 9,-8 -4,-2 -5,-10 -3,-2 -2,2 h -7 l -4,3 -2,-4 -7,4 h -5 l -2,-5 -6,2 z" },
+  { id: "13116", name: "豊島区", d: "m 610,176 7,2 1,2 v 8 l 4,5 13,5 9,-6 -3,-10 2,-10 -7,-5 -6,-4 -14,-1 -9,4 -4,5 7,5 z" },
+  { id: "13117", name: "北区", d: "m 620,157 6,4 7,5 14,1 6,4 7,5 3,10 7,2 1,-4 13,-2 12,-6 -2,-8 4,-10 -8,-4 -4,-11 -14,-5 -11,1 -2,-3 -10,6 -9,-5 -5,1 -4,5 -5,-2 -3,3 z" },
+  { id: "13118", name: "荒川区", d: "m 669,170 -2,3 -1,3 13,5 9,-6 14,3 2,-9 -7,-4 -7,1 h -3 l -2,-2 -6,1 z" },
+  { id: "13119", name: "板橋区", d: "m 556,130 -15,6 -5,8 -9,5 4,7 -4,8 4,4 7,1 10,-3 3,7 1,-1 12,6 9,-4 14,1 -4,-5 9,-9 -3,-6 -15,-14 -3,-7 h -8 z m 38,33 -9,4 14,5 4,11 8,4 -4,10 2,8 -12,6 -13,2 -1,4 5,2 -3,3 2,3 11,-1 14,5 7,-5 1,-5 h 7 l 14,-14 -2,-4 v -4 l 7,-3 -2,-10 -19,-8 -6,-6 -2,-4 z" },
+  { id: "13120", name: "練馬区", d: "m 481,165 2,5 8,3 4,-3 2,-4 5,2 3,-3 5,2 4,-5 9,-5 -4,-7 9,-5 5,-8 15,-6 -9,-9 -9,2 -3,-4 -14,4 -9,-4 -7,6 1,9 -7,11 z m 35,-14 8,4 -4,8 -10,3 -7,-1 -4,-4 4,-8 z" },
+  { id: "13121", name: "足立区", d: "m 689,154 6,16 17,5 9,-10 17,-4 7,-11 -3,-7 -14,-12 -23,4 -9,-5 z m -14,-10 3,7 9,5 10,-6 -1,-9 -7,-6 z m 5,13 -6,6 6,1 7,-1 3,-10 -7,-4 z" },
+  { id: "13122", name: "葛飾区", d: "m 710,187 1,20 7,5 11,1 -1,-13 h 11 l -1,-14 -12,-7 -9,10 z" },
+  { id: "13123", name: "江戸川区", d: "m 718,208 -1,28 7,12 3,-2 18,7 7,-20 3,-6 -11,-12 -15,1 -4,-13 z" },
+  { id: "13201", name: "八王子市", d: "m 310,302 -16,20 -9,3 -2,14 8,7 10,-1 6,9 21,-4 9,6 1,-10 11,-3 -4,-8 4,-5 8,1 7,-8 7,2 4,-11 -4,-2 4,-9 -9,-14 -25,3 -7,8 -13,-3 z" },
+  { id: "13202", name: "立川市", d: "m 440,232 7,13 10,-1 4,-7 12,5 4,-4 -2,-10 8,-10 -14,-3 -10,-12 -13,5 -2,8 z" },
+  { id: "13203", name: "武蔵野市", d: "m 461,207 7,5 8,-3 5,4 6,-3 -3,-8 -7,-9 -11,1 z" },
+  { id: "13204", name: "三鷹市", d: "m 455,219 6,13 -2,9 13,-5 10,12 -8,10 2,10 -4,4 5,4 9,-4 8,1 3,-8 -3,-13 -7,-8 -4,-3 3,-7 -5,-8 v -3 l -6,3 -5,-4 -8,3 z" },
+  { id: "13205", name: "青梅市", d: "m 222,138 -9,20 2,5 -2,8 10,8 -5,14 2,2 13,-5 18,11 14,-5 3,-8 12,-2 v -13 l -8,-16 -10,-4 -17,-13 -7,4 z" },
+  { id: "13206", name: "府中市", d: "m 409,265 8,3 4,-3 5,2 h 7 l 2,-8 7,-4 h 6 l -6,-14 -5,-2 -4,-9 -9,3 -1,10 -9,-6 -21,4 -6,-9 -10,1 4,10 4,2 1,8 9,7 9,-2 z" },
+  { id: "13207", name: "昭島市", d: "m 368,218 -5,6 4,8 11,2 10,-8 4,4 h 7 l 5,-9 -4,-4 -5,1 -3,-4 -11,3 z" },
+  { id: "13208", name: "調布市", d: "m 446,262 3,-3 v -5 l 10,-5 -5,-4 -9,4 -8,-1 -3,8 -7,4 h -6 l 6,14 h 7 l 4,3 1,-5 z" },
+  { id: "13209", name: "町田市", d: "m 373,335 5,4 4,-1 10,8 8,2 15,-7 5,2 13,-6 3,-15 -9,-6 -21,4 -6,-9 -10,1 1,-10 -11,3 4,8 -4,5 4,2 -4,9 z" },
+  { id: "13210", name: "小金井市", d: "m 443,225 11,-1 7,9 3,-3 -3,-11 -3,-3 -8,2 z" },
+  { id: "13211", name: "小平市", d: "m 449,196 v 11 l -5,3 3,11 8,-2 3,3 3,-3 h 10 l 4,-7 -3,-10 -7,-4 -1,-9 z" },
+  { id: "13212", name: "日野市", d: "m 393,281 1,-5 -9,-7 -1,-8 -4,-2 -4,-10 -5,2 -4,8 4,4 -4,2 -3,6 10,6 2,9 9,2 z" },
+  { id: "13213", name: "東村山市", d: "m 449,196 1,9 7,4 3,10 h 8 l 5,-4 -4,-6 -3,-10 v -7 l -10,-3 z" },
+  { id: "13214", name: "国分寺市", d: "m 430,221 13,4 v -9 l -3,-3 -11,2 z" },
+  { id: "13215", name: "国立市", d: "m 422,232 8,0 v -11 l -10,2 v 5 z" },
+  { id: "13216", name: "福生市", d: "m 326,171 3,8 6,1 2,-9 -5,-3 z" },
+  { id: "13217", name: "狛江市", d: "m 503,275 2,3 h 5 l 2,-5 h 4 v -5 l -7,-13 -5,1 v 4 l -3,10 z" },
+  { id: "13218", name: "東大和市", d: "m 403,191 v 9 l 7,2 3,-3 8,-1 -1,-9 -7,-6 z" },
+  { id: "13219", name: "清瀬市", d: "m 481,165 -5,18 7,11 7,-6 9,-4 -2,-5 -8,-3 z" },
+  { id: "13220", name: "東久留米市", d: "m 469,176 12,-11 -6,-7 -11,6 -3,8 z" },
+  { id: "13221", name: "武蔵村山市", d: "m 370,183 4,5 8,-1 3,6 9,-1 v -9 l -7,-6 -11,3 z" },
+  { id: "13222", name: "多摩市", d: "m 393,308 v -7 l -9,-2 -2,-9 -10,-6 -6,10 -3,15 z" },
+  { id: "13223", name: "稲城市", d: "m 430,298 v -12 l -6,-4 -6,3 h -5 l -9,6 -1,10 6,9 10,-1 z" },
+  { id: "13224", name: "羽村市", d: "m 301,161 10,4 8,5 6,1 -3,-8 h -6 l -2,-6 -9,1 z" },
+  { id: "13225", name: "あきる野市", d: "m 248,194 -4,12 2,8 8,4 10,-1 7,7 10,-5 13,-13 -5,-15 -12,2 -3,8 -14,5 z" },
+  { id: "13226", name: "西東京市", d: "m 469,176 3,-8 11,-6 -5,-10 -14,4 -4,7 3,10 z" },
+  { id: "13228", name: "西多摩郡瑞穂町", d: "m 290,161 3,8 h 6 l 2,6 h 6 l -3,-8 -5,-3 -3,-8 z" },
 ];
 
 interface TokyoWardMapProps {
   areas?: { area_name: string; href?: string | null }[];
+  showLegend?: boolean;
 }
 
-export function TokyoWardMap({ areas }: TokyoWardMapProps) {
+export function TokyoWardMap({ areas, showLegend = true }: TokyoWardMapProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const router = useRouter();
 
-  const getHref = (ward: Ward): string => {
+  const getHref = (name: string): string => {
     if (areas) {
-      const area = areas.find((a) => a.area_name === ward.name);
+      const area = areas.find((a) => a.area_name === name);
       if (area?.href) return area.href;
     }
-    return ward.href || `/areas/${encodeURIComponent(ward.name)}`;
+    return WARD_HREF[name] || `/areas/${encodeURIComponent(name)}`;
   };
+
+  const isActive = (name: string) => ACTIVE_WARDS.has(name);
 
   return (
     <div style={{ position: "relative", width: "100%" }}>
       <svg
-        viewBox="0 0 570 560"
+        viewBox="0 0 820 440"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ width: "100%", height: "auto", display: "block" }}
+        style={{ width: "100%", height: "auto", display: "block", backgroundColor: "#1B3A4B", borderRadius: "12px" }}
       >
-        {/* 背景 */}
-        <rect width="570" height="560" fill="#1B3A4B" rx="12" />
-
         {/* タイトル */}
-        <text
-          x="20" y="28"
-          fill="rgba(255,255,255,0.9)"
-          fontSize="15" fontWeight="bold"
-          fontFamily="'Noto Sans JP', sans-serif"
-        >
+        <text x="16" y="28" fill="rgba(255,255,255,0.9)"
+          fontSize="14" fontWeight="bold"
+          fontFamily="'Noto Sans JP', 'Hiragino Sans', sans-serif">
           エリアから探す
         </text>
 
         {/* 全エリア一覧リンク */}
         <a href="/properties" style={{ cursor: "pointer" }}>
-          <text
-            x="458" y="28"
-            fill="rgba(255,255,255,0.55)"
-            fontSize="10"
-            fontFamily="'Noto Sans JP', sans-serif"
-          >
-            全エリア一覧 ›
+          <text x="700" y="28" fill="rgba(255,255,255,0.6)"
+            fontSize="11" fontFamily="'Noto Sans JP', sans-serif">
+            全エリア一覧
           </text>
+          <polygon points="772,23 778,27 772,31" fill="rgba(255,255,255,0.6)" />
         </a>
 
-        {/* 城東エリア（非アクティブ） */}
-        {INACTIVE_WARDS.map((ward) => (
-          <g key={ward.id}>
-            <path
-              d={ward.path}
-              fill="rgba(255,255,255,0.03)"
-              stroke="rgba(255,255,255,0.12)"
-              strokeWidth="1"
-            />
-            {ward.name && (
-              <text
-                x={ward.labelX} y={ward.labelY}
-                textAnchor="middle" dominantBaseline="middle"
-                fill="rgba(255,255,255,0.22)"
-                fontSize="8"
-                fontFamily="'Noto Sans JP', sans-serif"
-                style={{ pointerEvents: "none", userSelect: "none" }}
-              >
-                {ward.name}
-              </text>
-            )}
-          </g>
-        ))}
+        {/* 区・市を描画 */}
+        {PATHS.map((ward) => {
+          const active = isActive(ward.name);
+          const hovered = hoveredId === ward.id;
 
-        {/* 対象17区（アクティブ） */}
-        {WARDS.map((ward) => {
-          const isHovered = hoveredId === ward.id;
-          const href = getHref(ward);
           return (
             <g
               key={ward.id}
-              style={{ cursor: "pointer" }}
-              onClick={() => router.push(href)}
-              onMouseEnter={() => setHoveredId(ward.id)}
+              style={{ cursor: active ? "pointer" : "default" }}
+              onClick={() => active && router.push(getHref(ward.name))}
+              onMouseEnter={() => active && setHoveredId(ward.id)}
               onMouseLeave={() => setHoveredId(null)}
             >
               <path
-                d={ward.path}
-                fill={isHovered ? "rgba(91,173,82,0.35)" : "rgba(91,173,82,0.12)"}
-                stroke={isHovered ? "rgba(91,173,82,0.9)" : "rgba(255,255,255,0.45)"}
-                strokeWidth={isHovered ? "1.8" : "1.2"}
-                style={{ transition: "all 0.2s ease" }}
+                d={ward.d}
+                fill={
+                  hovered
+                    ? "rgba(91,173,82,0.6)"
+                    : active
+                    ? "rgba(91,173,82,0.25)"
+                    : "rgba(255,255,255,0.05)"
+                }
+                stroke={
+                  hovered
+                    ? "#5BAD52"
+                    : active
+                    ? "rgba(255,255,255,0.5)"
+                    : "rgba(255,255,255,0.15)"
+                }
+                strokeWidth={hovered ? "1.5" : "0.8"}
+                style={{ transition: "all 0.15s ease" }}
               />
-              <text
-                x={ward.labelX} y={ward.labelY}
-                textAnchor="middle" dominantBaseline="middle"
-                fill={isHovered ? "#7FD476" : "rgba(255,255,255,0.9)"}
-                fontSize="9"
-                fontWeight={isHovered ? "700" : "500"}
-                fontFamily="'Noto Sans JP', sans-serif"
-                style={{
-                  pointerEvents: "none",
-                  userSelect: "none",
-                  transition: "fill 0.2s ease",
-                }}
-              >
-                {ward.name}
-              </text>
+              {active && (
+                <text
+                  x={0}
+                  y={0}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill={hovered ? "white" : "rgba(255,255,255,0.9)"}
+                  fontSize="7"
+                  fontWeight={hovered ? "700" : "400"}
+                  fontFamily="'Noto Sans JP', 'Hiragino Sans', sans-serif"
+                  style={{ pointerEvents: "none", userSelect: "none" }}
+                >
+                  {ward.name}
+                </text>
+              )}
             </g>
           );
         })}
-
-        {/* 凡例 */}
-        <rect x="20" y="532" width="10" height="10" rx="2"
-          fill="rgba(91,173,82,0.35)" stroke="rgba(91,173,82,0.8)" strokeWidth="1" />
-        <text x="34" y="541" fill="rgba(255,255,255,0.55)" fontSize="9"
-          fontFamily="'Noto Sans JP', sans-serif" dominantBaseline="middle">
-          対応エリア
-        </text>
-        <rect x="110" y="532" width="10" height="10" rx="2"
-          fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
-        <text x="124" y="541" fill="rgba(255,255,255,0.35)" fontSize="9"
-          fontFamily="'Noto Sans JP', sans-serif" dominantBaseline="middle">
-          対応エリア外
-        </text>
       </svg>
+
+      {/* 凡例 */}
+      {showLegend && (
+        <div style={{ display: "flex", gap: "16px", marginTop: "8px", paddingLeft: "4px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <div style={{ width: "12px", height: "12px", borderRadius: "2px", backgroundColor: "rgba(91,173,82,0.4)", border: "1px solid #5BAD52" }} />
+            <span style={{ fontSize: "11px", color: "#555" }}>対応エリア</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <div style={{ width: "12px", height: "12px", borderRadius: "2px", backgroundColor: "rgba(255,255,255,0.1)", border: "1px solid rgba(0,0,0,0.15)" }} />
+            <span style={{ fontSize: "11px", color: "#888" }}>対応エリア外</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
