@@ -65,7 +65,7 @@ export function HeroSliderClient({ slides }: HeroSliderClientProps) {
       }}
     >
       {/* スライド群（gridで重ねて高さはimageに合わせる） */}
-      <div style={{ display: "grid" }}>
+      <div style={{ display: "grid", maxHeight: "600px", overflow: "hidden" }}>
         {slides.map((slide, index) => (
           <SlideItem
             key={slide.id}
@@ -191,6 +191,7 @@ function SlideItem({
           alt={slide.catchCopy.replace("\n", " ")}
           width={1920}
           height={1080}
+          quality={100}
           style={{ display: "block", width: "100%", height: "auto" }}
           priority
           sizes="100vw"
