@@ -17,7 +17,7 @@ function TestimonialCard({ t }: { t: Testimonial }) {
     { label: "決め手", value: t.decision_text },
     { label: "実際に住んでみて", value: t.impression_text },
     { label: "これから購入される方へ", value: t.advice_text },
-    { label: "", value: t.final_text },
+    { label: "最後に一言", value: t.final_text },
   ].filter((s) => s.value);
 
   return (
