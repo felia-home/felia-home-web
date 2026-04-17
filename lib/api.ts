@@ -330,6 +330,8 @@ export interface OpenHouse {
   is_open_house: boolean;
   station_name1?: string | null;
   station_walk1?: number | null;
+  property_type?: string | null;
+  price?: number | null;
 }
 
 export interface NewsItem {
