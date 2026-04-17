@@ -142,7 +142,7 @@ export default async function MypagePage() {
                       style={{ backgroundColor: "#EBF7EA", color: "#5BAD52" }}
                     >
                       <Wallet size={9} className="inline mr-0.5" />
-                      〜{profileData.budget_max.toLocaleString()}万円
+                      〜{profileData.budget_max != null ? profileData.budget_max.toLocaleString() : "未設定"}万円
                     </span>
                   )}
                   {profileData.purchase_timing && (

@@ -52,10 +52,10 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     { label: "築年月",     value: property.buildingYear ? `${property.buildingYear}年` : "—", icon: Calendar },
     { label: "構造",       value: property.structure || "—",                      icon: Building2 },
     ...(property.managementFee != null ? [{
-      label: "管理費", value: `${property.managementFee.toLocaleString()}円/月`, icon: null
+      label: "管理費", value: property.managementFee != null ? `${property.managementFee.toLocaleString()}円/月` : "なし", icon: null
     }] : []),
     ...(property.repairReserve != null ? [{
-      label: "修繕積立金", value: `${property.repairReserve.toLocaleString()}円/月`, icon: null
+      label: "修繕積立金", value: property.repairReserve != null ? `${property.repairReserve.toLocaleString()}円/月` : "なし", icon: null
     }] : []),
   ];
 
