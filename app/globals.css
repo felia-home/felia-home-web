@@ -110,6 +110,19 @@
   }
 }
 
+/* 採用ページ */
+@media (max-width: 767px) {
+  .recruit-reasons {
+    grid-template-columns: 1fr !important;
+  }
+  .recruit-numbers {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .recruit-flow {
+    flex-direction: column !important;
+  }
+}
+
 /* 物件詳細ページ */
 @media (max-width: 900px) {
   .property-detail-grid {
