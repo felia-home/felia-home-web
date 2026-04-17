@@ -91,9 +91,15 @@ export function PropertyCard({ property, size = "normal" }: PropertyCardProps) {
             className={`font-bold ${isLarge ? "text-2xl tb:text-3xl" : "text-xl"}`}
             style={{ color: "#5BAD52" }}
           >
-            {property.price.toLocaleString()}
+            {property.price != null
+              ? property.price.toLocaleString()
+              : (property as any).salesPrice != null
+              ? (property as any).salesPrice.toLocaleString()
+              : "価格未定"}
           </span>
-          <span className="text-sm text-gray-500">万円</span>
+          {(property.price != null || (property as any).salesPrice != null) && (
+            <span className="text-sm text-gray-500">万円</span>
+          )}
         </div>
 
         {/* 物件名 */}
