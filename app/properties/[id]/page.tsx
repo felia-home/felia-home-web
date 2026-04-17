@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getPropertyDetail, getPropertyImages, getStaffDetail } from "@/lib/api";
 import PropertyGallery from "@/components/property/PropertyGallery";
+import LoanSimulator from "@/components/property/LoanSimulator";
 
 interface PageProps {
   params: { id: string };
@@ -269,7 +270,14 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           </div>
 
           {/* 右カラム */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
+            position: "sticky",
+            top: "80px",
+            alignSelf: "flex-start",
+          }}>
 
             {/* ① 価格・CTAカード */}
             <div style={{
@@ -277,8 +285,6 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               borderRadius: "12px",
               padding: "24px",
               border: "2px solid #5BAD52",
-              position: "sticky",
-              top: "80px",
             }}>
               {/* 価格 */}
               <div style={{ marginBottom: "20px" }}>
@@ -347,6 +353,11 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 お気軽にお問い合わせください
               </p>
             </div>
+
+            {/* ローンシミュレーター */}
+            {property.price != null && (
+              <LoanSimulator price={property.price} />
+            )}
 
             {/* ② 現地販売会カード（条件付き） */}
             {property.is_open_house && property.open_house_start && (
