@@ -1,8 +1,25 @@
 // components/home/NewAndNewsSection.tsx
 import Link from "next/link";
-import { ArrowRight, Home, Bell } from "lucide-react";
+import { ArrowRight, Bell } from "lucide-react";
 import { getNewProperties, getPropertyNews } from "@/lib/api";
 import type { Property, NewsItem } from "@/lib/api";
+
+const PROPERTY_TYPE_MAP: Record<string, string> = {
+  LAND: "土地",
+  USED_HOUSE: "中古戸建",
+  NEW_HOUSE: "新築戸建",
+  MANSION: "マンション",
+  USED_MANSION: "中古マンション",
+  NEW_MANSION: "新築マンション",
+  OTHER: "その他",
+};
+
+function formatPropertyDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
 
 interface NewAndNewsSectionProps {
   heading?: string | null;
@@ -105,38 +122,83 @@ export async function NewAndNewsSection(_props: NewAndNewsSectionProps = {}) {
 
 // 新着物件の1行
 function NewPropertyRow({ property }: { property: Property }) {
-  const rawDate = property.createdAt ?? (property as any).created_at ?? "";
-  const dateObj = rawDate ? new Date(rawDate) : null;
-  const date = dateObj && !isNaN(dateObj.getTime())
-    ? dateObj.toLocaleDateString("ja-JP", { month: "2-digit", day: "2-digit" })
-    : "";
+  // APIはsnake_caseで返すため両方に対応
+  const typeKey = property.property_type ?? property.propertyType ?? "";
+  const typeLabel = PROPERTY_TYPE_MAP[typeKey] ?? typeKey ?? "物件";
+  const location = property.city ?? property.address ?? "";
+  const floorPlan = property.rooms ?? property.layout ?? null;
+  const dateStr = property.created_at ?? property.createdAt ?? property.published_at ?? "";
 
   return (
     <Link
       href={`/properties/${property.id}`}
       style={{
         display: "flex",
-        alignItems: "flex-start",
-        gap: "12px",
-        padding: "14px 0",
-        borderBottom: "1px solid #E5E5E5",
+        alignItems: "center",
+        gap: "8px",
+        padding: "10px 0",
+        borderBottom: "1px solid #f0f0f0",
         textDecoration: "none",
         color: "inherit",
       }}
     >
-      <Home size={14} style={{ color: "#5BAD52", flexShrink: 0, marginTop: "2px" }} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: "13px", color: "#555", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {property.name}
-        </p>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "2px" }}>
-          <span style={{ fontSize: "11px", color: "#aaa" }}>{property.address}</span>
-          <span style={{ fontSize: "11px", fontWeight: "600", color: "#5BAD52" }}>
-            {property.price.toLocaleString()}万円
-          </span>
-        </div>
-      </div>
-      <span style={{ fontSize: "10px", color: "#ccc", flexShrink: 0 }}>{date}</span>
+      {/* 物件種別バッジ */}
+      <span style={{
+        fontSize: "10px",
+        padding: "2px 6px",
+        borderRadius: "3px",
+        backgroundColor: "#e8f5e6",
+        color: "#5BAD52",
+        whiteSpace: "nowrap",
+        flexShrink: 0,
+      }}>
+        {typeLabel}
+      </span>
+
+      {/* 場所 */}
+      <span style={{
+        fontSize: "13px",
+        color: "#333",
+        flex: 1,
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+      }}>
+        {location}
+      </span>
+
+      {/* 間取り */}
+      {floorPlan && (
+        <span style={{
+          fontSize: "12px",
+          color: "#666",
+          whiteSpace: "nowrap",
+          flexShrink: 0,
+        }}>
+          {floorPlan}
+        </span>
+      )}
+
+      {/* 価格 */}
+      <span style={{
+        fontSize: "13px",
+        fontWeight: "bold",
+        color: "#5BAD52",
+        whiteSpace: "nowrap",
+        flexShrink: 0,
+      }}>
+        {property.price?.toLocaleString()}万円
+      </span>
+
+      {/* 日付 */}
+      <span style={{
+        fontSize: "11px",
+        color: "#aaa",
+        whiteSpace: "nowrap",
+        flexShrink: 0,
+      }}>
+        {formatPropertyDate(dateStr)}
+      </span>
     </Link>
   );
 }

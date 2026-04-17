@@ -1,6 +1,7 @@
 // app/page.tsx
 export const dynamic = "force-dynamic";
 
+import React from "react";
 import { HeroSlider } from "@/components/home/HeroSlider";
 import { FeliaSectionSelection } from "@/components/home/FeliaSectionSelection";
 import { RecommendSection } from "@/components/home/RecommendSection";
@@ -11,79 +12,79 @@ import { OpenHouseAndInfoSection } from "@/components/home/OpenHouseAndInfoSecti
 import { FeatureSection } from "@/components/home/FeatureSection";
 import { FreeBannerSection } from "@/components/home/FreeBannerSection";
 import { AccessSection } from "@/components/home/AccessSection";
-import { getHpSections } from "@/lib/api";
+import { getHpSections, type HpSection } from "@/lib/api";
+
+// sections APIが失敗した場合のデフォルト順序（全表示）
+const DEFAULT_SECTIONS: HpSection[] = [
+  { section_key: "hero",        is_visible: true, sort_order: 1,  heading: null, subheading: null, label: "" },
+  { section_key: "selection",   is_visible: true, sort_order: 2,  heading: null, subheading: null, label: "" },
+  { section_key: "recommend",   is_visible: true, sort_order: 3,  heading: null, subheading: null, label: "" },
+  { section_key: "new_news",    is_visible: true, sort_order: 4,  heading: null, subheading: null, label: "" },
+  { section_key: "full_banner", is_visible: true, sort_order: 5,  heading: null, subheading: null, label: "" },
+  { section_key: "search",      is_visible: true, sort_order: 6,  heading: null, subheading: null, label: "" },
+  { section_key: "open_house",  is_visible: true, sort_order: 7,  heading: null, subheading: null, label: "" },
+  { section_key: "features",    is_visible: true, sort_order: 8,  heading: null, subheading: null, label: "" },
+  { section_key: "free_banner", is_visible: true, sort_order: 9,  heading: null, subheading: null, label: "" },
+  { section_key: "access",      is_visible: true, sort_order: 10, heading: null, subheading: null, label: "" },
+];
+
+function getHeading(sections: HpSection[], key: string): string | null {
+  return sections.find((s) => s.section_key === key)?.heading ?? null;
+}
+
+function getSubheading(sections: HpSection[], key: string): string | null {
+  return sections.find((s) => s.section_key === key)?.subheading ?? null;
+}
 
 export default async function HomePage() {
-  const sections = await getHpSections();
+  const fetched = await getHpSections();
+  // API失敗（空配列）時はデフォルト順序にフォールバック
+  const sectionList = fetched.length > 0 ? fetched : DEFAULT_SECTIONS;
 
-  // section_keyで表示判定（API取得失敗時は全セクション表示）
-  const isVisible = (key: string): boolean => {
-    if (sections.length === 0) return true;
-    const section = sections.find((s) => s.section_key === key);
-    return section ? section.is_visible : true;
-  };
-
-  const getHeading = (key: string): string | null => {
-    const section = sections.find((s) => s.section_key === key);
-    return section?.heading ?? null;
-  };
-
-  const getSubheading = (key: string): string | null => {
-    const section = sections.find((s) => s.section_key === key);
-    return section?.subheading ?? null;
+  // section_key → コンポーネントのマップ（各コンポーネントが内部でデータ取得）
+  const sectionComponents: Record<string, React.ReactNode> = {
+    hero: <HeroSlider />,
+    selection: (
+      <FeliaSectionSelection
+        heading={getHeading(sectionList, "selection")}
+        subheading={getSubheading(sectionList, "selection")}
+      />
+    ),
+    recommend: (
+      <RecommendSection
+        heading={getHeading(sectionList, "recommend")}
+        subheading={getSubheading(sectionList, "recommend")}
+      />
+    ),
+    new_news: (
+      <NewAndNewsSection
+        heading={getHeading(sectionList, "new_news")}
+        subheading={getSubheading(sectionList, "new_news")}
+      />
+    ),
+    full_banner: <FullWidthBannerSection />,
+    search: <SearchSection />,
+    open_house: <OpenHouseAndInfoSection />,
+    features: (
+      <FeatureSection
+        heading={getHeading(sectionList, "features")}
+        subheading={getSubheading(sectionList, "features")}
+      />
+    ),
+    free_banner: <FreeBannerSection />,
+    access: <AccessSection />,
   };
 
   return (
     <main style={{ backgroundColor: "#ffffff" }}>
-      {/* 1. ヒーロースライダー */}
-      {isVisible("hero") && <HeroSlider />}
-
-      {/* 2. 厳選物件 */}
-      {isVisible("selection") && (
-        <FeliaSectionSelection
-          heading={getHeading("selection")}
-          subheading={getSubheading("selection")}
-        />
-      )}
-
-      {/* 3. エリア別おすすめ */}
-      {isVisible("recommend") && (
-        <RecommendSection
-          heading={getHeading("recommend")}
-          subheading={getSubheading("recommend")}
-        />
-      )}
-
-      {/* 4. 新着物件 ＋ お知らせ */}
-      {isVisible("new_news") && (
-        <NewAndNewsSection
-          heading={getHeading("new_news")}
-          subheading={getSubheading("new_news")}
-        />
-      )}
-
-      {/* 5. 会員登録誘導バナー */}
-      {isVisible("full_banner") && <FullWidthBannerSection />}
-
-      {/* 6. 物件検索（SVGマップ ＋ 路線） */}
-      {isVisible("search") && <SearchSection />}
-
-      {/* 7. 現地販売会 ＋ お知らせ */}
-      {isVisible("open_house") && <OpenHouseAndInfoSection />}
-
-      {/* 9. 特集 */}
-      {isVisible("features") && (
-        <FeatureSection
-          heading={getHeading("features")}
-          subheading={getSubheading("features")}
-        />
-      )}
-
-      {/* 10. フリーバナー */}
-      {isVisible("free_banner") && <FreeBannerSection />}
-
-      {/* 11. Access */}
-      {isVisible("access") && <AccessSection />}
+      {sectionList
+        .filter((s) => s.is_visible)
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((s) => (
+          <React.Fragment key={s.section_key}>
+            {sectionComponents[s.section_key] ?? null}
+          </React.Fragment>
+        ))}
     </main>
   );
 }

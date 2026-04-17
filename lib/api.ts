@@ -309,6 +309,15 @@ export interface Property {
   repairReserve?: number;
   createdAt: string;
   updatedAt: string;
+  // Prismaから直接返される場合のsnake_caseフィールド
+  title?: string | null;
+  property_type?: string | null;
+  city?: string | null;
+  rooms?: string | null;
+  created_at?: string | null;
+  published_at?: string | null;
+  station_name1?: string | null;
+  station_walk1?: number | null;
 }
 
 export interface OpenHouse {
