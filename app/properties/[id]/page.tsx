@@ -269,9 +269,9 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           </div>
 
           {/* 右カラム */}
-          <div className="property-sticky-sidebar" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
-            {/* 価格・CTA */}
+            {/* ① 価格・CTAカード */}
             <div style={{
               backgroundColor: "#fff",
               borderRadius: "12px",
@@ -280,22 +280,19 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               position: "sticky",
               top: "80px",
             }}>
-              <div style={{ marginBottom: "16px" }}>
+              {/* 価格 */}
+              <div style={{ marginBottom: "20px" }}>
                 <p style={{ fontSize: "12px", color: "#888", margin: "0 0 4px" }}>販売価格</p>
                 <p style={{ fontSize: "32px", fontWeight: "bold", color: "#5BAD52", margin: 0, lineHeight: 1 }}>
-                  {property.price != null
-                    ? property.price.toLocaleString()
-                    : "応相談"}
-                  {property.price != null && (
-                    <span style={{ fontSize: "16px", marginLeft: "4px" }}>万円</span>
-                  )}
+                  {property.price != null ? property.price.toLocaleString() : "応相談"}
+                  {property.price != null && <span style={{ fontSize: "16px", marginLeft: "4px" }}>万円</span>}
                 </p>
                 {property.price_negotiable && (
                   <p style={{ fontSize: "12px", color: "#E67E22", margin: "4px 0 0" }}>※価格交渉可</p>
                 )}
               </div>
 
-              {/* アクションボタン */}
+              {/* CTAボタン */}
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 <Link
                   href={`/contact?property_id=${property.id}&type=viewing`}
@@ -311,7 +308,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                     fontSize: "15px",
                   }}
                 >
-                  来店・内覧予約
+                  🏠 来店・内覧予約
                 </Link>
                 <Link
                   href={`/contact?property_id=${property.id}&type=document`}
@@ -328,7 +325,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                     border: "2px solid #5BAD52",
                   }}
                 >
-                  資料請求
+                  📄 資料請求
                 </Link>
                 <Link
                   href={`/contact?property_id=${property.id}&type=inquiry`}
@@ -343,16 +340,15 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                     fontSize: "13px",
                   }}
                 >
-                  メールで問い合わせ
+                  ✉️ メールで問い合わせ
                 </Link>
               </div>
-
-              <p style={{ fontSize: "11px", color: "#aaa", textAlign: "center", marginTop: "12px" }}>
+              <p style={{ fontSize: "11px", color: "#aaa", textAlign: "center", margin: "12px 0 0" }}>
                 お気軽にお問い合わせください
               </p>
             </div>
 
-            {/* 現地販売会 */}
+            {/* ② 現地販売会カード（条件付き） */}
             {property.is_open_house && property.open_house_start && (
               <div style={{
                 backgroundColor: "#fff9f0",
@@ -361,32 +357,47 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 border: "1px solid #f5c97a",
               }}>
                 <p style={{ fontSize: "13px", fontWeight: "bold", color: "#E67E22", margin: "0 0 8px" }}>
-                  現地販売会 開催中
+                  🏡 現地販売会 開催中
                 </p>
                 <p style={{ fontSize: "13px", color: "#555", margin: 0 }}>
                   {(() => {
                     const d = new Date(property.open_house_start!);
+                    if (isNaN(d.getTime())) return "日程未定";
                     return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
                   })()}
                   {property.open_house_end && (() => {
                     const d = new Date(property.open_house_end);
+                    if (isNaN(d.getTime())) return "";
                     return ` 〜 ${d.getMonth() + 1}月${d.getDate()}日`;
                   })()}
                 </p>
               </div>
             )}
 
-            {/* 担当スタッフ */}
+            {/* ③ 担当スタッフカード（独立） */}
             {staff && (
-              <div style={{ backgroundColor: "#fff", borderRadius: "12px", padding: "20px" }}>
-                <p style={{ fontSize: "13px", fontWeight: "bold", color: "#333", margin: "0 0 12px", borderLeft: "3px solid #5BAD52", paddingLeft: "8px" }}>
+              <div style={{
+                backgroundColor: "#fff",
+                borderRadius: "12px",
+                padding: "20px",
+                border: "1px solid #e8e8e8",
+              }}>
+                <p style={{
+                  fontSize: "13px",
+                  fontWeight: "bold",
+                  color: "#333",
+                  margin: "0 0 16px",
+                  borderLeft: "3px solid #5BAD52",
+                  paddingLeft: "8px",
+                }}>
                   担当スタッフ
                 </p>
                 <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                  {/* スタッフ写真 */}
                   <div style={{
                     position: "relative",
-                    width: "60px",
-                    height: "60px",
+                    width: "64px",
+                    height: "64px",
                     borderRadius: "50%",
                     overflow: "hidden",
                     flexShrink: 0,
@@ -398,24 +409,26 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                         alt={staff.name}
                         fill
                         style={{ objectFit: "cover" }}
+                        sizes="64px"
                       />
                     )}
                   </div>
-                  <div>
+                  {/* スタッフ情報 */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: "15px", fontWeight: "bold", color: "#333", margin: "0 0 2px" }}>
                       {staff.name}
                     </p>
-                    <p style={{ fontSize: "12px", color: "#888", margin: "0 0 6px" }}>
-                      {staff.position}{staff.store_name ? ` ／ ${staff.store_name}` : ""}
+                    <p style={{ fontSize: "12px", color: "#888", margin: "0 0 8px" }}>
+                      {[staff.position, staff.store_name].filter(Boolean).join(" ／ ")}
                     </p>
                     {staff.catchphrase && (
-                      <p style={{ fontSize: "12px", color: "#5BAD52", fontStyle: "italic", margin: "0 0 4px" }}>
-                        &ldquo;{staff.catchphrase}&rdquo;
+                      <p style={{ fontSize: "12px", color: "#5BAD52", margin: "0 0 6px", fontStyle: "italic" }}>
+                        「{staff.catchphrase}」
                       </p>
                     )}
                     {staff.bio && (
-                      <p style={{ fontSize: "12px", color: "#555", margin: 0, lineHeight: 1.5 }}>
-                        {staff.bio.length > 80 ? staff.bio.substring(0, 80) + "…" : staff.bio}
+                      <p style={{ fontSize: "12px", color: "#555", margin: 0, lineHeight: 1.6 }}>
+                        {staff.bio.length > 80 ? staff.bio.substring(0, 80) + "..." : staff.bio}
                       </p>
                     )}
                   </div>
