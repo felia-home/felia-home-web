@@ -1,5 +1,21 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(curl -s http://localhost:3001/api/hp/open-house)",
+      "Read(//c/Users/User/projects/**)",
+      "Read(//var/**)",
+      "Bash(grep -v \"//\")",
+      "Bash(xargs grep *)",
+      "Bash(ls public/images/recruit/)",
+      "Bash(ls public/image/recruit/)",
+      "Bash(mv \"recruit_customer01 \\(1\\).png\" recruit_customer02.png)",
+      "Bash(mv \"recruit_customer01 \\(2\\).png\" recruit_customer03.png)",
+      "Bash(mv \"recruit_customer01 \\(3\\).png\" recruit_customer04.png)",
+      "Bash(mv \"recruit_recruit_flow01 \\(1\\).png\" recruit_recruit_flow02.png)",
+      "Bash(mv \"recruit_recruit_flow01 \\(2\\).png\" recruit_recruit_flow03.png)"
+    ],
     "additionalDirectories": [
       "c:\\Users\\User\\projects\\felia-home-web\\app\\staff"
     ]
