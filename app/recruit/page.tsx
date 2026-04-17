@@ -11,6 +11,15 @@ export default async function RecruitPage() {
   return (
     <main style={{ backgroundColor: "#fff" }}>
 
+      {/* パンくず・ページタイトル */}
+      <div style={{ backgroundColor: "#f9f9f9", borderBottom: "1px solid #e8e8e8", padding: "12px 24px" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", gap: "8px", fontSize: "12px", color: "#888", alignItems: "center" }}>
+          <Link href="/" style={{ color: "#888", textDecoration: "none" }}>ホーム</Link>
+          <span>›</span>
+          <span style={{ color: "#333", fontWeight: "500" }}>採用情報</span>
+        </div>
+      </div>
+
       {/* ① ヒーローバナー */}
       <div style={{ position: "relative", width: "100%", height: "500px" }}>
         <Image
@@ -22,55 +31,93 @@ export default async function RecruitPage() {
           style={{ objectFit: "cover", objectPosition: "center" }}
           sizes="100vw"
         />
+        {/* 薄いオーバーレイのみ */}
         <div style={{
           position: "absolute", inset: 0,
-          backgroundColor: "rgba(0,0,0,0.35)",
-          display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center",
-          textAlign: "center", padding: "0 24px",
-        }}>
-          <p style={{
-            fontSize: "13px", color: "rgba(255,255,255,0.8)",
-            letterSpacing: "0.2em", margin: "0 0 16px",
-            fontFamily: "'Montserrat', sans-serif",
-          }}>
-            RECRUIT
-          </p>
-          <h1 style={{
-            fontSize: "clamp(28px, 5vw, 48px)",
-            fontWeight: "bold", color: "#fff",
-            lineHeight: 1.3, margin: "0 0 20px",
-          }}>
-            人を本気で大切に。<br />
-            本気の私たちと共に歩みます。
-          </h1>
-          <p style={{
-            fontSize: "15px", color: "rgba(255,255,255,0.85)",
-            lineHeight: 1.8, maxWidth: "600px",
-          }}>
-            フェリアホームは、不動産を通じて「人の暮らし」に向き合う会社です。<br />
-            お客様の大切な人生の転機に真剣に向き合える仲間を探しています。
-          </p>
-        </div>
+          backgroundColor: "rgba(0,0,0,0.2)",
+        }} />
       </div>
 
       {/* メッセージ */}
-      <div style={{ padding: "80px 24px", maxWidth: "800px", margin: "0 auto", textAlign: "center" }}>
-        <p style={{ fontSize: "13px", color: "#5BAD52", letterSpacing: "0.2em", margin: "0 0 16px", fontFamily: "'Montserrat', sans-serif" }}>
-          MESSAGE
-        </p>
-        <h2 style={{ fontSize: "clamp(22px, 4vw, 32px)", fontWeight: "bold", color: "#1a1a1a", margin: "0 0 32px" }}>
-          人を本気で大切に。<br />本気の私たちと共に歩みます。
-        </h2>
-        <div style={{ width: "40px", height: "3px", backgroundColor: "#5BAD52", margin: "0 auto 40px" }} />
-        <p style={{ fontSize: "15px", color: "#555", lineHeight: 2, textAlign: "left" }}>
-          私たちフェリアホームは、東京都内を中心に不動産売買仲介を行う会社です。<br /><br />
-          お客様にとって不動産の売買は、人生で最も大きな決断のひとつ。<br />
-          だからこそ私たちは、数字よりも「人」を大切にし、<br />
-          一人ひとりのお客様に誠実に向き合うことを何より重視しています。<br /><br />
-          経験よりも大切なのは「誠実さ」と「熱意」。<br />
-          お客様の笑顔のために、本気で取り組める仲間をお待ちしています。
-        </p>
+      <div style={{ padding: "100px 24px", background: "linear-gradient(180deg, #fff 0%, #f0f9ef 100%)" }}>
+        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "60px" }}>
+            <p style={{
+              fontSize: "12px", color: "#5BAD52", letterSpacing: "0.3em",
+              margin: "0 0 20px", fontFamily: "'Montserrat', sans-serif", fontWeight: "600",
+            }}>
+              MESSAGE
+            </p>
+            <h2 style={{
+              fontSize: "clamp(28px, 5vw, 44px)",
+              fontWeight: "bold", color: "#1a1a1a",
+              lineHeight: 1.4, margin: "0 0 24px",
+            }}>
+              人を本気で大切に。<br />
+              本気の私たちと共に歩みます。
+            </h2>
+            <div style={{ width: "48px", height: "3px", backgroundColor: "#5BAD52", margin: "0 auto" }} />
+          </div>
+
+          <div style={{
+            backgroundColor: "#fff",
+            borderRadius: "16px",
+            padding: "48px 56px",
+            boxShadow: "0 8px 40px rgba(91,173,82,0.08)",
+            border: "1px solid #e8f5e6",
+            position: "relative",
+            overflow: "hidden",
+          }}>
+            {/* 装飾 */}
+            <div style={{
+              position: "absolute", top: 0, left: 0,
+              width: "6px", height: "100%",
+              backgroundColor: "#5BAD52",
+              borderRadius: "3px 0 0 3px",
+            }} />
+            <div style={{
+              position: "absolute", top: "-40px", right: "-40px",
+              width: "160px", height: "160px",
+              borderRadius: "50%",
+              backgroundColor: "#f0f9ef",
+              zIndex: 0,
+            }} />
+
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <p style={{
+                fontSize: "clamp(15px, 2vw, 18px)",
+                color: "#333", lineHeight: 2.1,
+                margin: "0 0 32px",
+                fontWeight: "500",
+              }}>
+                私たちフェリアホームは、東京都内を中心に不動産売買仲介を行う会社です。
+              </p>
+              <p style={{ fontSize: "15px", color: "#555", lineHeight: 2, margin: "0 0 24px" }}>
+                お客様にとって不動産の売買は、人生で最も大きな決断のひとつ。<br />
+                だからこそ私たちは、数字よりも「人」を大切にし、<br />
+                一人ひとりのお客様に誠実に向き合うことを何より重視しています。
+              </p>
+              <p style={{ fontSize: "15px", color: "#555", lineHeight: 2, margin: 0 }}>
+                経験よりも大切なのは「誠実さ」と「熱意」。<br />
+                お客様の笑顔のために、本気で取り組める仲間をお待ちしています。
+              </p>
+
+              <div style={{
+                marginTop: "40px",
+                paddingTop: "32px",
+                borderTop: "1px solid #e8f5e6",
+                textAlign: "right",
+              }}>
+                <p style={{ fontSize: "16px", fontWeight: "bold", color: "#333", margin: 0 }}>
+                  株式会社フェリアホーム
+                </p>
+                <p style={{ fontSize: "13px", color: "#888", margin: "4px 0 0" }}>
+                  代表取締役 北原 啓輔
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ② 事業内容 */}
@@ -133,21 +180,34 @@ export default async function RecruitPage() {
       {/* ⑥ 当社の強み */}
       <div style={{ padding: "80px 24px", maxWidth: "1100px", margin: "0 auto" }}>
         <SectionHeader en="STRENGTH" ja="当社の強み" />
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          {[
-            "/images/recruit/recruit_strength01.png",
-            "/images/recruit/recruit_strength02.png",
-            "/images/recruit/recruit_strength03.png",
-          ].map((src, i) => (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "24px" }}>
+          {/* 上段：1枚（中央） */}
+          <div style={{ width: "60%", maxWidth: "600px" }}>
             <Image
-              key={i}
-              src={src}
-              alt={`当社の強み ${i + 1}`}
-              width={1100}
+              src="/images/recruit/recruit_strength01.png"
+              alt="当社の強み 1"
+              width={600}
               height={400}
               style={{ width: "100%", height: "auto", display: "block", borderRadius: "12px" }}
             />
-          ))}
+          </div>
+          {/* 下段：2枚（横並び） */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", width: "100%" }}>
+            <Image
+              src="/images/recruit/recruit_strength02.png"
+              alt="当社の強み 2"
+              width={520}
+              height={360}
+              style={{ width: "100%", height: "auto", display: "block", borderRadius: "12px" }}
+            />
+            <Image
+              src="/images/recruit/recruit_strength03.png"
+              alt="当社の強み 3"
+              width={520}
+              height={360}
+              style={{ width: "100%", height: "auto", display: "block", borderRadius: "12px" }}
+            />
+          </div>
         </div>
       </div>
 
@@ -283,21 +343,79 @@ export default async function RecruitPage() {
             textAlign: "center", fontSize: "15px", color: "#555",
             lineHeight: 1.9, maxWidth: "700px", margin: "0 auto 48px",
           }}>
-            渋谷区千駄ヶ谷に位置する北参道DTビル1階。<br />
-            明るく開放的なオフィスで、お客様をお迎えしています。<br />
-            落ち着いた雰囲気の中で、スタッフ同士の連携も取りやすい職場環境です。
+            渋谷区千駄ヶ谷・幡ヶ谷の2拠点で展開しています。<br />
+            明るく開放的なオフィスで、お客様もスタッフも快適に過ごせる環境です。
           </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" }}>
-            {["recruit_store01.jpg", "recruit_store02.jpg"].map((file, i) => (
-              <Image
-                key={i}
-                src={`/images/recruit/${file}`}
-                alt={`店舗 ${i + 1}`}
-                width={540}
-                height={360}
-                style={{ width: "100%", height: "auto", display: "block", borderRadius: "12px" }}
-              />
-            ))}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "40px" }}>
+            {/* 千駄ヶ谷本店 */}
+            <div>
+              <div style={{ borderRadius: "12px", overflow: "hidden", marginBottom: "20px" }}>
+                <Image
+                  src="/images/recruit/recruit_store01.jpg"
+                  alt="千駄ヶ谷本店"
+                  width={540}
+                  height={360}
+                  style={{ width: "100%", height: "auto", display: "block" }}
+                />
+              </div>
+              <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "#333", margin: "0 0 12px", borderLeft: "4px solid #5BAD52", paddingLeft: "12px" }}>
+                千駄ヶ谷本店
+              </h3>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <tbody>
+                  {[
+                    { label: "住所",     value: "〒151-0051 東京都渋谷区千駄ヶ谷4-16-7 北参道DTビル1階" },
+                    { label: "アクセス", value: "東京メトロ副都心線「北参道」駅 徒歩3分\nJR総武線「千駄ヶ谷」駅 徒歩8分" },
+                    { label: "TEL",     value: "03-5781-6301" },
+                    { label: "営業時間", value: "9:30〜18:30（水・日定休）" },
+                  ].map((row, i) => (
+                    <tr key={i} style={{ borderBottom: "1px solid #e8e8e8" }}>
+                      <td style={{ padding: "10px 12px", color: "#888", fontWeight: "bold", width: "90px", verticalAlign: "top", whiteSpace: "nowrap", backgroundColor: "#fff" }}>
+                        {row.label}
+                      </td>
+                      <td style={{ padding: "10px 12px", color: "#333", lineHeight: 1.7, whiteSpace: "pre-line", backgroundColor: "#fff" }}>
+                        {row.value}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* 幡ヶ谷店 */}
+            <div>
+              <div style={{ borderRadius: "12px", overflow: "hidden", marginBottom: "20px" }}>
+                <Image
+                  src="/images/recruit/recruit_store02.jpg"
+                  alt="幡ヶ谷店"
+                  width={540}
+                  height={360}
+                  style={{ width: "100%", height: "auto", display: "block" }}
+                />
+              </div>
+              <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "#333", margin: "0 0 12px", borderLeft: "4px solid #5BAD52", paddingLeft: "12px" }}>
+                幡ヶ谷店
+              </h3>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <tbody>
+                  {[
+                    { label: "住所",     value: "東京都渋谷区幡ヶ谷（詳細はお問い合わせください）" },
+                    { label: "アクセス", value: "京王新線「幡ヶ谷」駅 徒歩圏内" },
+                    { label: "TEL",     value: "03-6276-7614" },
+                    { label: "営業時間", value: "9:30〜18:30（水・日定休）" },
+                  ].map((row, i) => (
+                    <tr key={i} style={{ borderBottom: "1px solid #e8e8e8" }}>
+                      <td style={{ padding: "10px 12px", color: "#888", fontWeight: "bold", width: "90px", verticalAlign: "top", whiteSpace: "nowrap", backgroundColor: "#fff" }}>
+                        {row.label}
+                      </td>
+                      <td style={{ padding: "10px 12px", color: "#333", lineHeight: 1.7, whiteSpace: "pre-line", backgroundColor: "#fff" }}>
+                        {row.value}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
