@@ -19,7 +19,7 @@ const DEFAULT_SECTIONS: HpSection[] = [
   { section_key: "hero",        is_visible: true, sort_order: 1,  heading: null, subheading: null, label: "" },
   { section_key: "selection",   is_visible: true, sort_order: 2,  heading: null, subheading: null, label: "" },
   { section_key: "recommend",   is_visible: true, sort_order: 3,  heading: null, subheading: null, label: "" },
-  { section_key: "new_news",    is_visible: true, sort_order: 4,  heading: null, subheading: null, label: "" },
+  { section_key: "news",    is_visible: true, sort_order: 4,  heading: null, subheading: null, label: "" },
   { section_key: "full_banner", is_visible: true, sort_order: 5,  heading: null, subheading: null, label: "" },
   { section_key: "search",      is_visible: true, sort_order: 6,  heading: null, subheading: null, label: "" },
   { section_key: "open_house",  is_visible: true, sort_order: 7,  heading: null, subheading: null, label: "" },
@@ -56,10 +56,10 @@ export default async function HomePage() {
         subheading={getSubheading(sectionList, "recommend")}
       />
     ),
-    new_news: (
+    news: (
       <NewAndNewsSection
-        heading={getHeading(sectionList, "new_news")}
-        subheading={getSubheading(sectionList, "new_news")}
+        heading={getHeading(sectionList, "news")}
+        subheading={getSubheading(sectionList, "news")}
       />
     ),
     full_banner: <FullWidthBannerSection />,
