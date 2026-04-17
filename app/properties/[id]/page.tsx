@@ -19,8 +19,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const property = await getPropertyById(params.id);
     return {
-      title: `${property.address} ${property.layout} ${property.price.toLocaleString()}万円`,
-      description: `${property.propertyType}｜${property.address}｜${property.price.toLocaleString()}万円｜${property.area}㎡｜${property.nearestStation}徒歩${property.walkMinutes}分`,
+      title: `${property.address} ${property.layout} ${property.price != null ? property.price.toLocaleString() : "未定"}万円`,
+      description: `${property.propertyType}｜${property.address}｜${property.price != null ? property.price.toLocaleString() : "未定"}万円｜${property.area}㎡｜${property.nearestStation}徒歩${property.walkMinutes}分`,
     };
   } catch {
     return { title: "物件詳細" };
@@ -44,17 +44,17 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
   const specs = [
     { label: "物件種別",   value: property.propertyType,                         icon: Home },
-    { label: "価格",       value: `${property.price.toLocaleString()}万円`,       icon: null },
+    { label: "価格",       value: property.price != null ? `${property.price.toLocaleString()}万円` : "未定", icon: null },
     { label: "所在地",     value: property.address,                               icon: MapPin },
     { label: "最寄駅",     value: `${property.nearestStation} 徒歩${property.walkMinutes}分`, icon: Train },
     { label: "面積",       value: property.area ? `${property.area}㎡` : "—",     icon: Maximize2 },
     { label: "間取り",     value: property.layout || "—",                         icon: LayoutGrid },
     { label: "築年月",     value: property.buildingYear ? `${property.buildingYear}年` : "—", icon: Calendar },
     { label: "構造",       value: property.structure || "—",                      icon: Building2 },
-    ...(property.managementFee ? [{
+    ...(property.managementFee != null ? [{
       label: "管理費", value: `${property.managementFee.toLocaleString()}円/月`, icon: null
     }] : []),
-    ...(property.repairReserve ? [{
+    ...(property.repairReserve != null ? [{
       label: "修繕積立金", value: `${property.repairReserve.toLocaleString()}円/月`, icon: null
     }] : []),
   ];
@@ -119,9 +119,9 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               style={{ borderColor: "#E5E5E5" }}
             >
               <span className="text-3xl tb:text-4xl font-bold" style={{ color: "#5BAD52" }}>
-                {property.price.toLocaleString()}
+                {property.price != null ? property.price.toLocaleString() : "未定"}
               </span>
-              <span className="text-lg text-gray-500">万円</span>
+              {property.price != null && <span className="text-lg text-gray-500">万円</span>}
             </div>
 
             {/* 画像ギャラリー */}
@@ -187,9 +187,9 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             >
               <div className="flex items-baseline gap-1 mb-4">
                 <span className="text-2xl font-bold" style={{ color: "#5BAD52" }}>
-                  {property.price.toLocaleString()}
+                  {property.price != null ? property.price.toLocaleString() : "未定"}
                 </span>
-                <span className="text-gray-500">万円</span>
+                {property.price != null && <span className="text-gray-500">万円</span>}
               </div>
 
               {/* 主要スペック */}

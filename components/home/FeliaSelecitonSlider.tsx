@@ -94,7 +94,7 @@ export default function FeliaSelecitonSlider({ properties }: { properties: Prope
                   <span style={{ position: 'absolute', top: '8px', left: '8px', background: '#5BAD52', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '3px 10px' }}>{type}</span>
                 </div>
                 <div style={{ padding: '14px 16px' }}>
-                  <p style={{ fontSize: '22px', fontWeight: 'bold', color: '#333', marginBottom: '4px', lineHeight: 1.2 }}>{p.price.toLocaleString()}万円</p>
+                  <p style={{ fontSize: '22px', fontWeight: 'bold', color: '#333', marginBottom: '4px', lineHeight: 1.2 }}>{p.price != null ? `${p.price.toLocaleString()}万円` : "価格未定"}</p>
                   <p style={{ fontSize: '12px', color: '#555', marginBottom: '2px' }}>{p.address}</p>
                   {p.nearestStation && (
                     <p style={{ fontSize: '11px', color: '#888', marginBottom: '8px' }}>{p.nearestStation}{p.walkMinutes ? ` 徒歩${p.walkMinutes}分` : ''}</p>
