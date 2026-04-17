@@ -403,6 +403,122 @@ export async function getCompanyBranches(): Promise<CompanyBranch[]> {
   }
 }
 
+// ---- 物件詳細（新型） ----
+
+export interface PropertyDetail {
+  id: string;
+  property_type: string;
+  transaction_type: string | null;
+  brokerage_type: string | null;
+  status: string;
+  title: string;
+  catch_copy: string | null;
+  description_hp: string | null;
+  prefecture: string | null;
+  city: string | null;
+  town: string | null;
+  address: string | null;
+  address_display_level: string | null;
+  price: number | null;
+  price_negotiable: boolean;
+  station_line1: string | null;
+  station_name1: string | null;
+  station_walk1: number | null;
+  station_line2: string | null;
+  station_name2: string | null;
+  station_walk2: number | null;
+  area_land_m2: number | null;
+  area_build_m2: number | null;
+  rooms: string | null;
+  building_year: number | null;
+  building_month: number | null;
+  structure: string | null;
+  floors_total: number | null;
+  direction: string | null;
+  use_zone: string | null;
+  bcr: number | null;
+  far: number | null;
+  land_right: string | null;
+  road_width: number | null;
+  road_type: string | null;
+  road_direction: string | null;
+  delivery_timing: string | null;
+  delivery_status: string | null;
+  selling_points: string[];
+  is_open_house: boolean;
+  open_house_start: string | null;
+  open_house_end: string | null;
+  is_felia_selection: boolean;
+  agent_id: string | null;
+  eq_system_kitchen: boolean;
+  eq_autolock: boolean;
+  eq_elevator: boolean;
+  eq_parking: boolean;
+  eq_bike_parking: boolean;
+  eq_pet_ok: boolean;
+  eq_floor_heating: boolean;
+  eq_all_electric: boolean;
+  eq_solar: boolean;
+  eq_walk_in_closet: boolean;
+  eq_washlet: boolean;
+  eq_bathroom_dryer: boolean;
+  eq_tv_intercom: boolean;
+  eq_fiber_optic: boolean;
+  eq_corner: boolean;
+  eq_top_floor: boolean;
+  eq_reformed: boolean;
+  eq_barrier_free: boolean;
+  eq_ev_charger: boolean;
+  eq_separate_bath_toilet: boolean;
+  eq_counter_kitchen: boolean;
+  eq_roof_balcony: boolean;
+}
+
+export interface PropertyImage {
+  id: string;
+  url: string;
+  filename: string;
+  order?: number;
+}
+
+export interface StaffDetail {
+  id: string;
+  name: string;
+  name_kana: string | null;
+  position: string | null;
+  store_name: string | null;
+  photo_url: string | null;
+  bio: string | null;
+  catchphrase: string | null;
+}
+
+export async function getPropertyDetail(id: string): Promise<PropertyDetail | null> {
+  try {
+    const res = await fetchFromAdmin<any>(`/api/properties/${id}`);
+    return res.property ?? res ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getPropertyImages(id: string): Promise<PropertyImage[]> {
+  try {
+    const res = await fetchFromAdmin<{ images: PropertyImage[] }>(`/api/properties/${id}/images`);
+    return res.images ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getStaffDetail(id: string): Promise<StaffDetail | null> {
+  try {
+    const res = await fetchFromAdmin<{ staff: StaffDetail }>(`/api/hp/staff/${id}`);
+    return res.staff ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // ---- 未公開物件 ----
 
 export interface PrivateProperty {

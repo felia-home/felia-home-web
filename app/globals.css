@@ -109,3 +109,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 物件詳細ページ */
+@media (max-width: 900px) {
+  .property-detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .property-sticky-sidebar {
+    position: static !important;
+  }
+}
