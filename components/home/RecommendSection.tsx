@@ -6,7 +6,12 @@ import { getAreas } from "@/lib/api";
 import { getAreaContent } from "@/lib/areaContents";
 import type { AreaSetting } from "@/lib/api";
 
-export async function RecommendSection() {
+interface RecommendSectionProps {
+  heading?: string | null;
+  subheading?: string | null;
+}
+
+export async function RecommendSection({ heading, subheading }: RecommendSectionProps = {}) {
   const areas = await getAreas();
 
   if (areas.length === 0) return null;
@@ -20,7 +25,7 @@ export async function RecommendSection() {
   return (
     <section style={{ padding: "64px 0", backgroundColor: "#ffffff" }}>
       <div className="container-content">
-        <SectionTitle en="Recommend" ja="エリア別おすすめ物件" />
+        <SectionTitle en={heading ?? "Recommend"} ja={subheading ?? "エリア別おすすめ物件"} />
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {groups.map((group, gi) => (
             <div

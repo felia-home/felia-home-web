@@ -3,7 +3,12 @@ import Link from "next/link";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { getFeatures, type Feature } from "@/lib/api";
 
-export async function FeatureSection() {
+interface FeatureSectionProps {
+  heading?: string | null;
+  subheading?: string | null;
+}
+
+export async function FeatureSection({ heading, subheading }: FeatureSectionProps = {}) {
   let features: Feature[] = [];
   try {
     features = await getFeatures();
@@ -16,7 +21,7 @@ export async function FeatureSection() {
   return (
     <section className="section-padding bg-white">
       <div className="container-content">
-        <SectionTitle en="Feature" ja="特集" />
+        <SectionTitle en={heading ?? "Feature"} ja={subheading ?? "特集"} />
         <div className="grid grid-cols-1 tb:grid-cols-3 gap-4 tb:gap-6">
           {features.slice(0, 3).map((feature) => (
             <Link

@@ -1,8 +1,40 @@
 // components/home/OpenHouseAndInfoSection.tsx
 import Link from "next/link";
 import { ArrowRight, MapPin, Info } from "lucide-react";
-import { getOpenHouses, getNews } from "@/lib/api";
+import { getOpenHouses, getInformationNews } from "@/lib/api";
 import type { OpenHouse, NewsItem } from "@/lib/api";
+
+function formatInfoDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}`;
+  } catch {
+    return "";
+  }
+}
+
+function formatYearMonth(dateStr: string | null | undefined): { year: string; month: string } {
+  if (!dateStr) return { year: "—", month: "—" };
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return { year: "—", month: "—" };
+  return { year: String(d.getFullYear()), month: String(d.getMonth() + 1) };
+}
+
+function formatDateRange(start: string | null | undefined, end: string | null | undefined): string {
+  const fmt = (dateStr: string | null | undefined) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  };
+  const s = fmt(start);
+  const e = fmt(end);
+  if (!s && !e) return "日程未定";
+  if (!e) return s;
+  return `${s} 〜 ${e}`;
+}
 
 export async function OpenHouseAndInfoSection() {
   let openHouses: OpenHouse[] = [];
@@ -11,42 +43,46 @@ export async function OpenHouseAndInfoSection() {
   try {
     [openHouses, infoItems] = await Promise.all([
       getOpenHouses(),
-      getNews(5),
+      getInformationNews(5),
     ]);
   } catch {
     // Admin APIが未起動の場合はスキップ
   }
 
   return (
-    <section className="section-padding bg-white">
-      <div className="container-content">
-        <div className="grid grid-cols-1 tb:grid-cols-2 gap-8 tb:gap-12">
+    <section style={{ backgroundColor: "#ffffff", padding: "48px 0" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 16px" }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: "48px",
+        }}>
 
           {/* 左: 現地販売会 */}
           <div>
-            <div className="flex items-end justify-between mb-6">
+            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "24px" }}>
               <div>
-                <span
-                  className="font-montserrat font-bold text-2xl tb:text-3xl tracking-wider"
-                  style={{ color: "#5BAD52", fontFamily: "'Montserrat', sans-serif" }}
-                >
+                <span style={{
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: "bold",
+                  fontSize: "24px",
+                  letterSpacing: "0.05em",
+                  color: "#5BAD52",
+                  display: "block",
+                }}>
                   Open House
                 </span>
-                <p className="text-xs text-gray-400 tracking-widest mt-1">現地販売会情報</p>
-                <div className="mt-2 w-8 h-0.5" style={{ backgroundColor: "#5BAD52" }} />
+                <p style={{ fontSize: "11px", color: "#aaa", letterSpacing: "0.2em", margin: "4px 0 0" }}>現地販売会情報</p>
+                <div style={{ marginTop: "8px", width: "32px", height: "2px", backgroundColor: "#5BAD52" }} />
               </div>
-              <Link
-                href="/open-houses"
-                className="text-xs flex items-center gap-1 hover:gap-2 transition-all"
-                style={{ color: "#5BAD52" }}
-              >
+              <Link href="/open-houses" style={{ color: "#5BAD52", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
                 もっと見る <ArrowRight size={12} />
               </Link>
             </div>
 
-            <div className="space-y-4">
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {openHouses.length === 0 ? (
-                <p className="text-sm text-gray-400 py-4">現地販売会の予定はありません</p>
+                <p style={{ fontSize: "13px", color: "#aaa", padding: "16px 0" }}>現地販売会の予定はありません</p>
               ) : (
                 openHouses.slice(0, 3).map((oh) => (
                   <OpenHouseCard key={oh.id} openHouse={oh} />
@@ -57,29 +93,29 @@ export async function OpenHouseAndInfoSection() {
 
           {/* 右: お知らせ */}
           <div>
-            <div className="flex items-end justify-between mb-6">
+            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "24px" }}>
               <div>
-                <span
-                  className="font-montserrat font-bold text-2xl tb:text-3xl tracking-wider text-gray-700"
-                  style={{ fontFamily: "'Montserrat', sans-serif" }}
-                >
+                <span style={{
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: "bold",
+                  fontSize: "24px",
+                  letterSpacing: "0.05em",
+                  color: "#555",
+                  display: "block",
+                }}>
                   Information
                 </span>
-                <p className="text-xs text-gray-400 tracking-widest mt-1">お知らせ</p>
-                <div className="mt-2 w-8 h-0.5 bg-gray-300" />
+                <p style={{ fontSize: "11px", color: "#aaa", letterSpacing: "0.2em", margin: "4px 0 0" }}>お知らせ</p>
+                <div style={{ marginTop: "8px", width: "32px", height: "2px", backgroundColor: "#ccc" }} />
               </div>
-              <Link
-                href="/news"
-                className="text-xs flex items-center gap-1 hover:gap-2 transition-all"
-                style={{ color: "#5BAD52" }}
-              >
+              <Link href="/news" style={{ color: "#5BAD52", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
                 もっと見る <ArrowRight size={12} />
               </Link>
             </div>
 
-            <div className="space-y-0 divide-y" style={{ borderColor: "#E5E5E5" }}>
+            <div style={{ borderTop: "1px solid #E5E5E5" }}>
               {infoItems.length === 0 ? (
-                <p className="text-sm text-gray-400 py-4">お知らせはありません</p>
+                <p style={{ fontSize: "13px", color: "#aaa", padding: "16px 0" }}>お知らせはありません</p>
               ) : (
                 infoItems.map((item) => (
                   <InfoRow key={item.id} item={item} />
@@ -96,49 +132,60 @@ export async function OpenHouseAndInfoSection() {
 
 // 現地販売会カード
 function OpenHouseCard({ openHouse }: { openHouse: OpenHouse }) {
-  const dateObj = new Date(openHouse.date);
-  const month = dateObj.getMonth() + 1;
-  const day = dateObj.getDate();
-  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-  const weekday = weekdays[dateObj.getDay()];
+  const { year, month } = formatYearMonth(openHouse.open_house_start);
+  const dateRange = formatDateRange(openHouse.open_house_start, openHouse.open_house_end);
 
   return (
     <Link
-      href={`/properties/${openHouse.propertyId}`}
-      className="group flex gap-3 p-3 rounded-lg border hover:shadow-sm transition-all"
-      style={{ borderColor: "#E5E5E5" }}
+      href={`/properties/${openHouse.id}`}
+      style={{
+        display: "flex",
+        gap: "12px",
+        padding: "12px",
+        borderRadius: "8px",
+        border: "1px solid #E5E5E5",
+        textDecoration: "none",
+        color: "inherit",
+      }}
     >
-      {/* 日付ブロック */}
-      <div
-        className="flex-shrink-0 w-14 rounded flex flex-col items-center justify-center py-2"
-        style={{ backgroundColor: "#EBF7EA" }}
-      >
-        <span className="font-montserrat font-bold text-xl leading-none" style={{ color: "#5BAD52" }}>
-          {day}
+      {/* 年月ブロック */}
+      <div style={{
+        flexShrink: 0,
+        width: "60px",
+        borderRadius: "4px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "8px 4px",
+        backgroundColor: "#EBF7EA",
+      }}>
+        <span style={{
+          fontFamily: "'Montserrat', sans-serif",
+          fontWeight: "bold",
+          fontSize: "22px",
+          lineHeight: 1,
+          color: "#5BAD52",
+        }}>
+          {year}
         </span>
-        <span className="text-[10px] text-gray-500 mt-0.5">
-          {month}月（{weekday}）
-        </span>
-        <span className="text-[9px] text-gray-400 mt-0.5">
-          {openHouse.startTime}〜
+        <span style={{ fontSize: "12px", color: "#666", marginTop: "4px" }}>
+          {month}月
         </span>
       </div>
 
       {/* 物件情報 */}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-700 group-hover:text-felia-green leading-snug truncate transition-colors">
-          {openHouse.propertyName}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: "13px", fontWeight: "500", color: "#333", margin: "0 0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {openHouse.title ?? "物件名未設定"}
         </p>
-        <div className="flex items-center gap-1 mt-1">
+        <p style={{ fontSize: "13px", color: "#555", margin: "0 0 4px" }}>
+          {dateRange}
+        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
           <MapPin size={10} style={{ color: "#5BAD52" }} />
-          <span className="text-xs text-gray-400 truncate">{openHouse.address}</span>
-        </div>
-        <div className="mt-1.5">
-          <span
-            className="text-[10px] font-medium px-2 py-0.5 rounded"
-            style={{ backgroundColor: "#EBF7EA", color: "#5BAD52" }}
-          >
-            現地販売会
+          <span style={{ fontSize: "11px", color: "#aaa", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {openHouse.city ?? ""}{openHouse.address ?? ""}
           </span>
         </div>
       </div>
@@ -148,23 +195,25 @@ function OpenHouseCard({ openHouse }: { openHouse: OpenHouse }) {
 
 // お知らせ行
 function InfoRow({ item }: { item: NewsItem }) {
-  const date = new Date(item.publishedAt).toLocaleDateString("ja-JP", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-
   return (
     <Link
-      href={`/news/${item.slug}`}
-      className="flex items-start gap-3 py-3.5 hover:bg-gray-50 -mx-2 px-2 rounded group transition-colors"
+      href={`/news/${item.id}`}
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: "12px",
+        padding: "14px 0",
+        borderBottom: "1px solid #E5E5E5",
+        textDecoration: "none",
+        color: "inherit",
+      }}
     >
-      <Info size={13} className="flex-shrink-0 mt-0.5" style={{ color: "#5BAD52" }} />
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-gray-700 group-hover:text-felia-green truncate transition-colors">
+      <Info size={13} style={{ color: "#5BAD52", flexShrink: 0, marginTop: "2px" }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: "13px", color: "#555", margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {item.title}
         </p>
-        <span className="text-[10px] text-gray-300">{date}</span>
+        <span style={{ fontSize: "10px", color: "#aaa" }}>{formatInfoDate(item.published_at)}</span>
       </div>
     </Link>
   );

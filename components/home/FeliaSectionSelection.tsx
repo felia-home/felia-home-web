@@ -6,7 +6,12 @@ import { getFeaturedProperties } from "@/lib/api";
 import type { Property } from "@/lib/api";
 import { FeaturedSlider } from "./FeaturedSlider";
 
-export async function FeliaSectionSelection() {
+interface FeliaSectionSelectionProps {
+  heading?: string | null;
+  subheading?: string | null;
+}
+
+export async function FeliaSectionSelection({ heading, subheading }: FeliaSectionSelectionProps = {}) {
   let properties: Property[] = [];
   try {
     properties = await getFeaturedProperties();
@@ -19,7 +24,7 @@ export async function FeliaSectionSelection() {
     <section className="section-padding bg-white">
       <div className="container-content">
         <div className="flex items-end justify-between mb-8 tb:mb-12">
-          <SectionTitle en="Felia Selection" ja="厳選物件情報" align="left" />
+          <SectionTitle en={heading ?? "Felia Selection"} ja={subheading ?? "厳選物件情報"} align="left" />
           <Link
             href="/properties?flag=featured"
             className="hidden tb:flex items-center gap-1 text-sm font-medium hover:gap-2 transition-all"

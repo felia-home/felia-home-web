@@ -59,14 +59,64 @@ export async function getOpenHouses() {
 
 // ---- お知らせ ----
 
-export async function getNews(limit?: number) {
-  const q = limit ? `?limit=${limit}` : "";
-  const res = await fetchFromAdmin<{ news: NewsItem[] }>(`/api/hp/news${q}`);
-  return res.news ?? [];
+export async function getPropertyNews(limit?: number): Promise<NewsItem[]> {
+  const q = limit ? `?type=property&limit=${limit}` : "?type=property";
+  try {
+    const res = await fetchFromAdmin<{ news: NewsItem[] }>(`/api/hp/news${q}`);
+    return res.news ?? [];
+  } catch {
+    return [];
+  }
 }
 
-export async function getNewsById(slug: string) {
-  return fetchFromAdmin<NewsItem>(`/api/news/${slug}`);
+export async function getInformationNews(limit?: number): Promise<NewsItem[]> {
+  const q = limit ? `?type=information&limit=${limit}` : "?type=information";
+  try {
+    const res = await fetchFromAdmin<{ news: NewsItem[] }>(`/api/hp/news${q}`);
+    return res.news ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getAllNews(limit?: number): Promise<NewsItem[]> {
+  const q = limit ? `?limit=${limit}` : "";
+  try {
+    const res = await fetchFromAdmin<{ news: NewsItem[] }>(`/api/hp/news${q}`);
+    return res.news ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getNewsById(id: string): Promise<NewsItem | null> {
+  try {
+    const res = await fetchFromAdmin<{ news: NewsItem }>(`/api/news/${id}`);
+    return res.news ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// ---- HPセクション表示管理 ----
+
+export interface HpSection {
+  section_key: string;
+  label: string;
+  is_visible: boolean;
+  sort_order: number;
+  heading: string | null;
+  subheading: string | null;
+}
+
+export async function getHpSections(): Promise<HpSection[]> {
+  try {
+    const res = await fetchFromAdmin<{ sections: HpSection[] }>("/api/hp/sections");
+    return res.sections ?? [];
+  } catch {
+    // セクション取得失敗時は全セクション表示（フォールバック）
+    return [];
+  }
 }
 
 // ---- ヒーローバナー ----
@@ -263,22 +313,23 @@ export interface Property {
 
 export interface OpenHouse {
   id: string;
-  propertyId: string;
-  propertyName: string;
-  address: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  image?: string;
+  title: string | null;
+  city: string | null;
+  address: string | null;
+  open_house_start: string | null;
+  open_house_end: string | null;
+  is_open_house: boolean;
+  station_name1?: string | null;
+  station_walk1?: number | null;
 }
 
 export interface NewsItem {
   id: string;
-  slug: string;
   title: string;
-  content: string;
-  category: string;
-  publishedAt: string;
+  category: "NEWS" | "INFORMATION";
+  news_type: "property" | "information";
+  published_at: string | null;
+  is_published: boolean;
 }
 
 export interface Feature {
