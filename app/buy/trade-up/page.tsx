@@ -241,7 +241,7 @@ export default function TradeUpPage() {
 
                   {/* 売却前の情報 */}
                   <div>
-                    <p style={{ fontWeight: "bold", fontSize: "15px", color: "#333" }}>購入価格 {c.sell.price.toLocaleString()}万円</p>
+                    <p style={{ fontWeight: "bold", fontSize: "15px", color: "#333" }}>購入価格 {c.sell.price != null ? c.sell.price.toLocaleString() : "未定"}万円</p>
                     <p style={{ fontSize: "12px", color: "#5BAD52", fontWeight: "bold", margin: "4px 0 8px" }}>専有面積 {c.sell.area}㎡（{c.sell.layout}）</p>
                     {c.sell.breakdown.map((b, i) => (
                       <p key={i} style={{ fontSize: "12px", color: "#666", lineHeight: 1.8 }}>・{b}</p>
@@ -261,12 +261,12 @@ export default function TradeUpPage() {
                   <div style={{ backgroundColor: "#F0F5F0", borderRadius: "8px", padding: "16px" }}>
                     <p style={{ fontSize: "12px", color: "#666", marginBottom: "6px" }}>{c.sell.soldYear}</p>
                     <p style={{ fontSize: "16px", fontWeight: "bold", color: "#2d5a2d", marginBottom: "12px" }}>
-                      成約価格 {c.sell.soldPrice.toLocaleString()}万円
+                      成約価格 {c.sell.soldPrice != null ? c.sell.soldPrice.toLocaleString() : "未定"}万円
                     </p>
                     <div style={{ borderTop: "1px dashed #ccc", paddingTop: "10px" }}>
                       <p style={{ fontSize: "11px", color: "#888", marginBottom: "4px" }}>残債返済・仲介手数料支払い後</p>
                       <p style={{ fontSize: "15px", fontWeight: "bold", color: "#2d5a2d" }}>
-                        手残資金 約{c.sell.soldNet.toLocaleString()}万円
+                        手残資金 約{c.sell.soldNet != null ? c.sell.soldNet.toLocaleString() : "未定"}万円
                       </p>
                     </div>
                   </div>
@@ -286,7 +286,7 @@ export default function TradeUpPage() {
                     <div style={{ backgroundColor: "#EBF7EA", borderRadius: "6px", padding: "8px 12px", display: "inline-block", marginBottom: "8px" }}>
                       <p style={{ fontSize: "11px", color: "#2d5a2d" }}>↓ {c.buy.note}</p>
                     </div>
-                    <p style={{ fontSize: "13px", color: "#555" }}>ローン金額 {c.buy.loan.toLocaleString()}万円</p>
+                    <p style={{ fontSize: "13px", color: "#555" }}>ローン金額 {c.buy.loan != null ? c.buy.loan.toLocaleString() : "未定"}万円</p>
                     <p style={{ fontWeight: "bold", fontSize: "14px", color: "#333", marginTop: "4px" }}>住宅ローン返済 {c.buy.monthly}万円／月</p>
                   </div>
                   <div style={{ position: "relative", width: "100%", maxWidth: "180px", aspectRatio: "4/3", borderRadius: "6px", overflow: "hidden" }}>
