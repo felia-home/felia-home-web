@@ -20,7 +20,7 @@ const DEFAULT_SECTIONS: HpSection[] = [
   { section_key: "selection",   is_visible: true, sort_order: 2,  heading: null, subheading: null, label: "" },
   { section_key: "recommend",   is_visible: true, sort_order: 3,  heading: null, subheading: null, label: "" },
   { section_key: "news",    is_visible: true, sort_order: 4,  heading: null, subheading: null, label: "" },
-  { section_key: "full_banner", is_visible: true, sort_order: 5,  heading: null, subheading: null, label: "" },
+  { section_key: "search_banner", is_visible: true, sort_order: 5,  heading: null, subheading: null, label: "" },
   { section_key: "search",      is_visible: true, sort_order: 6,  heading: null, subheading: null, label: "" },
   { section_key: "open_house",  is_visible: true, sort_order: 7,  heading: null, subheading: null, label: "" },
   { section_key: "features",    is_visible: true, sort_order: 8,  heading: null, subheading: null, label: "" },
@@ -62,7 +62,7 @@ export default async function HomePage() {
         subheading={getSubheading(sectionList, "news")}
       />
     ),
-    full_banner: <FullWidthBannerSection />,
+    search_banner: <FullWidthBannerSection />,
     search: <SearchSection />,
     open_house: <OpenHouseAndInfoSection />,
     features: (
