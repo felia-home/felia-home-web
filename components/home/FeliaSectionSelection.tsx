@@ -1,79 +1,80 @@
 // components/home/FeliaSectionSelection.tsx
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { SectionTitle } from "@/components/ui/SectionTitle";
 import { getFeaturedProperties } from "@/lib/api";
 import type { Property } from "@/lib/api";
-import { FeaturedSlider } from "./FeaturedSlider";
+import FeliaSelecitonSlider from "./FeliaSelecitonSlider";
 
 interface FeliaSectionSelectionProps {
   heading?: string | null;
   subheading?: string | null;
 }
 
-export async function FeliaSectionSelection({ heading, subheading }: FeliaSectionSelectionProps = {}) {
+export async function FeliaSectionSelection({
+  heading,
+  subheading,
+}: FeliaSectionSelectionProps = {}) {
   let properties: Property[] = [];
   try {
     properties = await getFeaturedProperties();
   } catch {
-    // Admin APIが未起動の場合はスキップ（開発時）
     properties = [];
   }
 
   return (
-    <section className="section-padding bg-white">
-      <div className="container-content">
-        <div className="flex items-end justify-between mb-8 tb:mb-12">
-          <SectionTitle en={heading ?? "Felia Selection"} ja={subheading ?? "厳選物件情報"} align="left" />
+    <section style={{ backgroundColor: "#fff", padding: "64px 0" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+
+        {/* ヘッダー */}
+        <div style={{
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          marginBottom: "36px",
+          flexWrap: "wrap",
+          gap: "12px",
+        }}>
+          <div>
+            <span style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: "bold",
+              fontSize: "32px",
+              letterSpacing: "0.05em",
+              color: "#5BAD52",
+              display: "block",
+              lineHeight: 1,
+              marginBottom: "6px",
+            }}>
+              {heading ?? "Felia Selection"}
+            </span>
+            <p style={{ fontSize: "13px", color: "#888", letterSpacing: "0.15em", margin: 0 }}>
+              {subheading ?? "厳選物件情報"}
+            </p>
+            <div style={{
+              marginTop: "10px",
+              width: "32px",
+              height: "3px",
+              backgroundColor: "#5BAD52",
+              borderRadius: "2px",
+            }} />
+          </div>
           <Link
             href="/properties?flag=featured"
-            className="hidden tb:flex items-center gap-1 text-sm font-medium hover:gap-2 transition-all"
-            style={{ color: "#5BAD52" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              fontSize: "13px",
+              fontWeight: "500",
+              color: "#5BAD52",
+              textDecoration: "none",
+            }}
           >
-            一覧を見る <ArrowRight size={14} />
+            一覧を見る →
           </Link>
         </div>
 
-        {properties.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <FeaturedSlider properties={properties} />
-        )}
-
-        {/* SP用「一覧を見る」 */}
-        <div className="mt-6 text-center tb:hidden">
-          <Link
-            href="/properties?flag=featured"
-            className="inline-flex items-center gap-1 text-sm font-medium"
-            style={{ color: "#5BAD52" }}
-          >
-            一覧を見る <ArrowRight size={14} />
-          </Link>
-        </div>
+        <FeliaSelecitonSlider properties={properties} />
       </div>
     </section>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="grid grid-cols-1 tb:grid-cols-2 gap-4 tb:gap-6">
-      {[1, 2].map((i) => (
-        <div
-          key={i}
-          className="rounded-lg border"
-          style={{
-            borderColor: "#E5E5E5",
-            paddingBottom: "55%",
-            position: "relative",
-            background: "linear-gradient(135deg,#f0f8f0,#e0f0e0)",
-          }}
-        >
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-gray-400 text-sm">厳選物件は準備中です</p>
-          </div>
-        </div>
-      ))}
-    </div>
   );
 }

@@ -1,128 +1,366 @@
-'use client'
+"use client";
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import type { Property } from "@/lib/api";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
+const PROPERTY_TYPE_MAP: Record<string, string> = {
+  LAND: "土地",
+  USED_HOUSE: "中古戸建",
+  NEW_HOUSE: "新築戸建",
+  MANSION: "マンション",
+  USED_MANSION: "中古マンション",
+  NEW_MANSION: "新築マンション",
+  OTHER: "その他",
+};
 
-type PropertyImage = { url: string }
-type Property = {
-  id: string
-  title: string
-  price: number
-  propertyType: string
-  address: string
-  nearestStation?: string
-  walkMinutes?: number
-  description?: string
-  layout?: string
-  buildingArea?: number
-  landArea?: number
-  exclusiveArea?: number
-  images?: PropertyImage[]
-  slug?: string
-}
+export default function FeliaSelecitonSlider({
+  properties,
+}: {
+  properties: Property[];
+}) {
+  const [current, setCurrent] = useState(0);
 
-const TYPE_LABEL: Record<string, string> = {
-  NEW_HOUSE: '新築戸建て',
-  USED_HOUSE: '中古戸建',
-  MANSION: 'マンション',
-  LAND: '土地',
-  OTHER: 'その他',
-}
-
-export default function FeliaSelecitonSlider({ properties }: { properties: Property[] }) {
-  const [page, setPage] = useState(0)
-  const PER = 2
-  const total = Math.ceil(properties.length / PER)
-  const items = properties.slice(page * PER, page * PER + PER)
-
-  if (properties.length === 0) {
-    return <p style={{ textAlign: 'center', color: '#aaa', padding: '48px 0' }}>物件情報を準備中です</p>
+  if (!properties || properties.length === 0) {
+    return (
+      <div style={{
+        height: "400px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#aaa",
+        fontSize: "14px",
+        backgroundColor: "#f9f9f9",
+        borderRadius: "12px",
+      }}>
+        掲載物件準備中です
+      </div>
+    );
   }
 
+  const p = properties[current];
+  const mainImage = p.images?.[0]?.url ?? null;
+  const subImages = p.images?.slice(1, 4) ?? [];
+  const typeLabel =
+    PROPERTY_TYPE_MAP[p.property_type ?? p.propertyType ?? ""] ?? "";
+  const address =
+    [p.city, p.town].filter(Boolean).join("") || p.address || "";
+
   return (
-    <div>
-      {/* ドット */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '20px' }}>
-        {Array.from({ length: total }).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setPage(i)}
-            aria-label={`ページ${i + 1}`}
-            style={{
-              width: '10px', height: '10px', borderRadius: '50%',
-              border: 'none', padding: 0, cursor: 'pointer',
-              background: i === page ? '#555' : '#ccc',
-              transition: 'background 0.2s',
-            }}
-          />
-        ))}
-      </div>
+    <div style={{ position: "relative", width: "100%" }}>
 
-      {/* スライダー */}
-      <div style={{ display: 'flex', alignItems: 'stretch' }}>
-        <button
-          onClick={() => setPage(p => (p - 1 + total) % total)}
-          aria-label="前へ"
-          style={{
-            flexShrink: 0, width: '40px',
-            background: 'rgba(0,0,0,0.3)', border: 'none', cursor: 'pointer',
-            color: '#fff', fontSize: '24px', lineHeight: 1,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >‹</button>
+      {/* メインカード */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "3fr 2fr",
+        backgroundColor: "#fff",
+        borderRadius: "16px",
+        overflow: "hidden",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+        minHeight: "420px",
+      }}>
 
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-          {items.map(p => {
-            const img = p.images?.[0]?.url
-            const type = TYPE_LABEL[p.propertyType] || p.propertyType
-            const areaText = p.buildingArea
-              ? `${p.layout ? p.layout + '　' : ''}建物${p.buildingArea.toFixed(2)}㎡　専有${(p.exclusiveArea || p.buildingArea).toFixed(2)}㎡`
-              : p.landArea ? `土地${p.landArea.toFixed(2)}㎡` : ''
-            return (
-              <Link key={p.id} href={`/properties/${p.slug || p.id}`}
-                style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: '#fff', border: '1px solid #e0e0e0' }}>
-                <div style={{ position: 'relative', aspectRatio: '4/3', background: '#efefef', overflow: 'hidden' }}>
-                  {img ? (
-                    <Image src={img} alt={p.title} fill style={{ objectFit: 'cover' }} sizes="50vw" />
-                  ) : (
-                    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: '12px', gap: '8px' }}>
-                      <svg width="36" height="36" viewBox="0 0 48 48" fill="none"><path d="M24 8L4 22h6v18h10V28h8v12h10V22h6L24 8z" fill="#ccc" /></svg>
-                      写真準備中
-                    </div>
-                  )}
-                  <span style={{ position: 'absolute', top: '8px', left: '8px', background: '#5BAD52', color: '#fff', fontSize: '10px', fontWeight: 'bold', padding: '3px 10px' }}>{type}</span>
+        {/* 左：画像エリア */}
+        <div style={{ position: "relative", backgroundColor: "#f0f0f0" }}>
+          {mainImage ? (
+            <Image
+              src={mainImage}
+              alt={p.title ?? p.name ?? "物件画像"}
+              fill
+              quality={90}
+              style={{ objectFit: "cover" }}
+              sizes="(max-width: 1200px) 60vw, 720px"
+              priority
+            />
+          ) : (
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#bbb",
+              fontSize: "13px",
+            }}>
+              画像なし
+            </div>
+          )}
+
+          {/* Felia Selection バッジ */}
+          <div style={{
+            position: "absolute",
+            top: "16px",
+            left: "16px",
+            backgroundColor: "#5BAD52",
+            color: "#fff",
+            padding: "4px 12px",
+            borderRadius: "20px",
+            fontSize: "11px",
+            fontWeight: "bold",
+            letterSpacing: "0.05em",
+            fontFamily: "'Montserrat', sans-serif",
+          }}>
+            Felia Selection
+          </div>
+
+          {/* サブ画像（右下） */}
+          {subImages.length > 0 && (
+            <div style={{
+              position: "absolute",
+              bottom: "12px",
+              right: "12px",
+              display: "flex",
+              gap: "6px",
+            }}>
+              {subImages.map((img, i) => (
+                <div key={img.id} style={{
+                  position: "relative",
+                  width: "64px",
+                  height: "48px",
+                  borderRadius: "6px",
+                  overflow: "hidden",
+                  border: "2px solid rgba(255,255,255,0.8)",
+                }}>
+                  <Image
+                    src={img.url}
+                    alt={`サブ画像${i + 1}`}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes="64px"
+                  />
                 </div>
-                <div style={{ padding: '14px 16px' }}>
-                  <p style={{ fontSize: '22px', fontWeight: 'bold', color: '#333', marginBottom: '4px', lineHeight: 1.2 }}>{p.price != null ? `${p.price.toLocaleString()}万円` : "価格未定"}</p>
-                  <p style={{ fontSize: '12px', color: '#555', marginBottom: '2px' }}>{p.address}</p>
-                  {p.nearestStation && (
-                    <p style={{ fontSize: '11px', color: '#888', marginBottom: '8px' }}>{p.nearestStation}{p.walkMinutes ? ` 徒歩${p.walkMinutes}分` : ''}</p>
-                  )}
-                  {p.description && (
-                    <p style={{ fontSize: '11px', color: '#555', lineHeight: 1.6, marginBottom: '8px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.description}</p>
-                  )}
-                  {areaText && (
-                    <p style={{ fontSize: '11px', color: '#999', paddingTop: '8px', borderTop: '1px solid #eee' }}>{areaText}</p>
-                  )}
-                </div>
-              </Link>
-            )
-          })}
-          {items.length < PER && <div />}
+              ))}
+            </div>
+          )}
         </div>
 
-        <button
-          onClick={() => setPage(p => (p + 1) % total)}
-          aria-label="次へ"
-          style={{
-            flexShrink: 0, width: '40px',
-            background: 'rgba(0,0,0,0.3)', border: 'none', cursor: 'pointer',
-            color: '#fff', fontSize: '24px', lineHeight: 1,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >›</button>
+        {/* 右：物件情報エリア */}
+        <div style={{
+          padding: "32px 28px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}>
+          {/* 上部情報 */}
+          <div>
+            {/* バッジ */}
+            <div style={{ display: "flex", gap: "6px", marginBottom: "12px", flexWrap: "wrap" }}>
+              {typeLabel && (
+                <span style={{
+                  fontSize: "11px",
+                  padding: "2px 10px",
+                  borderRadius: "20px",
+                  backgroundColor: "#e8f5e6",
+                  color: "#5BAD52",
+                  fontWeight: "bold",
+                }}>
+                  {typeLabel}
+                </span>
+              )}
+              {p.is_open_house && (
+                <span style={{
+                  fontSize: "11px",
+                  padding: "2px 10px",
+                  borderRadius: "20px",
+                  backgroundColor: "#fff3e0",
+                  color: "#E67E22",
+                  fontWeight: "bold",
+                }}>
+                  現地販売会
+                </span>
+              )}
+            </div>
+
+            {/* 物件名 */}
+            <h3 style={{
+              fontSize: "17px",
+              fontWeight: "bold",
+              color: "#333",
+              lineHeight: 1.5,
+              margin: "0 0 8px",
+            }}>
+              {p.title ?? p.name ?? "物件名未設定"}
+            </h3>
+
+            {/* キャッチコピー */}
+            {p.catch_copy && (
+              <p style={{
+                fontSize: "13px",
+                color: "#5BAD52",
+                lineHeight: 1.6,
+                margin: "0 0 16px",
+                borderLeft: "3px solid #5BAD52",
+                paddingLeft: "10px",
+                fontStyle: "italic",
+              }}>
+                {p.catch_copy}
+              </p>
+            )}
+
+            {/* スペック */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "20px" }}>
+              {address && (
+                <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
+                  <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>所在地</span>
+                  <span style={{ color: "#333" }}>{address}</span>
+                </div>
+              )}
+              {p.station_name1 && (
+                <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
+                  <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>最寄駅</span>
+                  <span style={{ color: "#333" }}>
+                    {p.station_name1}駅 徒歩{p.station_walk1}分
+                  </span>
+                </div>
+              )}
+              {p.rooms && (
+                <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
+                  <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>間取り</span>
+                  <span style={{ color: "#333" }}>{p.rooms}</span>
+                </div>
+              )}
+              {p.area_build_m2 && (
+                <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
+                  <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>建物面積</span>
+                  <span style={{ color: "#333" }}>{p.area_build_m2}㎡</span>
+                </div>
+              )}
+              {p.area_land_m2 && (
+                <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
+                  <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>土地面積</span>
+                  <span style={{ color: "#333" }}>{p.area_land_m2}㎡</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 価格・CTAエリア */}
+          <div>
+            <div style={{
+              backgroundColor: "#f9f9f9",
+              borderRadius: "8px",
+              padding: "14px 16px",
+              marginBottom: "16px",
+            }}>
+              <p style={{ fontSize: "11px", color: "#aaa", margin: "0 0 4px" }}>販売価格</p>
+              <p style={{ fontSize: "26px", fontWeight: "bold", color: "#5BAD52", margin: 0, lineHeight: 1 }}>
+                {p.price != null ? p.price.toLocaleString() : "応相談"}
+                {p.price != null && (
+                  <span style={{ fontSize: "14px", marginLeft: "4px" }}>万円</span>
+                )}
+              </p>
+            </div>
+
+            <Link
+              href={`/properties/${p.id}`}
+              style={{
+                display: "block",
+                textAlign: "center",
+                padding: "14px",
+                backgroundColor: "#5BAD52",
+                color: "#fff",
+                borderRadius: "8px",
+                textDecoration: "none",
+                fontWeight: "bold",
+                fontSize: "14px",
+                marginBottom: "8px",
+              }}
+            >
+              物件詳細を見る →
+            </Link>
+            <Link
+              href={`/contact?property_id=${p.id}&type=inquiry`}
+              style={{
+                display: "block",
+                textAlign: "center",
+                padding: "10px",
+                backgroundColor: "#fff",
+                color: "#5BAD52",
+                borderRadius: "8px",
+                textDecoration: "none",
+                fontSize: "13px",
+                border: "1px solid #5BAD52",
+              }}
+            >
+              この物件に問い合わせる
+            </Link>
+          </div>
+        </div>
       </div>
+
+      {/* スライダーコントロール */}
+      {properties.length > 1 && (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "16px",
+          marginTop: "20px",
+        }}>
+          <button
+            onClick={() => setCurrent(i => (i - 1 + properties.length) % properties.length)}
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              border: "1px solid #e0e0e0",
+              backgroundColor: "#fff",
+              cursor: "pointer",
+              fontSize: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#555",
+            }}
+          >
+            ‹
+          </button>
+
+          <div style={{ display: "flex", gap: "8px" }}>
+            {properties.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                style={{
+                  width: i === current ? "24px" : "8px",
+                  height: "8px",
+                  borderRadius: "4px",
+                  border: "none",
+                  backgroundColor: i === current ? "#5BAD52" : "#ddd",
+                  cursor: "pointer",
+                  padding: 0,
+                  transition: "all 0.2s ease",
+                }}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={() => setCurrent(i => (i + 1) % properties.length)}
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              border: "1px solid #e0e0e0",
+              backgroundColor: "#fff",
+              cursor: "pointer",
+              fontSize: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#555",
+            }}
+          >
+            ›
+          </button>
+        </div>
+      )}
+
+      {properties.length > 1 && (
+        <p style={{ textAlign: "center", fontSize: "12px", color: "#aaa", marginTop: "8px" }}>
+          {current + 1} / {properties.length}
+        </p>
+      )}
     </div>
-  )
+  );
 }

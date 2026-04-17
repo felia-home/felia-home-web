@@ -295,7 +295,7 @@ export interface Property {
   nearestStation: string;
   walkMinutes: number;
   mainImage: string;
-  images: string[];
+  images?: PropertyImage[];
   isFeatured: boolean;
   isNew: boolean;
   isOpenHouse: boolean;
@@ -311,13 +311,18 @@ export interface Property {
   updatedAt: string;
   // Prismaから直接返される場合のsnake_caseフィールド
   title?: string | null;
+  catch_copy?: string | null;
   property_type?: string | null;
   city?: string | null;
+  town?: string | null;
   rooms?: string | null;
+  area_build_m2?: number | null;
+  area_land_m2?: number | null;
   created_at?: string | null;
   published_at?: string | null;
   station_name1?: string | null;
   station_walk1?: number | null;
+  is_open_house?: boolean;
 }
 
 export interface OpenHouse {
