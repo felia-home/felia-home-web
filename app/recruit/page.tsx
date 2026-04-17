@@ -1,5 +1,6 @@
 // app/recruit/page.tsx
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getRecruitStaff } from "@/lib/api";
 import StaffCard from "@/components/recruit/StaffCard";
@@ -53,7 +54,7 @@ export default async function RecruitPage() {
             お客様の大切な人生の転機に真剣に向き合える仲間を探しています。<br />
             経験よりも「誠実さ」と「熱意」を大切にしています。
           </p>
-          {/* ヒーロー画像プレースホルダー */}
+          {/* ヒーロー画像 */}
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
@@ -61,19 +62,24 @@ export default async function RecruitPage() {
             maxWidth: "800px",
             margin: "0 auto",
           }}>
-            {["社員写真①", "社員写真②", "オフィス写真"].map((label, i) => (
+            {[
+              { src: "/images/recruit/recruithero.jpg", alt: "フェリアホーム スタッフ" },
+              { src: "/images/recruit/recruit_company_event01.jpg", alt: "フェリアホーム 社内イベント" },
+              { src: "/images/recruit/recruit_store01.jpg", alt: "フェリアホーム 店舗" },
+            ].map((img, i) => (
               <div key={i} style={{
+                position: "relative",
                 height: "200px",
-                backgroundColor: "#d4edda",
                 borderRadius: "12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#5BAD52",
-                fontSize: "13px",
-                border: "2px dashed #5BAD52",
+                overflow: "hidden",
               }}>
-                📷 {label}
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  style={{ objectFit: "cover" }}
+                  sizes="(max-width: 800px) 33vw, 260px"
+                />
               </div>
             ))}
           </div>
@@ -100,45 +106,59 @@ export default async function RecruitPage() {
               num: "01",
               title: "お客様と長く向き合える環境",
               desc: "一人ひとりのお客様に時間をかけて向き合うスタイル。数字だけを追う文化はありません。",
+              img: "/images/recruit/recruit_strength01.png",
             },
             {
               num: "02",
               title: "成長を支えるキャリアパス",
               desc: "入社後の成長ステップが明確。先輩社員がしっかりサポートする体制が整っています。",
+              img: "/images/recruit/recruit_strength02.png",
             },
             {
               num: "03",
               title: "働きやすい職場環境",
               desc: "有給取得率が高く、育児支援制度も充実。長く活躍できる環境づくりを大切にしています。",
+              img: "/images/recruit/recruit_strength03.png",
             },
           ].map((item) => (
             <div key={item.num} style={{
-              textAlign: "center",
-              padding: "32px 24px",
               borderRadius: "12px",
               backgroundColor: "#f9f9f9",
               border: "1px solid #e8e8e8",
+              overflow: "hidden",
             }}>
-              <p style={{
-                fontSize: "40px",
-                fontWeight: "bold",
-                color: "#5BAD52",
-                opacity: 0.3,
-                fontFamily: "'Montserrat', sans-serif",
-                margin: "0 0 12px",
-                lineHeight: 1,
-              }}>
-                {item.num}
-              </p>
-              <h3 style={{
-                fontSize: "16px", fontWeight: "bold",
-                color: "#333", margin: "0 0 12px",
-              }}>
-                {item.title}
-              </h3>
-              <p style={{ fontSize: "13px", color: "#666", lineHeight: 1.7, margin: 0 }}>
-                {item.desc}
-              </p>
+              {/* カード画像 */}
+              <div style={{ position: "relative", width: "100%", height: "160px" }}>
+                <Image
+                  src={item.img}
+                  alt={item.title}
+                  fill
+                  style={{ objectFit: "cover" }}
+                  sizes="(max-width: 767px) 100vw, 33vw"
+                />
+              </div>
+              <div style={{ padding: "24px", textAlign: "center" }}>
+                <p style={{
+                  fontSize: "36px",
+                  fontWeight: "bold",
+                  color: "#5BAD52",
+                  opacity: 0.3,
+                  fontFamily: "'Montserrat', sans-serif",
+                  margin: "0 0 8px",
+                  lineHeight: 1,
+                }}>
+                  {item.num}
+                </p>
+                <h3 style={{
+                  fontSize: "16px", fontWeight: "bold",
+                  color: "#333", margin: "0 0 10px",
+                }}>
+                  {item.title}
+                </h3>
+                <p style={{ fontSize: "13px", color: "#666", lineHeight: 1.7, margin: 0 }}>
+                  {item.desc}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -162,11 +182,13 @@ export default async function RecruitPage() {
                 name: "星 俊彦",
                 position: "営業部部長 / 2019年入社",
                 quote: "都内人気エリアに特化し、物件提案から融資提案まで一貫して担当するため、スキルアップが早い。社員の声も反映されやすく、20代スタッフも多く和気あいあいとした雰囲気です。",
+                img: "/images/recruit/recruit_customer01.png",
               },
               {
                 name: "伊藤 貴洋",
                 position: "営業部係長 / 2022年入社",
                 quote: "不動産のメリット・デメリットを正確にお伝えし、しっかりとお考え頂けるよう丁寧な接客を心掛けております。発展途上中のため社員の声が反映されやすい環境です。",
+                img: "/images/recruit/recruit_customer01%20(1).png",
               },
             ].map((person, i) => (
               <div key={i} style={{
@@ -179,24 +201,23 @@ export default async function RecruitPage() {
                 flexDirection: i % 2 === 1 ? "row-reverse" : "row",
                 flexWrap: "wrap",
               }}>
-                {/* 写真プレースホルダー */}
+                {/* スタッフ写真 */}
                 <div style={{
+                  position: "relative",
                   width: "160px",
                   height: "200px",
-                  backgroundColor: "#d4edda",
                   borderRadius: "8px",
+                  overflow: "hidden",
                   flexShrink: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#5BAD52",
-                  fontSize: "12px",
-                  border: "2px dashed #5BAD52",
-                  flexDirection: "column",
-                  gap: "8px",
+                  backgroundColor: "#f0f0f0",
                 }}>
-                  <span style={{ fontSize: "24px" }}>📷</span>
-                  <span>{person.name}</span>
+                  <Image
+                    src={person.img}
+                    alt={person.name}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes="160px"
+                  />
                 </div>
                 <div style={{ flex: 1, minWidth: "200px" }}>
                   <p style={{
