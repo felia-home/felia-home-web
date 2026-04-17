@@ -124,10 +124,10 @@ export async function NewAndNewsSection(_props: NewAndNewsSectionProps = {}) {
 function NewPropertyRow({ property }: { property: Property }) {
   // APIはsnake_caseで返すため両方に対応
   const typeKey = property.property_type ?? property.propertyType ?? "";
-  const typeLabel = PROPERTY_TYPE_MAP[typeKey] ?? typeKey ?? "物件";
-  const location = property.city ?? property.address ?? "";
-  const floorPlan = property.rooms ?? property.layout ?? null;
-  const dateStr = property.created_at ?? property.createdAt ?? property.published_at ?? "";
+  const typeLabel = PROPERTY_TYPE_MAP[typeKey] ?? (typeKey || "物件");
+  const location = (property.city ?? property.address ?? "") || "所在地未定";
+  const floorPlan = property.rooms ?? (property as any).floor_plan ?? property.layout ?? null;
+  const dateStr = property.created_at ?? property.createdAt ?? property.published_at ?? (property as any).updated_at ?? "";
 
   return (
     <Link
@@ -187,7 +187,11 @@ function NewPropertyRow({ property }: { property: Property }) {
         whiteSpace: "nowrap",
         flexShrink: 0,
       }}>
-        {property.price?.toLocaleString()}万円
+        {property.price != null
+          ? `${property.price.toLocaleString()}万円`
+          : (property as any).salesPrice != null
+          ? `${(property as any).salesPrice.toLocaleString()}万円`
+          : "価格未定"}
       </span>
 
       {/* 日付 */}
