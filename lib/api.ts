@@ -551,7 +551,7 @@ export interface RecruitStaff {
 export async function getRecruitStaff(): Promise<RecruitStaff[]> {
   try {
     const res = await fetchFromAdmin<any>("/api/hp/staff?recruit=true");
-    return res.staff ?? res.staffs ?? [];
+    return res.staffs ?? res.staff ?? [];
   } catch {
     return [];
   }
