@@ -524,6 +524,39 @@ export async function getStaffDetail(id: string): Promise<StaffDetail | null> {
   }
 }
 
+// ---- 採用スタッフ ----
+
+export interface RecruitStaff {
+  id: string;
+  name: string;
+  name_kana: string | null;
+  position: string | null;
+  department: string | null;
+  store_name: string | null;
+  photo_url: string | null;
+  bio: string | null;
+  catchphrase: string | null;
+  motto: string | null;
+  hobby: string | null;
+  favorite: string | null;
+  joined_at: string | null;
+  interview_q1: string | null;
+  interview_q2: string | null;
+  interview_q3: string | null;
+  interview_q4: string | null;
+  interview_q5: string | null;
+  interview_q6: string | null;
+}
+
+export async function getRecruitStaff(): Promise<RecruitStaff[]> {
+  try {
+    const res = await fetchFromAdmin<any>("/api/hp/staff?recruit=true");
+    return res.staff ?? res.staffs ?? [];
+  } catch {
+    return [];
+  }
+}
+
 // ---- 未公開物件 ----
 
 export interface PrivateProperty {

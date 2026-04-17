@@ -1,6 +1,10 @@
 // app/recruit/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getRecruitStaff } from "@/lib/api";
+import StaffCard from "@/components/recruit/StaffCard";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "採用情報 | フェリアホーム",
@@ -8,7 +12,9 @@ export const metadata: Metadata = {
     "フェリアホームでは不動産営業スタッフを募集しています。月給25万円以上、週休2日制、宅建資格支援制度あり。未経験・第二新卒歓迎。",
 };
 
-export default function RecruitPage() {
+export default async function RecruitPage() {
+  const recruitStaff = await getRecruitStaff();
+
   return (
     <main style={{ backgroundColor: "#fff" }}>
 
@@ -388,7 +394,31 @@ export default function RecruitPage() {
         </div>
       </div>
 
-      {/* ⑦ CTA */}
+      {/* ⑦ スタッフインタビュー */}
+      {recruitStaff.length > 0 && (
+        <div style={{ padding: "80px 24px" }}>
+          <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+            <div style={{ textAlign: "center", marginBottom: "48px" }}>
+              <p style={{ fontSize: "13px", color: "#5BAD52", letterSpacing: "0.15em", fontFamily: "'Montserrat', sans-serif", margin: "0 0 8px" }}>
+                STAFF INTERVIEW
+              </p>
+              <h2 style={{ fontSize: "28px", fontWeight: "bold", color: "#1a1a1a", margin: "0 0 8px" }}>
+                スタッフ紹介
+              </h2>
+              <p style={{ fontSize: "14px", color: "#888", margin: 0 }}>
+                クリックするとインタビューをご覧いただけます
+              </p>
+            </div>
+            <div className="recruit-staff-grid">
+              {recruitStaff.map(staff => (
+                <StaffCard key={staff.id} staff={staff} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ⑧ CTA */}
       <div style={{
         backgroundColor: "#5BAD52",
         padding: "80px 24px",

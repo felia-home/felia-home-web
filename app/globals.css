@@ -110,6 +110,23 @@
   }
 }
 
+/* 採用スタッフグリッド */
+.recruit-staff-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+@media (max-width: 1023px) {
+  .recruit-staff-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 767px) {
+  .recruit-staff-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* 採用ページ */
 @media (max-width: 767px) {
   .recruit-reasons {
