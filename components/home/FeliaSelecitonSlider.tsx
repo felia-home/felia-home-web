@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Property } from "@/lib/api";
@@ -20,6 +20,12 @@ export default function FeliaSelecitonSlider({
   properties: Property[];
 }) {
   const [current, setCurrent] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  // 物件が切り替わったら画像インデックスをリセット
+  useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [current]);
 
   if (!properties || properties.length === 0) {
     return (
@@ -39,8 +45,9 @@ export default function FeliaSelecitonSlider({
   }
 
   const p = properties[current];
-  const mainImage = p.images?.[0]?.url ?? null;
-  const subImages = p.images?.slice(1, 4) ?? [];
+  const allImages = p.images ?? [];
+  const mainImage = allImages[selectedImageIndex]?.url ?? allImages[0]?.url ?? null;
+  const subImages = allImages.filter((_, i) => i !== selectedImageIndex).slice(0, 3);
   const typeLabel =
     PROPERTY_TYPE_MAP[p.property_type ?? p.propertyType ?? ""] ?? "";
   const address =
@@ -48,6 +55,34 @@ export default function FeliaSelecitonSlider({
 
   return (
     <div style={{ position: "relative", width: "100%" }}>
+
+      {/* 左矢印（物件切り替え） */}
+      {properties.length > 1 && (
+        <button
+          onClick={() => setCurrent(i => (i - 1 + properties.length) % properties.length)}
+          style={{
+            position: "absolute",
+            left: "-20px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 10,
+            width: "44px",
+            height: "44px",
+            borderRadius: "50%",
+            border: "1px solid #e0e0e0",
+            backgroundColor: "#fff",
+            cursor: "pointer",
+            fontSize: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#555",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          }}
+        >
+          ‹
+        </button>
+      )}
 
       {/* メインカード */}
       <div style={{
@@ -61,26 +96,37 @@ export default function FeliaSelecitonSlider({
       }}>
 
         {/* 左：画像エリア */}
-        <div style={{ position: "relative", backgroundColor: "#f0f0f0" }}>
+        <div style={{
+          position: "relative",
+          backgroundColor: "#f5f5f5",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "420px",
+          padding: "24px",
+        }}>
           {mainImage ? (
             <Image
               src={mainImage}
-              alt={p.title ?? p.name ?? "物件画像"}
-              fill
+              alt={p.title ?? "物件画像"}
+              width={700}
+              height={500}
               quality={90}
-              style={{ objectFit: "cover" }}
-              sizes="(max-width: 1200px) 60vw, 720px"
+              style={{
+                width: "100%",
+                height: "auto",
+                maxHeight: "480px",
+                objectFit: "contain",
+                display: "block",
+              }}
+              sizes="(max-width: 1200px) 60vw, 700px"
               priority
             />
           ) : (
             <div style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#bbb",
-              fontSize: "13px",
+              width: "100%", minHeight: "300px",
+              display: "flex", alignItems: "center",
+              justifyContent: "center", color: "#bbb", fontSize: "13px",
             }}>
               画像なし
             </div>
@@ -103,7 +149,7 @@ export default function FeliaSelecitonSlider({
             Felia Selection
           </div>
 
-          {/* サブ画像（右下） */}
+          {/* サブ画像サムネイル（下部）*/}
           {subImages.length > 0 && (
             <div style={{
               position: "absolute",
@@ -113,20 +159,27 @@ export default function FeliaSelecitonSlider({
               gap: "6px",
             }}>
               {subImages.map((img, i) => (
-                <div key={img.id} style={{
-                  position: "relative",
-                  width: "64px",
-                  height: "48px",
-                  borderRadius: "6px",
-                  overflow: "hidden",
-                  border: "2px solid rgba(255,255,255,0.8)",
-                }}>
+                <div
+                  key={img.id}
+                  onClick={() => setSelectedImageIndex(
+                    allImages.findIndex(a => a.id === img.id)
+                  )}
+                  style={{
+                    position: "relative",
+                    width: "56px",
+                    height: "42px",
+                    borderRadius: "4px",
+                    overflow: "hidden",
+                    border: "2px solid rgba(255,255,255,0.8)",
+                    cursor: "pointer",
+                  }}
+                >
                   <Image
                     src={img.url}
                     alt={`サブ画像${i + 1}`}
                     fill
                     style={{ objectFit: "cover" }}
-                    sizes="64px"
+                    sizes="56px"
                   />
                 </div>
               ))}
@@ -288,74 +341,57 @@ export default function FeliaSelecitonSlider({
         </div>
       </div>
 
-      {/* スライダーコントロール */}
+      {/* 右矢印（物件切り替え） */}
       {properties.length > 1 && (
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "16px",
-          marginTop: "20px",
-        }}>
-          <button
-            onClick={() => setCurrent(i => (i - 1 + properties.length) % properties.length)}
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              border: "1px solid #e0e0e0",
-              backgroundColor: "#fff",
-              cursor: "pointer",
-              fontSize: "18px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#555",
-            }}
-          >
-            ‹
-          </button>
+        <button
+          onClick={() => setCurrent(i => (i + 1) % properties.length)}
+          style={{
+            position: "absolute",
+            right: "-20px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 10,
+            width: "44px",
+            height: "44px",
+            borderRadius: "50%",
+            border: "1px solid #e0e0e0",
+            backgroundColor: "#fff",
+            cursor: "pointer",
+            fontSize: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#555",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          }}
+        >
+          ›
+        </button>
+      )}
 
-          <div style={{ display: "flex", gap: "8px" }}>
-            {properties.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                style={{
-                  width: i === current ? "24px" : "8px",
-                  height: "8px",
-                  borderRadius: "4px",
-                  border: "none",
-                  backgroundColor: i === current ? "#5BAD52" : "#ddd",
-                  cursor: "pointer",
-                  padding: 0,
-                  transition: "all 0.2s ease",
-                }}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={() => setCurrent(i => (i + 1) % properties.length)}
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              border: "1px solid #e0e0e0",
-              backgroundColor: "#fff",
-              cursor: "pointer",
-              fontSize: "18px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#555",
-            }}
-          >
-            ›
-          </button>
+      {/* ドットインジケーター */}
+      {properties.length > 1 && (
+        <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "20px" }}>
+          {properties.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              style={{
+                width: i === current ? "24px" : "8px",
+                height: "8px",
+                borderRadius: "4px",
+                border: "none",
+                backgroundColor: i === current ? "#5BAD52" : "#ddd",
+                cursor: "pointer",
+                padding: 0,
+                transition: "all 0.2s ease",
+              }}
+            />
+          ))}
         </div>
       )}
 
+      {/* 件数表示 */}
       {properties.length > 1 && (
         <p style={{ textAlign: "center", fontSize: "12px", color: "#aaa", marginTop: "8px" }}>
           {current + 1} / {properties.length}
