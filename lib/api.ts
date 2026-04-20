@@ -526,26 +526,31 @@ export async function getStaffDetail(id: string): Promise<StaffDetail | null> {
 
 // ---- 採用スタッフ ----
 
+export interface RecruitStaffInterview {
+  question: string;
+  answer: string;
+}
+
 export interface RecruitStaff {
   id: string;
   name: string;
   name_kana: string | null;
+  nickname: string | null;
   position: string | null;
   department: string | null;
   store_name: string | null;
   photo_url: string | null;
   bio: string | null;
   catchphrase: string | null;
-  motto: string | null;
+  qualification: string | null;
+  favorite_word: string | null;
   hobby: string | null;
-  favorite: string | null;
+  memorable_client: string | null;
+  daily_mindset: string | null;
   joined_at: string | null;
-  interview_q1: string | null;
-  interview_q2: string | null;
-  interview_q3: string | null;
-  interview_q4: string | null;
-  interview_q5: string | null;
-  interview_q6: string | null;
+  motto: string | null;
+  favorite: string | null;
+  interviews: RecruitStaffInterview[];
 }
 
 export async function getRecruitStaff(): Promise<RecruitStaff[]> {
