@@ -149,3 +149,20 @@
     position: static !important;
   }
 }
+
+/* Felia Selection一覧 */
+.felia-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+@media (max-width: 1023px) {
+  .felia-selection-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 599px) {
+  .felia-selection-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -58,7 +58,7 @@ export async function FeliaSectionSelection({
             }} />
           </div>
           <Link
-            href="/properties?flag=featured"
+            href="/felia-selection"
             style={{
               display: "flex",
               alignItems: "center",

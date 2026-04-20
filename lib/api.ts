@@ -31,6 +31,8 @@ export async function getFeaturedProperties() {
   return res.properties ?? [];
 }
 
+export const getFeliaSectionProperties = getFeaturedProperties;
+
 export async function getNewProperties() {
   const res = await fetchFromAdmin<{ properties: Property[] }>(
     "/api/properties?flag=new"
