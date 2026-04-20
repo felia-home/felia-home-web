@@ -125,7 +125,10 @@ function NewPropertyRow({ property }: { property: Property }) {
   // APIはsnake_caseで返すため両方に対応
   const typeKey = property.property_type ?? property.propertyType ?? "";
   const typeLabel = PROPERTY_TYPE_MAP[typeKey] ?? (typeKey || "物件");
-  const location = (property.city ?? property.address ?? "") || "所在地未定";
+  const location =
+    [property.city, property.town].filter(Boolean).join("") ||
+    (property.address ?? "") ||
+    "所在地未定";
   const floorPlan = property.rooms ?? (property as any).floor_plan ?? property.layout ?? null;
   const dateStr = property.created_at ?? property.createdAt ?? property.published_at ?? (property as any).updated_at ?? "";
 
