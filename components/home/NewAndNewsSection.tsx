@@ -65,7 +65,7 @@ export async function NewAndNewsSection(_props: NewAndNewsSectionProps = {}) {
                 <p style={{ fontSize: "11px", color: "#aaa", letterSpacing: "0.2em", margin: "2px 0 0" }}>新着物件情報</p>
                 <div style={{ marginTop: "8px", width: "32px", height: "2px", backgroundColor: "#5BAD52" }} />
               </div>
-              <Link href="/properties?flag=new" style={{ color: "#5BAD52", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
+              <Link href="/properties" style={{ color: "#5BAD52", fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
                 もっと見る <ArrowRight size={12} />
               </Link>
             </div>
