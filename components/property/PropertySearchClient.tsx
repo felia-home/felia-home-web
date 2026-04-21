@@ -40,6 +40,14 @@ const CONDITIONS = [
   { value: "is_felia_selection",label: "⭐ Felia Selection" },
 ];
 
+const TRAIN_LINES = [
+  { group: "JR", lines: ["JR山手線", "JR中央線", "JR総武線", "JR埼京線", "JR京浜東北線", "JR横須賀線"] },
+  { group: "東急", lines: ["東急東横線", "東急田園都市線", "東急目黒線", "東急大井町線", "東急池上線", "東急世田谷線"] },
+  { group: "東京メトロ", lines: ["銀座線", "丸ノ内線", "日比谷線", "東西線", "千代田線", "有楽町線", "半蔵門線", "南北線", "副都心線"] },
+  { group: "都営", lines: ["都営浅草線", "都営三田線", "都営新宿線", "都営大江戸線"] },
+  { group: "私鉄", lines: ["小田急小田原線", "小田急多摩線", "京王線", "京王井の頭線", "西武池袋線", "西武新宿線", "東武東上線", "東武伊勢崎線"] },
+];
+
 const AREAS = [
   "千代田区","中央区","港区","新宿区","文京区","台東区",
   "品川区","目黒区","大田区","世田谷区","渋谷区","中野区",
@@ -83,6 +91,7 @@ export default function PropertySearchClient() {
   const [selectedType, setSelectedType] = useState("");
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [selectedArea, setSelectedArea] = useState("");
+  const [selectedLine, setSelectedLine] = useState("");
   const [conditions, setConditions] = useState<string[]>([]);
 
   const doSearch = useCallback(async (page = 1) => {
@@ -97,6 +106,8 @@ export default function PropertySearchClient() {
     if (pr.min) params.set("price_min", pr.min);
     if (pr.max) params.set("price_max", pr.max);
     if (selectedArea) params.set("city", selectedArea);
+    // 沿線（station パラメータで部分一致検索）
+    if (selectedLine) params.set("station", selectedLine);
     // こだわり条件
     conditions.forEach(cond => {
       params.set(cond, "true");
@@ -117,7 +128,7 @@ export default function PropertySearchClient() {
     } finally {
       setLoading(false);
     }
-  }, [keyword, selectedType, selectedPriceRange, selectedArea, conditions]);
+  }, [keyword, selectedType, selectedPriceRange, selectedArea, selectedLine, conditions]);
 
   // 初回
   useEffect(() => { doSearch(1); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -127,6 +138,7 @@ export default function PropertySearchClient() {
     setSelectedType("");
     setSelectedPriceRange(0);
     setSelectedArea("");
+    setSelectedLine("");
     setConditions([]);
   };
 
@@ -160,13 +172,12 @@ export default function PropertySearchClient() {
           PROPERTY SEARCH
         </p>
         <h1 style={{
-          fontSize: "clamp(28px, 5vw, 42px)",
+          fontSize: "clamp(26px, 4vw, 38px)",
           fontWeight: "bold",
           margin: "0 0 12px",
           lineHeight: 1.2,
-          letterSpacing: "-0.02em",
         }}>
-          理想の住まいを、見つけよう。
+          物件検索
         </h1>
         <p style={{
           fontSize: "14px",
@@ -174,7 +185,7 @@ export default function PropertySearchClient() {
           margin: 0,
           lineHeight: 1.7,
         }}>
-          エリア・価格・こだわり条件から、あなたにぴったりの物件を探せます
+          ご希望の条件を選択して物件をお探しください
         </p>
       </div>
 
@@ -185,7 +196,7 @@ export default function PropertySearchClient() {
           {/* キーワード検索 */}
           <div style={{ marginBottom: "24px" }}>
             <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
-              🔤 キーワードで探す（駅名・エリア・物件名など）
+              キーワード検索
             </p>
             <div style={{ display: "flex", gap: "8px" }}>
               <input
@@ -193,7 +204,7 @@ export default function PropertySearchClient() {
                 value={keyword}
                 onChange={e => setKeyword(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && doSearch(1)}
-                placeholder="例：渋谷　三軒茶屋　新築　4LDK..."
+                placeholder="例：新宿区、四ツ谷駅、4LDK など"
                 style={{
                   flex: 1,
                   padding: "12px 16px",
@@ -212,7 +223,7 @@ export default function PropertySearchClient() {
           {/* 物件種別 */}
           <div style={{ marginBottom: "20px" }}>
             <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
-              🏠 どんな物件？
+              物件種別
             </p>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
               {PROPERTY_TYPES.map((type) => (
@@ -242,7 +253,7 @@ export default function PropertySearchClient() {
           {/* 価格帯 */}
           <div style={{ marginBottom: "20px" }}>
             <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
-              💴 ご予算は？
+              価格帯
             </p>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
               {PRICE_RANGES.map((range, i) => (
@@ -270,7 +281,7 @@ export default function PropertySearchClient() {
           {/* エリア */}
           <div style={{ marginBottom: "28px" }}>
             <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
-              📍 エリアは？
+              エリア
             </p>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
               <button
@@ -311,10 +322,47 @@ export default function PropertySearchClient() {
             </div>
           </div>
 
+          {/* 沿線 */}
+          <div style={{ marginBottom: "20px" }}>
+            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
+              沿線
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {TRAIN_LINES.map((group) => (
+                <div key={group.group}>
+                  <p style={{ fontSize: "11px", color: "#aaa", margin: "0 0 6px", letterSpacing: "0.05em" }}>
+                    {group.group}
+                  </p>
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    {group.lines.map((line) => (
+                      <button
+                        key={line}
+                        onClick={() => setSelectedLine(selectedLine === line ? "" : line)}
+                        style={{
+                          padding: "6px 12px",
+                          borderRadius: "4px",
+                          border: selectedLine === line ? "2px solid #5BAD52" : "1px solid #e0e0e0",
+                          backgroundColor: selectedLine === line ? "#e8f5e6" : "#fff",
+                          color: selectedLine === line ? "#3a8a32" : "#555",
+                          fontSize: "12px",
+                          fontWeight: selectedLine === line ? "bold" : "normal",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        {line}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* こだわり条件 */}
           <div style={{ marginBottom: "28px" }}>
             <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
-              ✨ こだわり条件（複数選択可）
+              こだわり条件
             </p>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
               {CONDITIONS.map((cond) => {
@@ -377,7 +425,7 @@ export default function PropertySearchClient() {
                 transition: "all 0.15s ease",
               }}
             >
-              {loading ? "検索中..." : "🔍 検索する"}
+              {loading ? "検索中..." : "検索する"}
             </button>
           </div>
         </div>
@@ -449,7 +497,7 @@ export default function PropertySearchClient() {
                 fontWeight: "bold",
               }}
             >
-              条件をリセットして再検索
+              条件をリセット
             </button>
           </div>
         )}
