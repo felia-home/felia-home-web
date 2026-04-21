@@ -12,12 +12,32 @@ const PROPERTY_TYPES = [
 ];
 
 const PRICE_RANGES = [
-  { label: "指定なし", min: "", max: "" },
-  { label: "〜3,000万円", min: "", max: "3000" },
-  { label: "3,000〜5,000万円", min: "3000", max: "5000" },
-  { label: "5,000〜7,000万円", min: "5000", max: "7000" },
-  { label: "7,000〜1億円", min: "7000", max: "10000" },
-  { label: "1億円以上", min: "10000", max: "" },
+  { label: "指定なし",       min: "",      max: ""      },
+  { label: "〜7,000万円",    min: "",      max: "7000"  },
+  { label: "7,000万〜1億円", min: "7000",  max: "10000" },
+  { label: "1億〜1.5億円",   min: "10000", max: "15000" },
+  { label: "1.5億〜2億円",   min: "15000", max: "20000" },
+  { label: "2億〜3億円",     min: "20000", max: "30000" },
+  { label: "3億〜5億円",     min: "30000", max: "50000" },
+  { label: "5億円以上",      min: "50000", max: ""      },
+];
+
+const CONDITIONS = [
+  { value: "eq_parking",        label: "🚗 駐車場あり" },
+  { value: "eq_system_kitchen", label: "🍳 システムキッチン" },
+  { value: "eq_floor_heating",  label: "🔥 床暖房" },
+  { value: "eq_walk_in_closet", label: "👗 ウォークインクローゼット" },
+  { value: "eq_bathroom_dryer", label: "🛁 浴室乾燥機" },
+  { value: "eq_autolock",       label: "🔒 オートロック" },
+  { value: "eq_elevator",       label: "🛗 エレベーター" },
+  { value: "eq_pet_ok",         label: "🐾 ペット可" },
+  { value: "eq_corner",         label: "🏢 角部屋" },
+  { value: "eq_top_floor",      label: "🌆 最上階" },
+  { value: "eq_all_electric",   label: "⚡ オール電化" },
+  { value: "eq_solar",          label: "☀️ 太陽光発電" },
+  { value: "eq_ev_charger",     label: "🔋 EV充電設備" },
+  { value: "is_open_house",     label: "🏠 現地販売会あり" },
+  { value: "is_felia_selection",label: "⭐ Felia Selection" },
 ];
 
 const AREAS = [
@@ -63,6 +83,7 @@ export default function PropertySearchClient() {
   const [selectedType, setSelectedType] = useState("");
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [selectedArea, setSelectedArea] = useState("");
+  const [conditions, setConditions] = useState<string[]>([]);
 
   const doSearch = useCallback(async (page = 1) => {
     setLoading(true);
@@ -76,6 +97,10 @@ export default function PropertySearchClient() {
     if (pr.min) params.set("price_min", pr.min);
     if (pr.max) params.set("price_max", pr.max);
     if (selectedArea) params.set("city", selectedArea);
+    // こだわり条件
+    conditions.forEach(cond => {
+      params.set(cond, "true");
+    });
     params.set("page", String(page));
     params.set("limit", "12");
 
@@ -92,7 +117,7 @@ export default function PropertySearchClient() {
     } finally {
       setLoading(false);
     }
-  }, [keyword, selectedType, selectedPriceRange, selectedArea]);
+  }, [keyword, selectedType, selectedPriceRange, selectedArea, conditions]);
 
   // 初回
   useEffect(() => { doSearch(1); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -102,6 +127,7 @@ export default function PropertySearchClient() {
     setSelectedType("");
     setSelectedPriceRange(0);
     setSelectedArea("");
+    setConditions([]);
   };
 
   return (
@@ -116,15 +142,45 @@ export default function PropertySearchClient() {
         </div>
       </div>
 
+      {/* ヘッダー */}
+      <div style={{
+        background: "linear-gradient(135deg, #1a4a24 0%, #2d7a3a 60%, #5BAD52 100%)",
+        padding: "48px 24px 40px",
+        textAlign: "center",
+        color: "#fff",
+      }}>
+        <p style={{
+          fontSize: "11px",
+          letterSpacing: "0.3em",
+          opacity: 0.7,
+          margin: "0 0 12px",
+          fontFamily: "'Montserrat', sans-serif",
+          fontWeight: "600",
+        }}>
+          PROPERTY SEARCH
+        </p>
+        <h1 style={{
+          fontSize: "clamp(28px, 5vw, 42px)",
+          fontWeight: "bold",
+          margin: "0 0 12px",
+          lineHeight: 1.2,
+          letterSpacing: "-0.02em",
+        }}>
+          理想の住まいを、見つけよう。
+        </h1>
+        <p style={{
+          fontSize: "14px",
+          opacity: 0.8,
+          margin: 0,
+          lineHeight: 1.7,
+        }}>
+          エリア・価格・こだわり条件から、あなたにぴったりの物件を探せます
+        </p>
+      </div>
+
       {/* 検索パネル */}
-      <div style={{ backgroundColor: "#fff", borderBottom: "3px solid #5BAD52", padding: "32px 24px" }}>
+      <div style={{ backgroundColor: "#f8f8f8", borderBottom: "3px solid #5BAD52", padding: "32px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <h1 style={{ fontSize: "24px", fontWeight: "bold", color: "#333", margin: "0 0 4px", textAlign: "center" }}>
-            物件を探す
-          </h1>
-          <p style={{ fontSize: "13px", color: "#888", textAlign: "center", margin: "0 0 28px" }}>
-            希望の条件を選んで、お気に入りの物件を見つけよう！
-          </p>
 
           {/* キーワード検索 */}
           <div style={{ marginBottom: "24px" }}>
@@ -252,6 +308,39 @@ export default function PropertySearchClient() {
                   {area}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* こだわり条件 */}
+          <div style={{ marginBottom: "28px" }}>
+            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
+              ✨ こだわり条件（複数選択可）
+            </p>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {CONDITIONS.map((cond) => {
+                const selected = conditions.includes(cond.value);
+                return (
+                  <button
+                    key={cond.value}
+                    onClick={() => setConditions(prev =>
+                      selected ? prev.filter(c => c !== cond.value) : [...prev, cond.value]
+                    )}
+                    style={{
+                      padding: "7px 14px",
+                      borderRadius: "20px",
+                      border: selected ? "2px solid #5BAD52" : "1px solid #e0e0e0",
+                      backgroundColor: selected ? "#e8f5e6" : "#fff",
+                      color: selected ? "#3a8a32" : "#555",
+                      fontSize: "12px",
+                      fontWeight: selected ? "bold" : "normal",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {cond.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
