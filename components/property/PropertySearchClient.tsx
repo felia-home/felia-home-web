@@ -2,13 +2,12 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
 const PROPERTY_TYPES = [
   { value: "", label: "すべて", emoji: "🏠" },
   { value: "NEW_HOUSE", label: "新築戸建て", emoji: "🏡" },
   { value: "USED_HOUSE", label: "中古戸建て", emoji: "🏘️" },
-  { value: "MANSION,USED_MANSION,NEW_MANSION", label: "マンション", emoji: "🏢" },
+  { value: "MANSION", label: "マンション", emoji: "🏢" },
   { value: "LAND", label: "土地", emoji: "🌿" },
 ];
 
@@ -22,19 +21,15 @@ const PRICE_RANGES = [
 ];
 
 const AREAS = [
-  "千代田区", "中央区", "港区", "新宿区", "文京区", "台東区",
-  "品川区", "目黒区", "大田区", "世田谷区", "渋谷区", "中野区",
-  "杉並区", "豊島区", "北区", "荒川区", "板橋区", "練馬区",
+  "千代田区","中央区","港区","新宿区","文京区","台東区",
+  "品川区","目黒区","大田区","世田谷区","渋谷区","中野区",
+  "杉並区","豊島区","北区","荒川区","板橋区","練馬区",
 ];
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
-  LAND: "土地",
-  USED_HOUSE: "中古戸建",
-  NEW_HOUSE: "新築戸建",
-  MANSION: "マンション",
-  USED_MANSION: "中古マンション",
-  NEW_MANSION: "新築マンション",
-  OTHER: "その他",
+  LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
+  MANSION: "マンション", USED_MANSION: "中古マンション",
+  NEW_MANSION: "新築マンション", OTHER: "その他",
 };
 
 interface Property {
@@ -56,50 +51,58 @@ interface Property {
 }
 
 export default function PropertySearchClient() {
-  const searchParams = useSearchParams();
-
   const [properties, setProperties] = useState<Property[]>([]);
   const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [selectedType, setSelectedType] = useState(searchParams.get("property_type") ?? "");
-  const [selectedPriceRange, setSelectedPriceRange] = useState(0);
-  const [selectedArea, setSelectedArea] = useState(searchParams.get("city") ?? "");
   const [searched, setSearched] = useState(false);
 
-  const search = useCallback(async () => {
+  // 検索条件
+  const [keyword, setKeyword] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedPriceRange, setSelectedPriceRange] = useState(0);
+  const [selectedArea, setSelectedArea] = useState("");
+
+  const doSearch = useCallback(async (page = 1) => {
     setLoading(true);
     setSearched(true);
+    setCurrentPage(page);
 
     const params = new URLSearchParams();
-    if (selectedType) {
-      // カンマ区切りの場合は複数type
-      const types = selectedType.split(",");
-      types.forEach(t => params.append("property_type", t));
-    }
+    if (keyword.trim()) params.set("keyword", keyword.trim());
+    if (selectedType) params.set("property_type", selectedType);
     const pr = PRICE_RANGES[selectedPriceRange];
     if (pr.min) params.set("price_min", pr.min);
     if (pr.max) params.set("price_max", pr.max);
     if (selectedArea) params.set("city", selectedArea);
-    params.set("limit", "20");
+    params.set("page", String(page));
+    params.set("limit", "12");
 
     try {
       const res = await fetch(`/api/properties/search?${params.toString()}`);
       const data = await res.json();
       setProperties(data.properties ?? []);
       setTotal(data.total ?? 0);
+      setTotalPages(data.total_pages ?? 0);
     } catch {
       setProperties([]);
       setTotal(0);
+      setTotalPages(0);
     } finally {
       setLoading(false);
     }
-  }, [selectedType, selectedPriceRange, selectedArea]);
+  }, [keyword, selectedType, selectedPriceRange, selectedArea]);
 
-  // 初回ロード
-  useEffect(() => {
-    search();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // 初回
+  useEffect(() => { doSearch(1); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const reset = () => {
+    setKeyword("");
+    setSelectedType("");
+    setSelectedPriceRange(0);
+    setSelectedArea("");
+  };
 
   return (
     <main style={{ backgroundColor: "#f8f8f8", minHeight: "100vh" }}>
@@ -113,25 +116,55 @@ export default function PropertySearchClient() {
         </div>
       </div>
 
-      {/* 検索エリア */}
-      <div style={{ backgroundColor: "#fff", borderBottom: "2px solid #5BAD52", padding: "32px 24px" }}>
+      {/* 検索パネル */}
+      <div style={{ backgroundColor: "#fff", borderBottom: "3px solid #5BAD52", padding: "32px 24px" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <h1 style={{ fontSize: "22px", fontWeight: "bold", color: "#333", margin: "0 0 28px", textAlign: "center" }}>
-            🔍 物件を探す
+          <h1 style={{ fontSize: "24px", fontWeight: "bold", color: "#333", margin: "0 0 4px", textAlign: "center" }}>
+            物件を探す
           </h1>
+          <p style={{ fontSize: "13px", color: "#888", textAlign: "center", margin: "0 0 28px" }}>
+            希望の条件を選んで、お気に入りの物件を見つけよう！
+          </p>
 
-          {/* 物件種別（大きなボタン） */}
+          {/* キーワード検索 */}
           <div style={{ marginBottom: "24px" }}>
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 12px" }}>
-              📋 どんな物件をお探しですか？
+            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
+              🔤 キーワードで探す（駅名・エリア・物件名など）
             </p>
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <input
+                type="text"
+                value={keyword}
+                onChange={e => setKeyword(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && doSearch(1)}
+                placeholder="例：渋谷　三軒茶屋　新築　4LDK..."
+                style={{
+                  flex: 1,
+                  padding: "12px 16px",
+                  borderRadius: "8px",
+                  border: "2px solid #e0e0e0",
+                  fontSize: "15px",
+                  outline: "none",
+                  transition: "border-color 0.15s",
+                }}
+                onFocus={e => e.target.style.borderColor = "#5BAD52"}
+                onBlur={e => e.target.style.borderColor = "#e0e0e0"}
+              />
+            </div>
+          </div>
+
+          {/* 物件種別 */}
+          <div style={{ marginBottom: "20px" }}>
+            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
+              🏠 どんな物件？
+            </p>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
               {PROPERTY_TYPES.map((type) => (
                 <button
                   key={type.value}
                   onClick={() => setSelectedType(type.value)}
                   style={{
-                    padding: "12px 20px",
+                    padding: "10px 18px",
                     borderRadius: "8px",
                     border: selectedType === type.value ? "2px solid #5BAD52" : "2px solid #e0e0e0",
                     backgroundColor: selectedType === type.value ? "#5BAD52" : "#fff",
@@ -140,9 +173,7 @@ export default function PropertySearchClient() {
                     fontWeight: "bold",
                     cursor: "pointer",
                     transition: "all 0.15s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
+                    display: "flex", alignItems: "center", gap: "6px",
                   }}
                 >
                   <span>{type.emoji}</span>
@@ -153,8 +184,8 @@ export default function PropertySearchClient() {
           </div>
 
           {/* 価格帯 */}
-          <div style={{ marginBottom: "24px" }}>
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 12px" }}>
+          <div style={{ marginBottom: "20px" }}>
+            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
               💴 ご予算は？
             </p>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -163,11 +194,11 @@ export default function PropertySearchClient() {
                   key={i}
                   onClick={() => setSelectedPriceRange(i)}
                   style={{
-                    padding: "10px 16px",
+                    padding: "8px 14px",
                     borderRadius: "6px",
                     border: selectedPriceRange === i ? "2px solid #5BAD52" : "1px solid #e0e0e0",
                     backgroundColor: selectedPriceRange === i ? "#e8f5e6" : "#fff",
-                    color: selectedPriceRange === i ? "#5BAD52" : "#555",
+                    color: selectedPriceRange === i ? "#3a8a32" : "#555",
                     fontSize: "13px",
                     fontWeight: selectedPriceRange === i ? "bold" : "normal",
                     cursor: "pointer",
@@ -182,37 +213,37 @@ export default function PropertySearchClient() {
 
           {/* エリア */}
           <div style={{ marginBottom: "28px" }}>
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 12px" }}>
+            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
               📍 エリアは？
             </p>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
               <button
                 onClick={() => setSelectedArea("")}
                 style={{
-                  padding: "8px 14px",
+                  padding: "7px 14px",
                   borderRadius: "6px",
                   border: selectedArea === "" ? "2px solid #5BAD52" : "1px solid #e0e0e0",
                   backgroundColor: selectedArea === "" ? "#e8f5e6" : "#fff",
-                  color: selectedArea === "" ? "#5BAD52" : "#555",
-                  fontSize: "13px",
+                  color: selectedArea === "" ? "#3a8a32" : "#555",
+                  fontSize: "12px",
                   fontWeight: selectedArea === "" ? "bold" : "normal",
                   cursor: "pointer",
                   transition: "all 0.15s ease",
                 }}
               >
-                すべてのエリア
+                すべて
               </button>
               {AREAS.map((area) => (
                 <button
                   key={area}
                   onClick={() => setSelectedArea(selectedArea === area ? "" : area)}
                   style={{
-                    padding: "8px 14px",
+                    padding: "7px 14px",
                     borderRadius: "6px",
                     border: selectedArea === area ? "2px solid #5BAD52" : "1px solid #e0e0e0",
                     backgroundColor: selectedArea === area ? "#e8f5e6" : "#fff",
-                    color: selectedArea === area ? "#5BAD52" : "#555",
-                    fontSize: "13px",
+                    color: selectedArea === area ? "#3a8a32" : "#555",
+                    fontSize: "12px",
                     fontWeight: selectedArea === area ? "bold" : "normal",
                     cursor: "pointer",
                     transition: "all 0.15s ease",
@@ -224,13 +255,27 @@ export default function PropertySearchClient() {
             </div>
           </div>
 
-          {/* 検索ボタン */}
-          <div style={{ textAlign: "center" }}>
+          {/* ボタン */}
+          <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
             <button
-              onClick={search}
+              onClick={() => { reset(); }}
+              style={{
+                padding: "14px 28px",
+                backgroundColor: "#fff",
+                color: "#888",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                fontSize: "14px",
+                cursor: "pointer",
+              }}
+            >
+              リセット
+            </button>
+            <button
+              onClick={() => doSearch(1)}
               disabled={loading}
               style={{
-                padding: "16px 64px",
+                padding: "14px 56px",
                 backgroundColor: "#5BAD52",
                 color: "#fff",
                 border: "none",
@@ -239,38 +284,43 @@ export default function PropertySearchClient() {
                 fontWeight: "bold",
                 cursor: loading ? "not-allowed" : "pointer",
                 opacity: loading ? 0.7 : 1,
-                transition: "all 0.15s ease",
                 boxShadow: "0 4px 16px rgba(91,173,82,0.3)",
+                transition: "all 0.15s ease",
               }}
             >
-              {loading ? "検索中..." : "🔍 この条件で検索する"}
+              {loading ? "検索中..." : "🔍 検索する"}
             </button>
           </div>
         </div>
       </div>
 
-      {/* 検索結果 */}
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "32px 24px 80px" }}>
+      {/* 結果エリア */}
+      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "28px 24px 80px" }}>
 
-        {/* 件数表示 */}
+        {/* 件数 */}
         {searched && !loading && (
-          <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <p style={{ fontSize: "14px", color: "#555", margin: 0 }}>
-              {total > 0 ? (
-                <>
-                  <span style={{ fontSize: "24px", fontWeight: "bold", color: "#5BAD52" }}>{total}</span>
-                  <span style={{ marginLeft: "4px" }}>件の物件が見つかりました</span>
-                </>
-              ) : (
-                "条件に合う物件が見つかりませんでした"
-              )}
-            </p>
+          <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px" }}>
+            {total > 0 ? (
+              <p style={{ fontSize: "14px", color: "#555", margin: 0 }}>
+                <span style={{ fontSize: "22px", fontWeight: "bold", color: "#5BAD52" }}>{total}</span>
+                <span style={{ marginLeft: "4px" }}>件の物件が見つかりました</span>
+                {currentPage > 1 && (
+                  <span style={{ marginLeft: "8px", fontSize: "12px", color: "#aaa" }}>
+                    （{currentPage}/{totalPages}ページ）
+                  </span>
+                )}
+              </p>
+            ) : (
+              <p style={{ fontSize: "14px", color: "#888", margin: 0 }}>
+                条件に合う物件が見つかりませんでした
+              </p>
+            )}
           </div>
         )}
 
         {/* ローディング */}
         {loading && (
-          <div style={{ textAlign: "center", padding: "60px 0" }}>
+          <div style={{ textAlign: "center", padding: "80px 0" }}>
             <div style={{
               width: "48px", height: "48px",
               border: "4px solid #e8f5e6",
@@ -279,7 +329,7 @@ export default function PropertySearchClient() {
               animation: "spin 0.8s linear infinite",
               margin: "0 auto 16px",
             }} />
-            <p style={{ color: "#888", fontSize: "14px" }}>物件を検索中...</p>
+            <p style={{ color: "#888", fontSize: "14px" }}>検索中...</p>
           </div>
         )}
 
@@ -288,20 +338,17 @@ export default function PropertySearchClient() {
           <div style={{
             textAlign: "center", padding: "80px 24px",
             backgroundColor: "#fff", borderRadius: "12px",
+            border: "1px solid #e8e8e8",
           }}>
             <p style={{ fontSize: "48px", margin: "0 0 16px" }}>🔍</p>
             <p style={{ fontSize: "18px", fontWeight: "bold", color: "#333", margin: "0 0 8px" }}>
               条件に合う物件が見つかりませんでした
             </p>
             <p style={{ fontSize: "14px", color: "#888", margin: "0 0 24px" }}>
-              条件を変えて再度検索してみてください
+              キーワードを変えたり、条件を広げて再度お試しください
             </p>
             <button
-              onClick={() => {
-                setSelectedType("");
-                setSelectedPriceRange(0);
-                setSelectedArea("");
-              }}
+              onClick={() => { reset(); doSearch(1); }}
               style={{
                 padding: "12px 32px",
                 backgroundColor: "#5BAD52",
@@ -313,25 +360,90 @@ export default function PropertySearchClient() {
                 fontWeight: "bold",
               }}
             >
-              条件をリセット
+              条件をリセットして再検索
             </button>
           </div>
         )}
 
         {/* 物件グリッド */}
         {!loading && properties.length > 0 && (
-          <div className="properties-search-grid">
-            {properties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
+          <>
+            <div className="properties-search-grid">
+              {properties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+
+            {/* ページネーション */}
+            {totalPages > 1 && (
+              <div style={{
+                display: "flex", justifyContent: "center",
+                gap: "8px", marginTop: "40px", flexWrap: "wrap",
+              }}>
+                <button
+                  onClick={() => { doSearch(currentPage - 1); window.scrollTo(0, 0); }}
+                  disabled={currentPage <= 1}
+                  style={{
+                    padding: "10px 16px",
+                    border: "1px solid #e0e0e0",
+                    borderRadius: "6px",
+                    backgroundColor: "#fff",
+                    color: currentPage <= 1 ? "#ccc" : "#555",
+                    cursor: currentPage <= 1 ? "not-allowed" : "pointer",
+                    fontSize: "13px",
+                  }}
+                >
+                  ← 前へ
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+                  .map((page, i, arr) => (
+                    <>
+                      {i > 0 && arr[i - 1] !== page - 1 && (
+                        <span key={`ellipsis-${i}`} style={{ padding: "10px 6px", color: "#aaa" }}>...</span>
+                      )}
+                      <button
+                        key={page}
+                        onClick={() => { doSearch(page); window.scrollTo(0, 0); }}
+                        style={{
+                          padding: "10px 14px",
+                          border: currentPage === page ? "2px solid #5BAD52" : "1px solid #e0e0e0",
+                          borderRadius: "6px",
+                          backgroundColor: currentPage === page ? "#5BAD52" : "#fff",
+                          color: currentPage === page ? "#fff" : "#555",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                          fontWeight: currentPage === page ? "bold" : "normal",
+                        }}
+                      >
+                        {page}
+                      </button>
+                    </>
+                  ))
+                }
+                <button
+                  onClick={() => { doSearch(currentPage + 1); window.scrollTo(0, 0); }}
+                  disabled={currentPage >= totalPages}
+                  style={{
+                    padding: "10px 16px",
+                    border: "1px solid #e0e0e0",
+                    borderRadius: "6px",
+                    backgroundColor: "#fff",
+                    color: currentPage >= totalPages ? "#ccc" : "#555",
+                    cursor: currentPage >= totalPages ? "not-allowed" : "pointer",
+                    fontSize: "13px",
+                  }}
+                >
+                  次へ →
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
       <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
     </main>
   );
@@ -356,11 +468,14 @@ function PropertyCard({ property }: { property: Property }) {
         overflow: "hidden",
         border: "1px solid #e8e8e8",
         boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.12)" : "0 2px 8px rgba(0,0,0,0.06)",
-        transform: hovered ? "translateY(-2px)" : "translateY(0)",
+        transform: hovered ? "translateY(-3px)" : "translateY(0)",
         transition: "all 0.2s ease",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
       }}>
         {/* 画像 */}
-        <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0" }}>
+        <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
           {mainImage ? (
             <Image
               src={mainImage}
@@ -374,12 +489,15 @@ function PropertyCard({ property }: { property: Property }) {
             <div style={{
               position: "absolute", inset: 0,
               display: "flex", alignItems: "center",
-              justifyContent: "center", color: "#bbb", fontSize: "13px",
+              justifyContent: "center",
+              flexDirection: "column", gap: "8px",
+              color: "#bbb",
             }}>
-              画像なし
+              <span style={{ fontSize: "32px" }}>🏠</span>
+              <span style={{ fontSize: "12px" }}>画像なし</span>
             </div>
           )}
-          <div style={{ position: "absolute", top: "10px", left: "10px", display: "flex", gap: "4px" }}>
+          <div style={{ position: "absolute", top: "10px", left: "10px", display: "flex", gap: "4px", flexWrap: "wrap" }}>
             <span style={{
               backgroundColor: "#5BAD52", color: "#fff",
               fontSize: "10px", padding: "2px 8px",
@@ -409,7 +527,7 @@ function PropertyCard({ property }: { property: Property }) {
         </div>
 
         {/* 情報 */}
-        <div style={{ padding: "14px 16px" }}>
+        <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
           {property.title && (
             <p style={{
               fontSize: "13px", fontWeight: "bold", color: "#333",
@@ -420,7 +538,7 @@ function PropertyCard({ property }: { property: Property }) {
             </p>
           )}
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "3px", marginBottom: "10px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "3px", marginBottom: "10px", flex: 1 }}>
             {location && (
               <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
                 📍 {location}
@@ -433,7 +551,7 @@ function PropertyCard({ property }: { property: Property }) {
             )}
             {property.rooms && (
               <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                🏠 {property.rooms}
+                🚪 {property.rooms}
               </p>
             )}
             {property.building_year && (
