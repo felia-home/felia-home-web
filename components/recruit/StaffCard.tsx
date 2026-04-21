@@ -31,7 +31,7 @@ export default function StaffCard({ staff }: { staff: RecruitStaff }) {
         <div style={{
           position: "relative",
           width: "100%",
-          aspectRatio: "3/4",
+          aspectRatio: "4/3",
           backgroundColor: "#f5f5f5",
           overflow: "hidden",
         }}>
@@ -40,7 +40,7 @@ export default function StaffCard({ staff }: { staff: RecruitStaff }) {
               src={staff.photo_url}
               alt={staff.name}
               fill
-              style={{ objectFit: "cover" }}
+              style={{ objectFit: "cover", objectPosition: "center top" }}
               sizes="(max-width: 768px) 50vw, 25vw"
             />
           ) : (
