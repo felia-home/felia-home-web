@@ -95,7 +95,7 @@ export function HeaderClient({ isLoggedIn, userName }: HeaderClientProps) {
                 </Link>
               ) : (
                 <Link
-                  href="/members/register"
+                  href="/lp/register"
                   className="hidden tb:flex items-center px-3 py-1.5 rounded text-sm font-medium text-white transition-colors"
                   style={{ backgroundColor: "#5BAD52" }}
                 >

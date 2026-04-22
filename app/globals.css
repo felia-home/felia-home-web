@@ -167,6 +167,16 @@
   }
 }
 
+/* 会員登録LP */
+@media (max-width: 767px) {
+  .lp-benefits-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .lp-assurance-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Felia Selection一覧 */
 .felia-selection-grid {
   display: grid;

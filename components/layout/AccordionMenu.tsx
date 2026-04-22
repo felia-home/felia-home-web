@@ -183,7 +183,7 @@ export function AccordionMenu({ isOpen, onClose }: AccordionMenuProps) {
         {/* 下部CTA */}
         <div className="px-6 py-6 space-y-3">
           <Link
-            href="/members/register"
+            href="/lp/register"
             onClick={onClose}
             className="flex items-center justify-center w-full py-3 rounded text-white font-medium text-sm transition-colors"
             style={{ backgroundColor: "#5BAD52" }}
