@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>無料会員登録｜フェリアホーム</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  :root {
+    /* ブランド色：サイト本体に合わせた深緑 + 温かみある白背景 */
+    --ink: #1a1a1a;
+    --ink-soft: #3a3a3a;
+    --paper: #ffffff;
+    --paper-warm: #f7f5f0;
+    --paper-deep: #efebe2;
+    --accent: #2d5e4a;         /* フェリアホームの深緑系 */
+    --accent-deep: #1f4434;
+    --accent-soft: #e8eee9;
+    --hairline: rgba(26, 26, 26, 0.10);
+    --hairline-strong: rgba(26, 26, 26, 0.22);
+    --muted: rgba(26, 26, 26, 0.55);
+    --serif-jp: "Noto Serif JP", "游明朝", "Yu Mincho", serif;
+    --sans-jp: "Noto Sans JP", sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans-jp);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "palt";
+  }
+
+  body { overflow-x: hidden; }
+  ::selection { background: var(--accent); color: #fff; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; border: none; background: none; cursor: pointer; color: inherit; }
+  input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+
+  #root { position: relative; }
+</style>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="root"></div>
+
+<script type="application/json" id="tweak-defaults">
+{
+  "formSteps": 2
+}
+</script>
+
+<script type="text/babel" data-presets="react" src="components/Shell.jsx"></script>
+<script type="text/babel" data-presets="react" src="components/Hero.jsx"></script>
+<script type="text/babel" data-presets="react" src="components/PrivateSelection.jsx"></script>
+<script type="text/babel" data-presets="react" src="components/Benefits.jsx"></script>
+<script type="text/babel" data-presets="react" src="components/Privacy.jsx"></script>
+<script type="text/babel" data-presets="react" src="components/RegisterForm.jsx"></script>
+<script type="text/babel" data-presets="react" src="components/Tweaks.jsx"></script>
+<script type="text/babel" data-presets="react" src="components/App.jsx"></script>
+</body>
+</html>

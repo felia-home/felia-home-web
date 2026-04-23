@@ -17,7 +17,8 @@
       "Bash(mv \"recruit_recruit_flow01 \\(2\\).png\" recruit_recruit_flow03.png)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(git fetch *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\User\\projects\\felia-home-web\\app\\staff"

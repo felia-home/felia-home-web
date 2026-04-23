@@ -367,36 +367,57 @@ export default function RegisterLPPage() {
             </h2>
           </div>
 
+          {/* ステップインジケーター（グリッドの外・上） */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            maxWidth: "500px",
+            margin: "0 auto 32px",
+          }}>
+            {[
+              { num: 1, label: "アカウント情報" },
+              { num: 2, label: "購入希望条件" },
+            ].map((s, i) => (
+              <div key={s.num} style={{ display: "flex", alignItems: "center", flex: i < 1 ? 1 : 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{
+                    width: "36px", height: "36px",
+                    borderRadius: "50%",
+                    backgroundColor: step >= s.num ? C.accent : "#e0e0e0",
+                    color: step >= s.num ? C.white : "#aaa",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "14px", fontWeight: "bold", flexShrink: 0,
+                    transition: "all 0.3s ease",
+                  }}>
+                    {step > s.num ? "✓" : s.num}
+                  </div>
+                  <span style={{
+                    fontSize: "14px",
+                    fontWeight: step === s.num ? "bold" : "normal",
+                    color: step >= s.num ? C.text : "#aaa",
+                    whiteSpace: "nowrap",
+                  }}>
+                    {s.label}
+                  </span>
+                </div>
+                {i < 1 && (
+                  <div style={{
+                    flex: 1,
+                    height: "2px",
+                    backgroundColor: step > 1 ? C.accent : "#e0e0e0",
+                    margin: "0 20px",
+                    transition: "background-color 0.3s ease",
+                  }} />
+                )}
+              </div>
+            ))}
+          </div>
+
           <div className="lp-register-grid" style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "48px", alignItems: "start" }}>
 
             {/* 左：フォーム */}
             <div>
-              {/* ステップインジケーター */}
-              <div style={{ display: "flex", alignItems: "center", marginBottom: "32px" }}>
-                {[{ num: 1, label: "アカウント情報" }, { num: 2, label: "購入希望条件" }].map((s, i) => (
-                  <div key={s.num} style={{ display: "flex", alignItems: "center", flex: i < 1 ? 1 : 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <div style={{
-                        width: "32px", height: "32px",
-                        borderRadius: "50%",
-                        backgroundColor: step >= s.num ? C.accent : "#e0e0e0",
-                        color: step >= s.num ? C.white : "#aaa",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: "13px", fontWeight: "bold", flexShrink: 0,
-                      }}>
-                        {step > s.num ? "✓" : s.num}
-                      </div>
-                      <span style={{ fontSize: "13px", fontWeight: step === s.num ? "bold" : "normal", color: step >= s.num ? C.text : "#aaa" }}>
-                        {s.label}
-                      </span>
-                    </div>
-                    {i < 1 && (
-                      <div style={{ flex: 1, height: "1px", backgroundColor: step > 1 ? C.accent : "#e0e0e0", margin: "0 16px" }} />
-                    )}
-                  </div>
-                ))}
-              </div>
-
               {/* エラー */}
               {error && (
                 <div style={{ backgroundColor: "#fdeaea", border: "1px solid #e87070", borderRadius: "6px", padding: "12px 16px", marginBottom: "20px", fontSize: "13px", color: "#8c1f1f" }}>
@@ -580,28 +601,99 @@ export default function RegisterLPPage() {
 
             {/* 右：特典サイドバー */}
             <div style={{ position: "sticky", top: "80px" }}>
-              <div style={{ backgroundColor: C.paper, borderRadius: "12px", border: `1px solid ${C.border}`, padding: "28px" }}>
-                <h3 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "16px", fontWeight: "600", color: C.text, margin: "0 0 20px", paddingBottom: "16px", borderBottom: `1px solid ${C.border}` }}>
-                  会員登録の特典
-                </h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div style={{
+                backgroundColor: C.paper,
+                borderRadius: "12px",
+                border: `1px solid ${C.border}`,
+                overflow: "hidden",
+              }}>
+                {/* ヘッダー */}
+                <div style={{
+                  backgroundColor: C.accent,
+                  padding: "20px 24px",
+                  color: C.white,
+                }}>
+                  <p style={{ fontSize: "11px", letterSpacing: "0.2em", opacity: 0.7, margin: "0 0 6px", fontFamily: "'Montserrat', sans-serif" }}>
+                    MEMBER BENEFITS
+                  </p>
+                  <h3 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "18px", fontWeight: "600", margin: 0 }}>
+                    会員登録の特典
+                  </h3>
+                </div>
+
+                {/* 特典リスト */}
+                <div style={{ padding: "0" }}>
                   {[
-                    { icon: "🔑", title: "非公開物件へのアクセス", desc: "一般未公開の100件以上の物件をご覧いただけます" },
-                    { icon: "🔔", title: "新着物件メール通知", desc: "条件にマッチした物件を最速でお知らせ" },
-                    { icon: "👤", title: "専任担当者サポート", desc: "経験豊富なスタッフが物件探しをご支援" },
-                  ].map((b) => (
-                    <div key={b.title} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
-                      <span style={{ fontSize: "20px", flexShrink: 0 }}>{b.icon}</span>
-                      <div>
-                        <p style={{ fontSize: "13px", fontWeight: "bold", color: C.text, margin: "0 0 2px" }}>{b.title}</p>
-                        <p style={{ fontSize: "12px", color: C.textMuted, margin: 0, lineHeight: 1.6 }}>{b.desc}</p>
+                    {
+                      icon: "🔑",
+                      title: "Felia Home Private Selection",
+                      desc: "市場に出る前の非公開・未公開物件へアクセス。一般には公開されない100件以上の優良物件をいち早くご覧いただけます。",
+                      highlight: true,
+                    },
+                    {
+                      icon: "🔔",
+                      title: "新着物件メール通知",
+                      desc: "ご希望条件に合う新着物件が登録されると、最速でメール通知。理想の物件を見逃しません。",
+                      highlight: false,
+                    },
+                    {
+                      icon: "👤",
+                      title: "専任担当者によるサポート",
+                      desc: "経験豊富な専任スタッフが、物件探しから契約まで一貫してサポートします。",
+                      highlight: false,
+                    },
+                    {
+                      icon: "📊",
+                      title: "マーケット分析レポート",
+                      desc: "東京都心の最新不動産マーケット動向・成約事例・価格トレンドを会員限定で閲覧できます。",
+                      highlight: false,
+                    },
+                  ].map((b, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        padding: "20px 24px",
+                        borderBottom: i < 3 ? `1px solid ${C.border}` : "none",
+                        backgroundColor: b.highlight ? C.accentBg : C.white,
+                      }}
+                    >
+                      <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                        <span style={{ fontSize: "22px", flexShrink: 0, marginTop: "2px" }}>{b.icon}</span>
+                        <div>
+                          <p style={{
+                            fontSize: "13px", fontWeight: "bold",
+                            color: b.highlight ? C.accent : C.text,
+                            margin: "0 0 4px",
+                          }}>
+                            {b.title}
+                          </p>
+                          <p style={{ fontSize: "12px", color: C.textMuted, margin: 0, lineHeight: 1.7 }}>
+                            {b.desc}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
-                <div style={{ marginTop: "20px", padding: "16px", backgroundColor: C.accentBg, borderRadius: "8px", borderLeft: `3px solid ${C.accent}` }}>
-                  <p style={{ fontSize: "12px", color: C.accent, fontWeight: "bold", margin: "0 0 4px" }}>登録無料</p>
-                  <p style={{ fontSize: "12px", color: C.textMuted, margin: 0 }}>いつでも退会可能・個人情報は厳重に管理</p>
+
+                {/* フッター */}
+                <div style={{
+                  backgroundColor: "#f0f0ec",
+                  padding: "16px 24px",
+                  display: "flex",
+                  gap: "16px",
+                  justifyContent: "center",
+                }}>
+                  {[
+                    { icon: "🆓", label: "完全無料" },
+                    { icon: "🔒", label: "情報保護" },
+                    { icon: "🚪", label: "いつでも退会" },
+                  ].map((item) => (
+                    <div key={item.label} style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: "18px" }}>{item.icon}</div>
+                      <div style={{ fontSize: "10px", color: C.textMuted, marginTop: "2px" }}>{item.label}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
