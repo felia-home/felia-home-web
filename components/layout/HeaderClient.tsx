@@ -14,8 +14,8 @@ interface HeaderClientProps {
 
 export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClientProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { status } = useSession();
-  const isLoggedIn = status === "authenticated";
+  const session = useSession();
+  const isLoggedIn = session?.status === "authenticated";
 
   return (
     <>
