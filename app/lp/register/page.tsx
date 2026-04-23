@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import HeroSection from "@/components/lp/HeroSection";
 
 // ---- カラー定数 ----
@@ -100,20 +101,42 @@ export default function RegisterLPPage() {
 
   const handleStep2 = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!step2.privacy_agreed) { setError("プライバシーポリシーへの同意が必要です"); return; }
+    if (!step2.privacy_agreed) {
+      setError("プライバシーポリシーへの同意が必要です");
+      return;
+    }
     setLoading(true);
     setError("");
+
     try {
+      // Step1: 会員登録
       const res = await fetch("/api/members/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...step1, ...step2 }),
       });
+
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.message ?? "登録に失敗しました");
       }
+
+      // Step2: 自動ログイン
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: step1.email,
+        password: step1.password,
+      });
+
+      if (result?.error) {
+        // ログインに失敗してもregistration自体は成功しているので完了ページへ
+        router.push("/members/register/complete");
+        return;
+      }
+
+      // ログイン成功 → 完了ページへ
       router.push("/members/register/complete");
+
     } catch (err: any) {
       setError(err.message ?? "エラーが発生しました");
     } finally {
