@@ -29,12 +29,15 @@ export const authOptions: NextAuthOptions = {
 
           if (!res.ok) return null;
           const data = await res.json();
-          if (!data.id) return null;
+
+          // レスポンス形式: { member: { id, email, name } }
+          const member = data.member ?? data;
+          if (!member?.id) return null;
 
           return {
-            id:    String(data.id),
-            email: data.email,
-            name:  data.name,
+            id:    String(member.id),
+            email: member.email,
+            name:  member.name,
           };
         } catch (e) {
           console.error("[NextAuth] authorize error:", e);
