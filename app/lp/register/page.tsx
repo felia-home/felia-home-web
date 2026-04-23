@@ -89,7 +89,13 @@ export default function RegisterLPPage() {
     if (step1.password !== step1.password_confirm) { setError("パスワードが一致しません"); return; }
     if (step1.password.length < 8) { setError("パスワードは8文字以上で入力してください"); return; }
     setStep(2);
-    window.scrollTo(0, 0);
+    // #registerセクションの先頭にスクロール
+    setTimeout(() => {
+      const el = document.getElementById("register");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 50);
   };
 
   const handleStep2 = async (e: React.FormEvent) => {
@@ -502,7 +508,15 @@ export default function RegisterLPPage() {
                     </div>
 
                     <div style={{ display: "flex", gap: "10px" }}>
-                      <button type="button" onClick={() => { setStep(1); window.scrollTo(0, 0); }} style={{ padding: "14px 20px", backgroundColor: C.white, color: C.textMuted, border: `1px solid ${C.border}`, borderRadius: "6px", fontSize: "14px", cursor: "pointer" }}>
+                      <button type="button" onClick={() => {
+                        setStep(1);
+                        setTimeout(() => {
+                          const el = document.getElementById("register");
+                          if (el) {
+                            el.scrollIntoView({ behavior: "smooth", block: "start" });
+                          }
+                        }, 50);
+                      }} style={{ padding: "14px 20px", backgroundColor: C.white, color: C.textMuted, border: `1px solid ${C.border}`, borderRadius: "6px", fontSize: "14px", cursor: "pointer" }}>
                         ← 戻る
                       </button>
                       <button type="submit" disabled={loading || !step2.privacy_agreed} style={{ ...btn(C.accent), flex: 1, opacity: (loading || !step2.privacy_agreed) ? 0.6 : 1, cursor: (loading || !step2.privacy_agreed) ? "not-allowed" : "pointer" }}>
