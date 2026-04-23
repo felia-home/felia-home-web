@@ -3,16 +3,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, Heart, Menu, User, Lock } from "lucide-react";
+import { Search, Heart, Menu, Lock } from "lucide-react";
 import { AccordionMenu } from "./AccordionMenu";
+import { useSession } from "next-auth/react";
 
 interface HeaderClientProps {
   isLoggedIn: boolean;
   userName?: string | null;
 }
 
-export function HeaderClient({ isLoggedIn, userName }: HeaderClientProps) {
+export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClientProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { status } = useSession();
+  const isLoggedIn = status === "authenticated";
 
   return (
     <>
@@ -84,34 +87,72 @@ export function HeaderClient({ isLoggedIn, userName }: HeaderClientProps) {
                 </Link>
               )}
 
-              {/* 会員登録 / マイページ */}
+              {/* ログイン状態によってボタンを切り替え */}
               {isLoggedIn ? (
-                <Link
-                  href="/members/mypage"
-                  className="hidden tb:flex items-center gap-1 px-3 py-1.5 rounded border border-gray-300 hover:border-felia-green text-sm font-medium text-gray-600 hover:text-felia-green transition-colors"
-                >
-                  <User size={14} />
-                  <span>マイページ</span>
-                </Link>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <Link
+                    href="/private-selection"
+                    style={{
+                      fontSize: "13px",
+                      color: "#5BAD52",
+                      textDecoration: "none",
+                      fontWeight: "bold",
+                      whiteSpace: "nowrap",
+                    }}
+                    className="hidden tb:block"
+                  >
+                    プライベートセレクション
+                  </Link>
+                  <Link
+                    href="/members/mypage"
+                    style={{
+                      display: "inline-block",
+                      padding: "8px 16px",
+                      backgroundColor: "#5BAD52",
+                      color: "#fff",
+                      borderRadius: "6px",
+                      textDecoration: "none",
+                      fontSize: "13px",
+                      fontWeight: "bold",
+                      whiteSpace: "nowrap",
+                    }}
+                    className="hidden tb:block"
+                  >
+                    マイページ
+                  </Link>
+                </div>
               ) : (
-                <Link
-                  href="/lp/register"
-                  className="hidden tb:flex items-center px-3 py-1.5 rounded text-sm font-medium text-white transition-colors"
-                  style={{ backgroundColor: "#5BAD52" }}
-                >
-                  無料会員登録
-                </Link>
-              )}
-
-              {/* ログイン（非ログイン時のみ） */}
-              {!isLoggedIn && (
-                <Link
-                  href="/members/login"
-                  className="hidden tb:flex items-center px-3 py-1.5 rounded border text-sm font-medium text-gray-600 hover:border-felia-green hover:text-felia-green transition-colors"
-                  style={{ borderColor: "#E5E5E5" }}
-                >
-                  ログイン
-                </Link>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <Link
+                    href="/lp/register"
+                    style={{
+                      display: "inline-block",
+                      padding: "8px 16px",
+                      backgroundColor: "#5BAD52",
+                      color: "#fff",
+                      borderRadius: "6px",
+                      textDecoration: "none",
+                      fontSize: "13px",
+                      fontWeight: "bold",
+                      whiteSpace: "nowrap",
+                    }}
+                    className="hidden tb:block"
+                  >
+                    無料会員登録
+                  </Link>
+                  <Link
+                    href="/members/login"
+                    style={{
+                      fontSize: "13px",
+                      color: "#555",
+                      textDecoration: "none",
+                      whiteSpace: "nowrap",
+                    }}
+                    className="hidden tb:block"
+                  >
+                    ログイン
+                  </Link>
+                </div>
               )}
 
               {/* ハンバーガーメニュー */}
