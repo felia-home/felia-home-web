@@ -118,6 +118,9 @@ export default function RegisterLPPage() {
 
       if (!res.ok) {
         const data = await res.json();
+        if (res.status === 409) {
+          throw new Error("このメールアドレスはすでに登録されています");
+        }
         throw new Error(data.message ?? "登録に失敗しました");
       }
 
@@ -524,8 +527,6 @@ export default function RegisterLPPage() {
                       />
                       <label htmlFor="privacy" style={{ fontSize: "13px", color: C.textMuted, lineHeight: 1.7, cursor: "pointer" }}>
                         <Link href="/privacy" style={{ color: C.accent }}>プライバシーポリシー</Link>
-                        および
-                        <Link href="/terms" style={{ color: C.accent }}>利用規約</Link>
                         に同意します
                       </label>
                     </div>
