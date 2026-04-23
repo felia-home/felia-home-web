@@ -4,14 +4,6 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { getPrivatePropertyById, verifyPrivateSelectionToken } from "@/lib/api";
-import {
-  getPropertyTitle, getPriceDisplay,
-  getAreaDisplay, getPropertyTypeLabel, getCardGradient,
-} from "@/lib/privatePropertyHelpers";
-import {
-  Lock, MapPin, Maximize2, ChevronLeft,
-  Mail, Phone, Shield, EyeOff,
-} from "lucide-react";
 
 export const metadata = {
   title: "非公開物件詳細 | フェリアホームプライベートセレクション",
@@ -46,269 +38,292 @@ export default async function PrivatePropertyDetailPage({
   const property = await getPrivatePropertyById(params.id);
   if (!property) notFound();
 
-  const title     = getPropertyTitle(property);
-  const price     = getPriceDisplay(property);
-  const area      = getAreaDisplay(property);
-  const typeLabel = getPropertyTypeLabel(property);
-  const gradient  = getCardGradient(property);
-
-  const specs = [
-    { label: "物件番号",   value: property.property_no },
-    { label: "物件種別",   value: typeLabel },
-    { label: "エリア",     value: [property.area, property.town].filter(Boolean).join(" ") || "—" },
-    { label: "土地面積",   value: property.area_land_m2  ? `${property.area_land_m2}㎡`  : "—" },
-    { label: "建物面積",   value: property.area_build_m2 ? `${property.area_build_m2}㎡` : "—" },
-    { label: "仲介手数料", value: property.commission ? `${property.commission.toLocaleString()}万円` : "別途ご相談" },
-  ].filter((s) => s.value !== "—");
+  // 物件種別
+  const typeLabel = property.is_mansion ? "マンション" : property.is_house ? "戸建て" : property.is_land ? "土地" : "物件";
+  const location = [property.area, property.town].filter(Boolean).join(" ");
+  const infoDate = property.info_date ? new Date(property.info_date) : null;
+  const dateLabel = infoDate && !isNaN(infoDate.getTime())
+    ? `${infoDate.getFullYear()}年${infoDate.getMonth() + 1}月${infoDate.getDate()}日情報`
+    : "";
 
   return (
-    <div style={{ backgroundColor: "#0A1A0F", minHeight: "100vh" }}>
+    <main style={{ backgroundColor: "#f7f5f0", minHeight: "100vh" }}>
 
       {/* パンくず */}
-      <div className="container-content py-4">
-        <Link
-          href={urlToken ? `/private-selection?token=${urlToken}` : "/private-selection"}
-          className="flex items-center gap-1 text-sm transition-colors hover:opacity-80"
-          style={{ color: "rgba(201,168,76,0.6)" }}
-        >
-          <ChevronLeft size={14} />
-          プライベートセレクション一覧
-        </Link>
+      <div style={{ backgroundColor: "#0d2218", padding: "12px 24px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", display: "flex", gap: "8px", fontSize: "12px", color: "rgba(255,255,255,0.4)", alignItems: "center" }}>
+          <Link href="/" style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none" }}>ホーム</Link>
+          <span>›</span>
+          <Link href="/private-selection" style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none" }}>Private Selection</Link>
+          <span>›</span>
+          <span style={{ color: "rgba(255,255,255,0.6)" }}>{location}</span>
+        </div>
       </div>
 
-      <div className="container-content pb-16">
-        <div className="grid grid-cols-1 pc:grid-cols-3 gap-8 tb:gap-10">
+      {/* ヒーロー */}
+      <div style={{
+        background: "linear-gradient(160deg, #0d2218 0%, #1a3d28 70%, #2d5e4a 100%)",
+        padding: "56px 24px",
+        color: "#fff",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{ position: "absolute", top: "-80px", right: "-80px", width: "400px", height: "400px", borderRadius: "50%", backgroundColor: "rgba(201,168,76,0.04)" }} />
+        <div style={{ maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+          <div style={{ display: "flex", gap: "12px", marginBottom: "20px", flexWrap: "wrap" }}>
+            <span style={{
+              border: "1px solid #C9A84C", color: "#C9A84C",
+              fontSize: "10px", padding: "4px 12px", borderRadius: "2px",
+              letterSpacing: "0.15em", fontFamily: "'Montserrat', sans-serif",
+            }}>
+              {typeLabel.toUpperCase()}
+            </span>
+            <span style={{
+              border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.5)",
+              fontSize: "10px", padding: "4px 12px", borderRadius: "2px",
+              letterSpacing: "0.1em", fontFamily: "'Montserrat', sans-serif",
+            }}>
+              MEMBERS ONLY
+            </span>
+          </div>
 
-          {/* 左・メインカラム */}
-          <div className="pc:col-span-2">
+          <h1 style={{
+            fontFamily: "'Noto Serif JP', serif",
+            fontSize: "clamp(24px, 4vw, 40px)",
+            fontWeight: "600", color: "#fff",
+            margin: "0 0 12px", lineHeight: 1.3,
+          }}>
+            {location || "所在地非公開"}
+          </h1>
 
-            {/* バッジ行 */}
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-              <span
-                className="flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded"
-                style={{
-                  backgroundColor: "rgba(201,168,76,0.08)",
-                  color: "#C9A84C",
-                  border: "1px solid rgba(201,168,76,0.3)",
-                }}
-              >
-                <Lock size={10} />
-                PRIVATE — ポータルサイト非掲載
-              </span>
-              <span style={{ color: "rgba(245,240,232,0.35)", fontSize: "11px" }}>
-                {typeLabel}
-              </span>
-            </div>
+          {property.property_no && (
+            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", margin: "0 0 24px", fontFamily: "'Montserrat', sans-serif" }}>
+              物件番号 {property.property_no}　{dateLabel}
+            </p>
+          )}
 
-            {/* 物件名・価格 */}
-            <h1
-              className="font-bold leading-tight mb-2"
-              style={{ color: "#F5F0E8", fontSize: "clamp(18px, 2.5vw, 30px)" }}
-            >
-              {title}
-            </h1>
-            <div
-              className="flex items-baseline gap-1 mb-6 pb-6"
-              style={{ borderBottom: "1px solid rgba(201,168,76,0.15)" }}
-            >
-              <span
-                className="font-bold"
-                style={{
-                  fontSize: "clamp(28px, 3.5vw, 42px)",
-                  color: "#C9A84C",
+          {property.price != null && (
+            <div>
+              <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", margin: "0 0 4px", letterSpacing: "0.1em" }}>販売価格</p>
+              <p style={{ margin: 0 }}>
+                <span style={{
                   fontFamily: "'Montserrat', sans-serif",
-                }}
-              >
-                {price}
-              </span>
+                  fontSize: "clamp(32px, 5vw, 48px)",
+                  fontWeight: "700", color: "#fff",
+                  letterSpacing: "-0.02em",
+                }}>
+                  {property.price.toLocaleString()}
+                </span>
+                <span style={{ fontSize: "16px", color: "rgba(255,255,255,0.6)", marginLeft: "6px" }}>万円</span>
+              </p>
             </div>
+          )}
+        </div>
+      </div>
 
-            {/* ビジュアルエリア（画像なし → グラデーション） */}
-            <div
-              className="rounded-xl mb-8 flex items-center justify-center"
-              style={{
-                background: gradient,
-                aspectRatio: "16/7",
-                border: "1px solid rgba(201,168,76,0.15)",
-              }}
-            >
-              <div className="text-center">
-                <Lock size={32} className="mx-auto mb-2" style={{ color: "rgba(201,168,76,0.3)" }} />
-                <p style={{ color: "rgba(201,168,76,0.4)", fontSize: "12px", letterSpacing: "0.2em" }}>
-                  PRIVATE PROPERTY
-                </p>
-                <p style={{ color: "rgba(245,240,232,0.2)", fontSize: "11px", marginTop: "4px" }}>
-                  No. {property.property_no}
-                </p>
+      {/* メインコンテンツ */}
+      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "40px 24px 80px" }}>
+        <div className="private-detail-grid" style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "32px", alignItems: "start" }}>
+
+          {/* 左：物件詳細 */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+
+            {/* 物件概要 */}
+            <div style={{
+              backgroundColor: "#fff",
+              borderRadius: "4px",
+              border: "1px solid #e0dbd4",
+              overflow: "hidden",
+            }}>
+              <div style={{ backgroundColor: "#0d2218", padding: "16px 24px" }}>
+                <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "15px", fontWeight: "600", color: "#fff", margin: 0 }}>
+                  物件概要
+                </h2>
+              </div>
+              <div>
+                {[
+                  { label: "物件種別", value: typeLabel },
+                  { label: "所在地", value: location || "詳細はお問い合わせください" },
+                  { label: "土地面積", value: property.area_land_m2 ? `${property.area_land_m2}㎡` : null },
+                  { label: "販売価格", value: property.price != null ? `${property.price.toLocaleString()}万円` : "応相談" },
+                  { label: "仲介手数料", value: property.commission ?? null },
+                  { label: "取引態様", value: property.transaction_type ?? null },
+                  { label: "売主", value: property.seller_name ?? null },
+                  { label: "情報日付", value: dateLabel || null },
+                ].filter(s => s.value).map((spec, i, arr) => (
+                  <div
+                    key={spec.label}
+                    style={{
+                      display: "flex",
+                      borderBottom: i < arr.length - 1 ? "1px solid #f0ece6" : "none",
+                    }}
+                  >
+                    <div style={{
+                      width: "140px", flexShrink: 0,
+                      padding: "14px 20px",
+                      backgroundColor: "#faf8f4",
+                      fontSize: "13px",
+                      color: "#888",
+                      fontWeight: "500",
+                    }}>
+                      {spec.label}
+                    </div>
+                    <div style={{
+                      flex: 1,
+                      padding: "14px 20px",
+                      fontSize: "13px",
+                      color: "#333",
+                      lineHeight: 1.6,
+                    }}>
+                      {spec.value}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* 物件概要テーブル */}
-            <div className="mb-8">
-              <h2
-                className="font-bold mb-4 pb-2"
-                style={{
-                  color: "#F5F0E8",
-                  borderBottom: "2px solid #C9A84C",
-                  fontSize: "16px",
-                }}
-              >
-                物件概要
-              </h2>
-              <dl
-                className="grid grid-cols-1 tb:grid-cols-2 border-t border-l"
-                style={{ borderColor: "rgba(201,168,76,0.12)" }}
-              >
-                {specs.map(({ label, value }) => (
-                  <div
-                    key={label}
-                    className="flex border-b border-r"
-                    style={{ borderColor: "rgba(201,168,76,0.12)" }}
-                  >
-                    <dt
-                      className="flex-shrink-0 w-28 px-3 py-3 text-xs font-medium flex items-center"
-                      style={{
-                        backgroundColor: "rgba(201,168,76,0.04)",
-                        color: "rgba(201,168,76,0.6)",
-                      }}
-                    >
-                      {label}
-                    </dt>
-                    <dd
-                      className="flex-1 px-3 py-3 text-sm"
-                      style={{ color: "rgba(245,240,232,0.75)" }}
-                    >
-                      {value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-
-            {/* 備考・説明文 */}
+            {/* 備考 */}
             {property.note && (
-              <div>
-                <h2
-                  className="font-bold mb-3 pb-2"
-                  style={{ color: "#F5F0E8", borderBottom: "2px solid #C9A84C", fontSize: "16px" }}
-                >
-                  物件説明
-                </h2>
-                <p
-                  className="text-sm leading-relaxed whitespace-pre-wrap"
-                  style={{ color: "rgba(245,240,232,0.65)" }}
-                >
-                  {property.note}
-                </p>
+              <div style={{
+                backgroundColor: "#fff",
+                borderRadius: "4px",
+                border: "1px solid #e0dbd4",
+                overflow: "hidden",
+              }}>
+                <div style={{ backgroundColor: "#0d2218", padding: "16px 24px" }}>
+                  <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "15px", fontWeight: "600", color: "#fff", margin: 0 }}>
+                    備考・担当者コメント
+                  </h2>
+                </div>
+                <div style={{ padding: "24px" }}>
+                  <p style={{
+                    fontSize: "14px", color: "#444",
+                    lineHeight: 1.9, margin: 0,
+                    whiteSpace: "pre-line",
+                  }}>
+                    {property.note}
+                  </p>
+                </div>
               </div>
             )}
 
-            {/* 転載禁止注意 */}
-            <div
-              className="mt-8 p-4 rounded-xl flex items-start gap-3"
-              style={{
-                backgroundColor: "rgba(201,168,76,0.04)",
-                border: "1px solid rgba(201,168,76,0.15)",
-              }}
-            >
-              <EyeOff size={14} className="flex-shrink-0 mt-0.5" style={{ color: "#C9A84C" }} />
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.4)" }}>
-                本物件情報は会員様限定の非公開情報です。
-                無断転載・第三者への情報提供は固くお断りしております。
+            {/* 注意事項 */}
+            <div style={{
+              padding: "20px 24px",
+              backgroundColor: "#faf8f4",
+              borderRadius: "4px",
+              border: "1px solid #e0dbd4",
+            }}>
+              <p style={{ fontSize: "12px", color: "#aaa", margin: 0, lineHeight: 1.8 }}>
+                ※ 本物件情報は会員様限定の非公開情報です。第三者への転送・共有はお控えください。<br />
+                ※ 掲載内容は予告なく変更・終了する場合があります。最新情報は担当者にご確認ください。
               </p>
             </div>
           </div>
 
-          {/* 右・サイドバー */}
-          <div>
-            <div
-              className="rounded-xl p-5 pc:sticky pc:top-24"
-              style={{
-                backgroundColor: "#0D2818",
-                border: "1px solid rgba(201,168,76,0.25)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-              }}
-            >
-              {/* 価格 */}
-              <div
-                className="mb-4 pb-4"
-                style={{ borderBottom: "1px solid rgba(201,168,76,0.12)" }}
-              >
-                <p style={{ color: "rgba(245,240,232,0.4)", fontSize: "11px", marginBottom: "4px" }}>
-                  価格
-                </p>
-                <span
-                  className="font-bold"
-                  style={{
-                    fontSize: "28px",
-                    color: "#C9A84C",
-                    fontFamily: "'Montserrat', sans-serif",
-                  }}
-                >
-                  {price}
-                </span>
-              </div>
+          {/* 右：問い合わせCTA */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", position: "sticky", top: "80px" }}>
 
-              {/* スペック */}
-              <div
-                className="space-y-2 mb-5 text-sm"
-                style={{ color: "rgba(245,240,232,0.55)" }}
-              >
-                {(property.area || property.town) && (
-                  <div className="flex items-center gap-2">
-                    <MapPin size={12} style={{ color: "#C9A84C" }} />
-                    {[property.area, property.town].filter(Boolean).join(" ")}
-                  </div>
-                )}
-                {area !== "—" && (
-                  <div className="flex items-center gap-2">
-                    <Maximize2 size={12} style={{ color: "#C9A84C" }} />
-                    {area}
-                  </div>
-                )}
-              </div>
+            {/* メインCTA */}
+            <div style={{
+              backgroundColor: "#0d2218",
+              borderRadius: "4px",
+              padding: "28px 24px",
+              color: "#fff",
+            }}>
+              <div style={{ width: "32px", height: "1px", backgroundColor: "#C9A84C", marginBottom: "16px" }} />
+              <h3 style={{
+                fontFamily: "'Noto Serif JP', serif",
+                fontSize: "17px", fontWeight: "600",
+                color: "#fff", margin: "0 0 8px", lineHeight: 1.5,
+              }}>
+                この物件について<br />お問い合わせください
+              </h3>
+              <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "0 0 24px", lineHeight: 1.7 }}>
+                内覧・詳細資料・価格交渉など、<br />
+                お気軽にご相談ください。
+              </p>
 
-              {/* CTAボタン */}
-              <div className="space-y-2.5">
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 <Link
-                  href={`/contact?propertyId=${property.id}&type=private&propertyNo=${property.property_no}`}
-                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-lg font-bold text-sm transition-all hover:scale-[1.02]"
+                  href={`/contact?property_id=${property.id}&type=private&property_no=${property.property_no ?? ""}`}
                   style={{
+                    display: "block", textAlign: "center",
+                    padding: "15px",
                     backgroundColor: "#C9A84C",
-                    color: "#0A1A0F",
-                    boxShadow: "0 4px 16px rgba(201,168,76,0.3)",
+                    color: "#0d2218",
+                    borderRadius: "3px",
+                    textDecoration: "none",
+                    fontWeight: "bold",
+                    fontSize: "14px",
+                    letterSpacing: "0.05em",
                   }}
                 >
-                  <Mail size={15} />
-                  担当者に相談する
+                  メールで問い合わせる
                 </Link>
                 <a
-                  href="tel:03XXXXXXXX"
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-lg font-bold text-sm border transition-colors"
-                  style={{ borderColor: "rgba(201,168,76,0.3)", color: "#C9A84C" }}
+                  href="tel:0357816301"
+                  style={{
+                    display: "block", textAlign: "center",
+                    padding: "14px",
+                    backgroundColor: "transparent",
+                    color: "#fff",
+                    borderRadius: "3px",
+                    textDecoration: "none",
+                    fontSize: "14px",
+                    border: "1px solid rgba(255,255,255,0.25)",
+                  }}
                 >
-                  <Phone size={15} />
-                  電話で問い合わせる
+                  📞 03-5781-6301
                 </a>
               </div>
 
-              {/* 注意書き */}
-              <div
-                className="mt-4 pt-4"
-                style={{ borderTop: "1px solid rgba(201,168,76,0.08)" }}
-              >
-                <div className="flex items-start gap-2">
-                  <Shield size={10} className="flex-shrink-0 mt-0.5" style={{ color: "rgba(201,168,76,0.4)" }} />
-                  <p className="text-[10px] leading-relaxed" style={{ color: "rgba(245,240,232,0.25)" }}>
-                    本物件は会員様限定の非公開情報です。第三者への情報提供はご遠慮ください。
-                  </p>
-                </div>
-              </div>
+              <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: "16px" }}>
+                営業時間 9:30〜18:30（水・日定休）
+              </p>
             </div>
-          </div>
 
+            {/* 担当者 */}
+            <div style={{
+              backgroundColor: "#fff",
+              borderRadius: "4px",
+              padding: "20px 24px",
+              border: "1px solid #e0dbd4",
+            }}>
+              <p style={{ fontSize: "11px", color: "#aaa", letterSpacing: "0.1em", margin: "0 0 12px", fontFamily: "'Montserrat', sans-serif" }}>
+                CONTACT
+              </p>
+              <p style={{ fontSize: "13px", fontWeight: "bold", color: "#0d2218", margin: "0 0 4px" }}>
+                株式会社フェリアホーム
+              </p>
+              <p style={{ fontSize: "12px", color: "#888", margin: "0 0 2px" }}>
+                東京都渋谷区千駄ヶ谷4-16-7<br />
+                北参道DTビル1階
+              </p>
+              <p style={{ fontSize: "12px", color: "#888", margin: 0 }}>
+                東京都知事（2）第104842号
+              </p>
+            </div>
+
+            {/* 一覧に戻る */}
+            <Link
+              href="/private-selection"
+              style={{
+                display: "block", textAlign: "center",
+                padding: "12px",
+                color: "#888",
+                textDecoration: "none",
+                fontSize: "13px",
+                border: "1px solid #e0dbd4",
+                borderRadius: "4px",
+                backgroundColor: "#fff",
+              }}
+            >
+              ← 一覧に戻る
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

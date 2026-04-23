@@ -5,14 +5,6 @@ import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { getPrivateProperties, verifyPrivateSelectionToken } from "@/lib/api";
 import type { PrivateProperty } from "@/lib/api";
-import {
-  getPropertyTitle, getPriceDisplay,
-  getAreaDisplay, getPropertyTypeLabel, getCardGradient,
-} from "@/lib/privatePropertyHelpers";
-import {
-  Lock, MapPin, Maximize2, ChevronRight,
-  Shield, Eye, EyeOff, UserPlus,
-} from "lucide-react";
 
 export const metadata = {
   title: "Felia Home Private Selection | フェリアホーム会員限定",
@@ -53,280 +45,188 @@ export default async function PrivateSelectionPage({ searchParams }: PageProps) 
   const properties = await getPrivateProperties();
 
   return (
-    <div style={{ backgroundColor: "#0A1A0F", minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "#f7f5f0", minHeight: "100vh" }}>
 
-      {/* トークンアクセス時の会員登録誘導バナー */}
-      {isTokenAccess && (
-        <div
-          className="sticky top-14 z-40 py-2.5 px-4 text-center"
-          style={{
-            background: "linear-gradient(90deg, #1a3a1a, #2d5a2d, #1a3a1a)",
-            borderBottom: "1px solid rgba(201,168,76,0.3)",
-          }}
-        >
-          <p className="text-sm" style={{ color: "rgba(245,240,232,0.8)" }}>
-            <span style={{ color: "#C9A84C" }}>✓</span>
-            {" "}担当者よりご案内のURLです。
-            <Link
-              href={`/members/register?email=${encodeURIComponent(tokenEmail)}`}
-              className="ml-2 font-bold underline hover:no-underline transition-all"
-              style={{ color: "#C9A84C" }}
-            >
-              会員登録するとより便利にご利用いただけます →
-            </Link>
-          </p>
-        </div>
-      )}
-
-      {/* ── ヒーローセクション ─────────────────────── */}
-      <div
-        className="relative overflow-hidden"
-        style={{
-          background: "linear-gradient(160deg, #0A1A0F 0%, #0D2818 50%, #0F3020 100%)",
-          borderBottom: "1px solid rgba(201,168,76,0.2)",
-        }}
-      >
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[600px] h-[400px] opacity-5"
-            style={{ background: "radial-gradient(circle at 80% 20%, #C9A84C, transparent 60%)" }} />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[300px] opacity-5"
-            style={{ background: "radial-gradient(circle at 20% 80%, #5BAD52, transparent 60%)" }} />
-        </div>
-
-        <div className="container-content py-14 tb:py-20 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-
-            <div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-6"
-              style={{ borderColor: "rgba(201,168,76,0.4)", backgroundColor: "rgba(201,168,76,0.08)" }}
-            >
-              <Lock size={11} style={{ color: "#C9A84C" }} />
-              <span className="text-xs tracking-[0.25em] font-medium" style={{ color: "#C9A84C" }}>
-                {isTokenAccess ? "担当者よりご案内" : "MEMBERS ONLY"} — 非公開物件
-              </span>
-            </div>
-
-            <h1
-              className="font-bold leading-tight mb-3"
-              style={{
-                fontSize: "clamp(26px, 4vw, 48px)",
-                color: "#F5F0E8",
-                fontFamily: "'Montserrat', sans-serif",
-                letterSpacing: "0.02em",
-              }}
-            >
-              Felia Home<br />
-              <span style={{ color: "#C9A84C" }}>Private Selection</span>
-            </h1>
-            <p className="font-medium tracking-widest mb-5"
-              style={{ color: "rgba(245,240,232,0.4)", fontSize: "11px", letterSpacing: "0.3em" }}>
-              フェリアホーム プライベートセレクション
-            </p>
-
-            <p className="leading-relaxed mb-8 mx-auto"
-              style={{ color: "rgba(245,240,232,0.65)", fontSize: "clamp(13px, 1.8vw, 15px)", maxWidth: "520px", lineHeight: 2 }}>
-              こちらの物件情報は、フェリアホームからご案内する
-              非公開物件です。レインズ・SUUMO・アットホーム等の
-              不動産ポータルサイトへの掲載は一切行っておりません。
-            </p>
-
-            <div
-              className="inline-flex items-start gap-3 px-5 py-3 rounded-xl text-left max-w-lg"
-              style={{ backgroundColor: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}
-            >
-              <Shield size={13} className="flex-shrink-0 mt-0.5" style={{ color: "#C9A84C" }} />
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.5)" }}>
-                掲載情報の無断転載・スクリーンショットの共有・
-                第三者への情報提供は固くお断りしております。
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="h-px"
-          style={{ background: "linear-gradient(90deg, transparent, #C9A84C, transparent)" }} />
+      {/* ページヘッダー */}
+      <div style={{
+        background: "linear-gradient(160deg, #0d2218 0%, #1a3d28 60%, #2d5e4a 100%)",
+        padding: "80px 24px 64px",
+        textAlign: "center",
+        color: "#fff",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{ position: "absolute", top: "-60px", right: "-60px", width: "300px", height: "300px", borderRadius: "50%", backgroundColor: "rgba(201,168,76,0.05)" }} />
+        <p style={{
+          fontSize: "11px", letterSpacing: "0.4em",
+          color: "#C9A84C", margin: "0 0 16px",
+          fontFamily: "'Montserrat', sans-serif", fontWeight: "600",
+        }}>
+          PRIVATE SELECTION
+        </p>
+        <h1 style={{
+          fontFamily: "'Noto Serif JP', serif",
+          fontSize: "clamp(24px, 4vw, 38px)",
+          fontWeight: "600", color: "#fff",
+          margin: "0 0 16px", lineHeight: 1.3,
+        }}>
+          会員限定・非公開物件
+        </h1>
+        <div style={{ width: "40px", height: "1px", backgroundColor: "#C9A84C", margin: "0 auto 20px" }} />
+        <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)", margin: 0, lineHeight: 1.8 }}>
+          一般には公開されていない、フェリアホーム独自ルートの物件情報です。<br />
+          詳細・内覧のご希望はお気軽にお問い合わせください。
+        </p>
       </div>
 
-      {/* 件数 */}
-      <div className="container-content py-5">
-        <div className="flex items-center justify-between">
-          <p style={{ color: "rgba(245,240,232,0.45)", fontSize: "13px" }}>
-            現在
-            <span className="font-bold mx-1.5"
-              style={{ color: "#C9A84C", fontSize: "20px", fontFamily: "'Montserrat', sans-serif" }}>
-              {properties.length}
-            </span>
-            件の非公開物件をご案内中
-          </p>
-          <div className="flex items-center gap-1.5"
-            style={{ color: "rgba(245,240,232,0.35)", fontSize: "11px" }}>
-            <Eye size={11} />
-            <span>非公開情報</span>
-          </div>
-        </div>
+      {/* 物件数 */}
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 24px 0" }}>
+        <p style={{ fontSize: "13px", color: "#888" }}>
+          {properties.length}件の非公開物件
+        </p>
       </div>
 
       {/* 物件グリッド */}
-      <div className="container-content pb-16">
-        {properties.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="grid grid-cols-1 tb:grid-cols-2 pc:grid-cols-3 gap-5 tb:gap-6">
-            {properties.map((property) => (
-              <PrivatePropertyCard
-                key={property.id}
-                property={property}
-                token={isTokenAccess ? urlToken : undefined}
-              />
-            ))}
-          </div>
-        )}
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px 24px 80px" }}>
+        <div className="private-selection-grid">
+          {properties.map((property) => (
+            <PrivatePropertyCard key={property.id} property={property} />
+          ))}
+        </div>
       </div>
-
-      {/* トークンアクセス時: 会員登録CTA */}
-      {isTokenAccess && (
-        <div
-          className="py-14 text-center"
-          style={{ borderTop: "1px solid rgba(201,168,76,0.12)", backgroundColor: "rgba(201,168,76,0.04)" }}
-        >
-          <UserPlus size={32} className="mx-auto mb-4" style={{ color: "#C9A84C" }} />
-          <h3 className="font-bold mb-2" style={{ color: "#F5F0E8", fontSize: "18px" }}>
-            会員登録で、さらに便利に
-          </h3>
-          <p className="text-sm mb-6" style={{ color: "rgba(245,240,232,0.5)" }}>
-            お気に入り保存・問い合わせ履歴・新着通知などをご利用いただけます
-          </p>
-          <Link
-            href={`/members/register?email=${encodeURIComponent(tokenEmail)}`}
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-bold text-sm transition-all hover:scale-105"
-            style={{ backgroundColor: "#C9A84C", color: "#0A1A0F" }}
-          >
-            <UserPlus size={16} />
-            無料会員登録はこちら
-          </Link>
-        </div>
-      )}
-
-      {/* ログイン済み時のCTA */}
-      {!isTokenAccess && (
-        <div className="py-12 text-center"
-          style={{ borderTop: "1px solid rgba(201,168,76,0.12)" }}>
-          <p style={{ color: "rgba(245,240,232,0.4)", fontSize: "13px", marginBottom: "16px" }}>
-            ご希望の条件に合う物件についてお気軽にご相談ください
-          </p>
-          <Link
-            href="/contact"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg font-bold text-sm transition-all hover:scale-105"
-            style={{ backgroundColor: "rgba(201,168,76,0.12)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.35)" }}
-          >
-            専任担当者に相談する <ChevronRight size={16} />
-          </Link>
-        </div>
-      )}
     </div>
   );
 }
 
-function PrivatePropertyCard({
-  property,
-  token,
-}: {
-  property: PrivateProperty;
-  token?: string;
-}) {
-  const title     = getPropertyTitle(property);
-  const price     = getPriceDisplay(property);
-  const area      = getAreaDisplay(property);
-  const typeLabel = getPropertyTypeLabel(property);
-  const gradient  = getCardGradient(property);
-  const href = token
-    ? `/private-selection/${property.id}?token=${token}`
-    : `/private-selection/${property.id}`;
+function PrivatePropertyCard({ property }: { property: PrivateProperty }) {
+  const typeLabel = property.is_mansion ? "マンション" : property.is_house ? "戸建て" : property.is_land ? "土地" : "物件";
+  const location = [property.area, property.town].filter(Boolean).join(" ");
+  const infoDate = property.info_date ? new Date(property.info_date) : null;
+  const dateLabel = infoDate && !isNaN(infoDate.getTime())
+    ? `${infoDate.getFullYear()}年${infoDate.getMonth() + 1}月${infoDate.getDate()}日`
+    : "";
 
   return (
     <Link
-      href={href}
-      className="group block rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
-      style={{ border: "1px solid rgba(201,168,76,0.15)", boxShadow: "0 4px 20px rgba(0,0,0,0.35)" }}
+      href={`/private-selection/${property.id}`}
+      style={{ display: "block", textDecoration: "none", color: "inherit" }}
     >
-      <div className="relative" style={{ paddingBottom: "58%", background: gradient }}>
-        <div className="absolute top-3 left-3 z-10">
-          <span
-            className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded"
-            style={{ backgroundColor: "rgba(0,0,0,0.6)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.4)" }}
-          >
-            <Lock size={8} /> PRIVATE
-          </span>
+      <div style={{
+        backgroundColor: "#fff",
+        borderRadius: "4px",
+        overflow: "hidden",
+        border: "1px solid #e0dbd4",
+        transition: "box-shadow 0.2s ease, transform 0.2s ease",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}>
+        {/* 上部：物件種別・番号 */}
+        <div style={{
+          backgroundColor: "#0d2218",
+          padding: "20px 24px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+        }}>
+          <div>
+            <span style={{
+              display: "inline-block",
+              border: "1px solid #C9A84C",
+              color: "#C9A84C",
+              fontSize: "10px",
+              padding: "3px 10px",
+              borderRadius: "2px",
+              letterSpacing: "0.1em",
+              fontFamily: "'Montserrat', sans-serif",
+              marginBottom: "8px",
+            }}>
+              {typeLabel.toUpperCase()}
+            </span>
+            <p style={{
+              fontFamily: "'Noto Serif JP', serif",
+              fontSize: "18px",
+              fontWeight: "600",
+              color: "#fff",
+              margin: 0,
+              lineHeight: 1.4,
+            }}>
+              {location || "所在地非公開"}
+            </p>
+          </div>
+          {property.property_no && (
+            <span style={{
+              fontSize: "11px",
+              color: "rgba(255,255,255,0.3)",
+              fontFamily: "'Montserrat', sans-serif",
+              flexShrink: 0,
+              marginLeft: "12px",
+            }}>
+              No.{property.property_no}
+            </span>
+          )}
         </div>
-        <div className="absolute top-3 right-3 z-10">
-          <span className="text-[10px] px-2 py-0.5 rounded"
-            style={{ backgroundColor: "rgba(0,0,0,0.5)", color: "rgba(245,240,232,0.7)", border: "1px solid rgba(245,240,232,0.1)" }}>
-            {typeLabel}
-          </span>
-        </div>
-        <div className="absolute bottom-3 left-3 z-10">
-          <span className="text-[10px] font-medium tracking-widest"
-            style={{ color: "rgba(201,168,76,0.5)", fontFamily: "'Montserrat', sans-serif" }}>
-            No. {property.property_no}
-          </span>
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-          style={{ backgroundColor: "rgba(0,0,0,0.45)" }}>
-          <span className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold"
-            style={{ backgroundColor: "#C9A84C", color: "#0A1A0F" }}>
-            詳細を見る <ChevronRight size={14} />
-          </span>
-        </div>
-      </div>
 
-      <div className="p-4" style={{ background: "linear-gradient(180deg, #0D2818 0%, #0A1A0F 100%)" }}>
-        <div className="flex items-baseline gap-1 mb-2">
-          <span className="font-bold"
-            style={{ fontSize: "clamp(18px, 2.2vw, 24px)", color: "#C9A84C", fontFamily: "'Montserrat', sans-serif" }}>
-            {price}
-          </span>
-        </div>
-        <p className="font-medium leading-snug mb-3 line-clamp-2" style={{ color: "#F5F0E8", fontSize: "14px" }}>
-          {title}
-        </p>
-        <div className="space-y-1.5">
-          {(property.area || property.town) && (
-            <div className="flex items-center gap-1.5" style={{ color: "rgba(245,240,232,0.45)", fontSize: "12px" }}>
-              <MapPin size={10} style={{ color: "#C9A84C" }} />
-              <span className="truncate">{[property.area, property.town].filter(Boolean).join(" ")}</span>
+        {/* 下部：情報 */}
+        <div style={{ padding: "20px 24px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", backgroundColor: "#f7f5f0" }}>
+          <div>
+            {/* 価格 */}
+            <div style={{ marginBottom: "16px" }}>
+              {property.price != null ? (
+                <p style={{ margin: 0 }}>
+                  <span style={{
+                    fontFamily: "'Montserrat', sans-serif",
+                    fontSize: "28px",
+                    fontWeight: "700",
+                    color: "#0d2218",
+                    letterSpacing: "-0.02em",
+                  }}>
+                    {property.price.toLocaleString()}
+                  </span>
+                  <span style={{ fontSize: "13px", color: "#666", marginLeft: "4px" }}>万円</span>
+                </p>
+              ) : (
+                <p style={{ fontSize: "16px", color: "#888", margin: 0, fontStyle: "italic" }}>価格応相談</p>
+              )}
             </div>
-          )}
-          {area !== "—" && (
-            <div className="flex items-center gap-1.5" style={{ color: "rgba(245,240,232,0.45)", fontSize: "12px" }}>
-              <Maximize2 size={10} style={{ color: "#C9A84C" }} />
-              <span>{area}</span>
+
+            {/* スペック */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              {property.area_land_m2 && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                  <span style={{ color: "#888" }}>土地面積</span>
+                  <span style={{ color: "#333", fontWeight: "500" }}>{property.area_land_m2}㎡</span>
+                </div>
+              )}
+              {property.transaction_type && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                  <span style={{ color: "#888" }}>取引態様</span>
+                  <span style={{ color: "#333", fontWeight: "500" }}>{property.transaction_type}</span>
+                </div>
+              )}
+              {dateLabel && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
+                  <span style={{ color: "#888" }}>情報日付</span>
+                  <span style={{ color: "#333", fontWeight: "500" }}>{dateLabel}</span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <div className="mt-3 pt-3 flex items-center justify-between"
-          style={{ borderTop: "1px solid rgba(201,168,76,0.1)" }}>
-          <span className="text-[11px] flex items-center gap-1" style={{ color: "rgba(201,168,76,0.5)" }}>
-            <EyeOff size={10} /> ポータルサイト非掲載
-          </span>
+          </div>
+
+          {/* フッター */}
+          <div style={{
+            marginTop: "20px",
+            paddingTop: "16px",
+            borderTop: "1px solid #e0dbd4",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}>
+            <span style={{ fontSize: "11px", color: "#aaa" }}>詳細・内覧のお問い合わせ</span>
+            <span style={{ fontSize: "12px", color: "#0d2218", fontWeight: "bold" }}>詳細を見る →</span>
+          </div>
         </div>
       </div>
     </Link>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="py-28 text-center">
-      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-        style={{ backgroundColor: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
-        <Lock size={24} style={{ color: "#C9A84C" }} />
-      </div>
-      <p style={{ color: "rgba(245,240,232,0.4)", fontSize: "14px", marginBottom: "6px" }}>
-        現在、非公開物件は準備中です
-      </p>
-      <p style={{ color: "rgba(245,240,232,0.25)", fontSize: "12px" }}>
-        新着情報はメールにてご連絡いたします
-      </p>
-    </div>
   );
 }
