@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import HeroSection from "@/components/lp/HeroSection";
 
 // ---- カラー定数 ----
 const C = {
@@ -118,93 +119,7 @@ export default function RegisterLPPage() {
     <main style={{ backgroundColor: C.paper, minHeight: "100vh" }}>
 
       {/* ============ HERO ============ */}
-      <section style={{
-        background: `linear-gradient(160deg, #0d2218 0%, ${C.accent} 50%, #3d7a60 100%)`,
-        padding: "100px 24px 80px",
-        color: C.white,
-        position: "relative",
-        overflow: "hidden",
-      }}>
-        {/* 装飾円 */}
-        <div style={{ position: "absolute", top: "-100px", right: "-100px", width: "500px", height: "500px", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.04)" }} />
-        <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "300px", height: "300px", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.03)" }} />
-
-        <div style={{ maxWidth: "900px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-          {/* ブランドロゴ */}
-          <div style={{ marginBottom: "40px" }}>
-            <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "18px", fontWeight: "300", letterSpacing: "0.1em", opacity: 0.9 }}>
-              Felia <strong style={{ fontWeight: "700" }}>Home</strong>
-            </span>
-          </div>
-
-          {/* キャッチコピー */}
-          <h1 style={{
-            fontFamily: "'Noto Serif JP', serif",
-            fontSize: "clamp(28px, 5vw, 52px)",
-            fontWeight: "600",
-            lineHeight: 1.3,
-            margin: "0 0 24px",
-            letterSpacing: "0.02em",
-          }}>
-            市場に出る前の物件情報を、<br />
-            会員様へ。
-          </h1>
-
-          <p style={{
-            fontSize: "clamp(14px, 2vw, 17px)",
-            lineHeight: 1.9,
-            opacity: 0.8,
-            margin: "0 0 56px",
-            maxWidth: "560px",
-          }}>
-            フェリアホームの会員登録で、
-            一般には公開されない非公開物件・未公開物件へアクセスできます。
-            登録は無料、いつでも退会可能です。
-          </p>
-
-          {/* 統計 */}
-          <div style={{ display: "flex", gap: "48px", flexWrap: "wrap", marginBottom: "56px" }}>
-            {[
-              { num: "100", unit: "件+", label: "非公開物件数" },
-              { num: "60", unit: "秒", label: "登録所要時間" },
-              { num: "0", unit: "円", label: "会員費用" },
-              { num: "18", unit: "区", label: "対応エリア" },
-            ].map((s) => (
-              <div key={s.label}>
-                <div style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontSize: "clamp(28px, 4vw, 44px)",
-                  fontWeight: "700",
-                  lineHeight: 1,
-                  marginBottom: "4px",
-                }}>
-                  {s.num}<span style={{ fontSize: "0.5em", opacity: 0.7 }}>{s.unit}</span>
-                </div>
-                <div style={{ fontSize: "12px", opacity: 0.6, letterSpacing: "0.05em" }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* CTA */}
-          <a
-            href="#register"
-            style={{
-              display: "inline-block",
-              padding: "18px 48px",
-              backgroundColor: C.white,
-              color: C.accent,
-              borderRadius: "4px",
-              textDecoration: "none",
-              fontWeight: "bold",
-              fontSize: "16px",
-              letterSpacing: "0.05em",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-            }}
-          >
-            無料で会員登録する
-          </a>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* ============ PRIVATE SELECTION ============ */}
       <section style={{ padding: "96px 24px", backgroundColor: C.white }}>
