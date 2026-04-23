@@ -177,6 +177,24 @@
   }
 }
 
+/* LP Register レスポンシブ */
+@media (max-width: 900px) {
+  .lp-register-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .lp-privacy-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .lp-private-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 599px) {
+  .lp-private-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Felia Selection一覧 */
 .felia-selection-grid {
   display: grid;
