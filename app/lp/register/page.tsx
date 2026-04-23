@@ -17,15 +17,15 @@ const C = {
 
 // ---- 型定義 ----
 interface Step1Data {
+  name: string;
+  name_kana: string;
   email: string;
+  phone: string;
   password: string;
   password_confirm: string;
 }
 
 interface Step2Data {
-  name: string;
-  name_kana: string;
-  phone: string;
   purpose: string;
   budget_min: string;
   budget_max: string;
@@ -67,11 +67,10 @@ export default function RegisterLPPage() {
   const [error, setError] = useState("");
 
   const [step1, setStep1] = useState<Step1Data>({
-    email: "", password: "", password_confirm: "",
+    name: "", name_kana: "", email: "", phone: "", password: "", password_confirm: "",
   });
 
   const [step2, setStep2] = useState<Step2Data>({
-    name: "", name_kana: "", phone: "",
     purpose: "purchase",
     budget_min: "", budget_max: "",
     preferred_areas: [], property_types: [],
@@ -85,7 +84,7 @@ export default function RegisterLPPage() {
   const handleStep1 = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!step1.email || !step1.password) { setError("必須項目を入力してください"); return; }
+    if (!step1.name || !step1.email || !step1.password) { setError("必須項目を入力してください"); return; }
     if (step1.password !== step1.password_confirm) { setError("パスワードが一致しません"); return; }
     if (step1.password.length < 8) { setError("パスワードは8文字以上で入力してください"); return; }
     setStep(2);
@@ -301,10 +300,10 @@ export default function RegisterLPPage() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             {[
-              { num: "01", title: "非公開物件へのアクセス", desc: "売主様のご意向により一般公開されていない物件情報を、会員様限定でご覧いただけます。市場に出る前の優良物件に出会える機会です。", icon: "🔑" },
+              { num: "01", title: "Felia Home Private Selection", desc: "フェリアホームが厳選した非公開・未公開の優良物件を会員様限定でご案内します。市場に出る前の希少物件にいち早くアクセスできます。", icon: "🔑" },
               { num: "02", title: "新着物件のメール通知", desc: "ご登録いただいた購入希望条件に合う新着物件が登録されると、いち早くメールでお知らせします。見逃しがなくなります。", icon: "🔔" },
               { num: "03", title: "専任担当者によるサポート", desc: "会員登録後、ご希望に応じてフェリアホームの専任担当者が物件探しを一貫してサポートします。", icon: "👤" },
-              { num: "04", title: "Felia Private Selection", desc: "フェリアホームが厳選した特別な物件情報を会員様限定でご案内します。希少性の高い物件をいち早くご覧いただけます。", icon: "⭐" },
+              { num: "04", title: "東京都心の不動産マーケット分析", desc: "東京都心エリアの最新マーケット動向・成約事例・価格トレンドなどの分析レポートを会員様限定でご覧いただけます。", icon: "📊" },
             ].map((b, i) => (
               <div
                 key={i}
@@ -410,11 +409,38 @@ export default function RegisterLPPage() {
                 <form onSubmit={handleStep1}>
                   <div style={{ backgroundColor: C.paper, borderRadius: "12px", border: `1px solid ${C.border}`, padding: "32px", display: "flex", flexDirection: "column", gap: "20px" }}>
 
+                    <Field label="お名前" required>
+                      <input
+                        type="text" value={step1.name} required
+                        onChange={e => setStep1(p => ({ ...p, name: e.target.value }))}
+                        placeholder="山田 太郎"
+                        style={inp}
+                      />
+                    </Field>
+
+                    <Field label="お名前（フリガナ）">
+                      <input
+                        type="text" value={step1.name_kana}
+                        onChange={e => setStep1(p => ({ ...p, name_kana: e.target.value }))}
+                        placeholder="ヤマダ タロウ"
+                        style={inp}
+                      />
+                    </Field>
+
                     <Field label="メールアドレス" required>
                       <input
                         type="email" value={step1.email} required
                         onChange={e => setStep1(p => ({ ...p, email: e.target.value }))}
                         placeholder="example@email.com"
+                        style={inp}
+                      />
+                    </Field>
+
+                    <Field label="電話番号">
+                      <input
+                        type="tel" value={step1.phone}
+                        onChange={e => setStep1(p => ({ ...p, phone: e.target.value }))}
+                        placeholder="090-0000-0000"
                         style={inp}
                       />
                     </Field>
@@ -453,18 +479,6 @@ export default function RegisterLPPage() {
               {step === 2 && (
                 <form onSubmit={handleStep2}>
                   <div style={{ backgroundColor: C.paper, borderRadius: "12px", border: `1px solid ${C.border}`, padding: "32px", display: "flex", flexDirection: "column", gap: "24px" }}>
-
-                    <Field label="お名前" required>
-                      <input type="text" value={step2.name} required onChange={e => setStep2(p => ({ ...p, name: e.target.value }))} placeholder="山田 太郎" style={inp} />
-                    </Field>
-
-                    <Field label="お名前（フリガナ）">
-                      <input type="text" value={step2.name_kana} onChange={e => setStep2(p => ({ ...p, name_kana: e.target.value }))} placeholder="ヤマダ タロウ" style={inp} />
-                    </Field>
-
-                    <Field label="電話番号">
-                      <input type="tel" value={step2.phone} onChange={e => setStep2(p => ({ ...p, phone: e.target.value }))} placeholder="090-0000-0000" style={inp} />
-                    </Field>
 
                     <Block label="ご購入目的">
                       <div style={{ display: "flex", gap: "8px" }}>
