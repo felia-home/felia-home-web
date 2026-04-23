@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 const IMAGES = [
@@ -14,14 +14,7 @@ const C = {
 };
 
 export default function HeroSection() {
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrent(i => (i + 1) % IMAGES.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
+  const [current] = useState(() => Math.floor(Math.random() * IMAGES.length));
 
   return (
     <section style={{
@@ -31,29 +24,18 @@ export default function HeroSection() {
       display: "flex",
       alignItems: "center",
     }}>
-      {/* 背景画像（スライドショー） */}
-      {IMAGES.map((src, i) => (
-        <div
-          key={src}
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: i === current ? 1 : 0,
-            transition: "opacity 1.5s ease",
-            zIndex: 0,
-          }}
-        >
-          <Image
-            src={src}
-            alt="高級物件イメージ"
-            fill
-            quality={90}
-            style={{ objectFit: "cover", objectPosition: "center" }}
-            sizes="100vw"
-            priority={i === 0}
-          />
-        </div>
-      ))}
+      {/* 背景画像（ランダム1枚） */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+        <Image
+          src={IMAGES[current]}
+          alt="高級物件イメージ"
+          fill
+          quality={90}
+          style={{ objectFit: "cover", objectPosition: "center" }}
+          sizes="100vw"
+          priority
+        />
+      </div>
 
       {/* 暗いオーバーレイ */}
       <div style={{
@@ -82,7 +64,7 @@ export default function HeroSection() {
             letterSpacing: "0.1em",
             opacity: 0.9,
           }}>
-            Felia <strong style={{ fontWeight: "700" }}>Home</strong>
+            Felia <strong style={{ fontWeight: "700" }}>Home</strong> Private Selection
           </span>
         </div>
 
@@ -113,35 +95,63 @@ export default function HeroSection() {
           登録は無料、いつでも退会可能です。
         </p>
 
-        {/* 統計 */}
+        {/* 価値提案 */}
         <div style={{
           display: "flex",
-          gap: "48px",
-          flexWrap: "wrap",
+          flexDirection: "column",
+          gap: "16px",
           marginBottom: "56px",
-          padding: "24px 0",
-          borderTop: "1px solid rgba(255,255,255,0.2)",
-          borderBottom: "1px solid rgba(255,255,255,0.2)",
+          maxWidth: "520px",
         }}>
           {[
-            { num: "100", unit: "件+", label: "非公開物件数" },
-            { num: "60", unit: "秒", label: "登録所要時間" },
-            { num: "0", unit: "円", label: "会員費用" },
-            { num: "18", unit: "区", label: "対応エリア" },
-          ].map((s) => (
-            <div key={s.label}>
+            {
+              title: "非公開物件へのアクセス",
+              desc: "売主様のご意向により、一般には公開されない物件情報を会員様限定でご覧いただけます。",
+            },
+            {
+              title: "専任担当者によるご支援",
+              desc: "経験豊富なスタッフが、物件探しから契約まで一貫してサポートいたします。",
+            },
+            {
+              title: "東京都心の厳選物件のみ",
+              desc: "フェリアホームが厳選した、価値ある不動産のみをご案内します。",
+            },
+          ].map((item) => (
+            <div
+              key={item.title}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "14px",
+              }}
+            >
               <div style={{
-                fontFamily: "'Montserrat', sans-serif",
-                fontSize: "clamp(28px, 4vw, 44px)",
-                fontWeight: "700",
-                lineHeight: 1,
-                marginBottom: "4px",
-              }}>
-                {s.num}
-                <span style={{ fontSize: "0.5em", opacity: 0.8 }}>{s.unit}</span>
-              </div>
-              <div style={{ fontSize: "12px", opacity: 0.6, letterSpacing: "0.05em" }}>
-                {s.label}
+                width: "4px",
+                height: "100%",
+                minHeight: "40px",
+                backgroundColor: "rgba(255,255,255,0.5)",
+                borderRadius: "2px",
+                flexShrink: 0,
+                marginTop: "2px",
+              }} />
+              <div>
+                <p style={{
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  color: "#fff",
+                  margin: "0 0 4px",
+                  letterSpacing: "0.03em",
+                }}>
+                  {item.title}
+                </p>
+                <p style={{
+                  fontSize: "13px",
+                  color: "rgba(255,255,255,0.7)",
+                  margin: 0,
+                  lineHeight: 1.7,
+                }}>
+                  {item.desc}
+                </p>
               </div>
             </div>
           ))}
@@ -170,32 +180,6 @@ export default function HeroSection() {
           <span style={{ fontSize: "12px", opacity: 0.6 }}>
             登録無料・いつでも退会可能
           </span>
-        </div>
-
-        {/* スライドインジケーター */}
-        <div style={{
-          position: "absolute",
-          bottom: "24px",
-          right: "24px",
-          display: "flex",
-          gap: "8px",
-        }}>
-          {IMAGES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              style={{
-                width: i === current ? "24px" : "8px",
-                height: "8px",
-                borderRadius: "4px",
-                border: "none",
-                backgroundColor: i === current ? C.white : "rgba(255,255,255,0.4)",
-                cursor: "pointer",
-                padding: 0,
-                transition: "all 0.3s ease",
-              }}
-            />
-          ))}
         </div>
       </div>
     </section>
