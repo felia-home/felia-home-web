@@ -40,17 +40,17 @@ function priceToNumber(p: PrivateProperty): number {
   return 0;
 }
 
-function formatPrice(p: PrivateProperty): string | null {
+function formatPrice(p: PrivateProperty): string {
   if (p.price_display && String(p.price_display).trim()) {
     const pd = String(p.price_display).trim();
-    if (pd.includes("万円") || pd.includes("円")) return pd;
-    return `${pd}万円`;
+    if (pd.match(/万円|億|円|未定|応相談|価格|予定/)) return pd;
+    if (pd.match(/^[\d,\.〜～・\-]+$/)) return `${pd}万円`;
+    return pd;
   }
-  if (p.price != null) {
-    const n = Number(p.price);
-    if (!isNaN(n)) return `${n.toLocaleString()}万円`;
+  if (p.price != null && Number(p.price) > 0) {
+    return `${Number(p.price).toLocaleString()}万円`;
   }
-  return null;
+  return "価格応相談";
 }
 
 function typeLabel(p: PrivateProperty): string {
@@ -479,158 +479,198 @@ function PrivateCard({
   isRequested: boolean;
   onRequest: () => void;
 }) {
+  const [hovered, setHovered] = useState(false);
+  const type = typeLabel(property);
   const colors = typeColors(property);
-  const tl = typeLabel(property);
   const location = [property.area, property.town].filter(Boolean).join(" ");
   const priceText = formatPrice(property);
   const infoDate = property.info_date ? new Date(property.info_date) : null;
   const dateLabel = infoDate && !isNaN(infoDate.getTime())
-    ? `${infoDate.getFullYear()}年${infoDate.getMonth() + 1}月${infoDate.getDate()}日`
+    ? `${infoDate.getFullYear()}/${String(infoDate.getMonth() + 1).padStart(2, "0")}/${String(infoDate.getDate()).padStart(2, "0")}`
     : "";
 
   return (
-    <div style={{
-      backgroundColor: "#fff",
-      borderRadius: "4px",
-      overflow: "hidden",
-      border: "1px solid #e0dbd4",
-      borderLeft: `4px solid ${colors.line}`,
-      display: "flex",
-      flexDirection: "column",
-    }}>
-      {/* 上部：物件種別・番号 */}
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        backgroundColor: "#fff",
+        borderRadius: "8px",
+        overflow: "hidden",
+        border: "1px solid #e0dbd4",
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: hovered ? "0 12px 32px rgba(0,0,0,0.12)" : "0 2px 8px rgba(0,0,0,0.06)",
+        transform: hovered ? "translateY(-3px)" : "translateY(0)",
+        transition: "all 0.25s ease",
+        position: "relative",
+      }}
+    >
+      {/* 左縦ライン */}
+      <div style={{
+        position: "absolute",
+        top: 0, left: 0, bottom: 0,
+        width: "4px",
+        backgroundColor: colors.line,
+        zIndex: 1,
+      }} />
+
+      {/* ヘッダー */}
       <div style={{
         backgroundColor: colors.bg,
-        padding: "20px 24px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
+        padding: "20px 20px 20px 24px",
+        position: "relative",
+        overflow: "hidden",
       }}>
-        <div>
+        {/* 装飾円 */}
+        <div style={{
+          position: "absolute",
+          top: "-30px", right: "-30px",
+          width: "100px", height: "100px",
+          borderRadius: "50%",
+          backgroundColor: "rgba(255,255,255,0.04)",
+        }} />
+
+        {/* 上段：種別バッジ + 物件番号 */}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "12px",
+        }}>
           <span style={{
-            display: "inline-block",
             border: `1px solid ${colors.badge}`,
             color: colors.badge,
             fontSize: "10px",
             padding: "3px 10px",
             borderRadius: "2px",
-            letterSpacing: "0.1em",
+            letterSpacing: "0.15em",
             fontFamily: "'Montserrat', sans-serif",
-            marginBottom: "8px",
-          }}>
-            {tl.toUpperCase()}
-          </span>
-          <p style={{
-            fontFamily: "'Noto Serif JP', serif",
-            fontSize: "18px",
             fontWeight: "600",
-            color: "#fff",
-            margin: 0,
-            lineHeight: 1.4,
           }}>
-            {location || "所在地非公開"}
-          </p>
-        </div>
-        {property.property_no && (
-          <span style={{
-            fontSize: "11px",
-            color: "rgba(255,255,255,0.3)",
-            fontFamily: "'Montserrat', sans-serif",
-            flexShrink: 0,
-            marginLeft: "12px",
-          }}>
-            No.{property.property_no}
+            {type.toUpperCase()}
           </span>
-        )}
-      </div>
-
-      {/* 下部：情報 + CTA */}
-      <div style={{ padding: "20px 24px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", backgroundColor: "#f7f5f0" }}>
-        <div>
-          {/* 価格 */}
-          <div style={{ marginBottom: "16px" }}>
-            {priceText ? (
-              <p style={{ margin: 0 }}>
-                <span style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontSize: "24px",
-                  fontWeight: "700",
-                  color: "#0d2218",
-                  letterSpacing: "-0.02em",
-                }}>
-                  {priceText}
-                </span>
-              </p>
-            ) : (
-              <p style={{ fontSize: "16px", color: "#888", margin: 0, fontStyle: "italic" }}>価格応相談</p>
-            )}
-          </div>
-
-          {/* スペック */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            {property.area_land_m2 && (
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                <span style={{ color: "#888" }}>土地面積</span>
-                <span style={{ color: "#333", fontWeight: "500" }}>{property.area_land_m2}㎡</span>
-              </div>
-            )}
-            {property.area_build_m2 && (
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                <span style={{ color: "#888" }}>建物面積</span>
-                <span style={{ color: "#333", fontWeight: "500" }}>{property.area_build_m2}㎡</span>
-              </div>
-            )}
-            {property.transaction_type && (
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                <span style={{ color: "#888" }}>取引態様</span>
-                <span style={{ color: "#333", fontWeight: "500" }}>{property.transaction_type}</span>
-              </div>
-            )}
-            {dateLabel && (
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px" }}>
-                <span style={{ color: "#888" }}>情報日付</span>
-                <span style={{ color: "#333", fontWeight: "500" }}>{dateLabel}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div style={{ marginTop: "20px" }}>
-          {isRequested ? (
-            <div style={{
-              textAlign: "center",
-              padding: "12px",
-              backgroundColor: "#f0f0ec",
-              borderRadius: "3px",
-              fontSize: "13px",
-              color: "#aaa",
-              border: "1px solid #e0dbd4",
+          {property.property_no && (
+            <span style={{
+              fontSize: "10px",
+              color: "rgba(255,255,255,0.3)",
+              fontFamily: "'Montserrat', sans-serif",
+              letterSpacing: "0.05em",
             }}>
-              ✓ 資料請求済み
-            </div>
-          ) : (
-            <button
-              onClick={onRequest}
-              style={{
-                display: "block",
-                width: "100%",
-                textAlign: "center",
-                padding: "12px",
-                backgroundColor: "#C9A84C",
-                color: "#0d2218",
-                border: "none",
-                borderRadius: "3px",
-                fontWeight: "bold",
-                fontSize: "13px",
-                letterSpacing: "0.05em",
-                cursor: "pointer",
-              }}
-            >
-              資料請求する
-            </button>
+              No.{property.property_no}
+            </span>
           )}
         </div>
+
+        {/* 所在地 */}
+        <h3 style={{
+          fontFamily: "'Noto Serif JP', serif",
+          fontSize: "17px",
+          fontWeight: "600",
+          color: "#fff",
+          margin: 0,
+          lineHeight: 1.4,
+          letterSpacing: "0.02em",
+        }}>
+          {location || "所在地非公開"}
+        </h3>
+      </div>
+
+      {/* ボディ */}
+      <div style={{
+        padding: "20px 20px 20px 24px",
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "#faf8f5",
+      }}>
+
+        {/* 価格 */}
+        <div style={{
+          marginBottom: "16px",
+          paddingBottom: "14px",
+          borderBottom: "1px solid #e8e2da",
+        }}>
+          <p style={{ fontSize: "11px", color: "#aaa", margin: "0 0 4px", letterSpacing: "0.08em" }}>
+            販売価格
+          </p>
+          <p style={{
+            margin: 0,
+            fontSize: priceText.length > 12 ? "16px" : "20px",
+            fontWeight: "bold",
+            color: "#1a1a1a",
+            letterSpacing: "-0.01em",
+            lineHeight: 1.3,
+          }}>
+            {priceText}
+          </p>
+        </div>
+
+        {/* スペック */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "18px", flex: 1 }}>
+          {property.area_land_m2 && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: "11px", color: "#999", letterSpacing: "0.03em" }}>土地面積</span>
+              <span style={{ fontSize: "13px", color: "#444", fontWeight: "500" }}>{property.area_land_m2}㎡</span>
+            </div>
+          )}
+          {property.area_build_m2 && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: "11px", color: "#999", letterSpacing: "0.03em" }}>建物面積</span>
+              <span style={{ fontSize: "13px", color: "#444", fontWeight: "500" }}>{property.area_build_m2}㎡</span>
+            </div>
+          )}
+          {property.transaction_type && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: "11px", color: "#999", letterSpacing: "0.03em" }}>取引態様</span>
+              <span style={{ fontSize: "11px", color: "#666" }}>{property.transaction_type}</span>
+            </div>
+          )}
+          {dateLabel && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: "11px", color: "#999", letterSpacing: "0.03em" }}>情報日付</span>
+              <span style={{ fontSize: "11px", color: "#999", fontFamily: "'Montserrat', sans-serif" }}>{dateLabel}</span>
+            </div>
+          )}
+        </div>
+
+        {/* 資料請求ボタン */}
+        {isRequested ? (
+          <div style={{
+            textAlign: "center",
+            padding: "12px",
+            backgroundColor: "#f0ece6",
+            borderRadius: "4px",
+            fontSize: "12px",
+            color: "#aaa",
+            border: "1px solid #e0dbd4",
+            letterSpacing: "0.05em",
+          }}>
+            ✓ 資料請求済み
+          </div>
+        ) : (
+          <button
+            onClick={onRequest}
+            style={{
+              display: "block",
+              width: "100%",
+              textAlign: "center",
+              padding: "13px",
+              backgroundColor: colors.line,
+              color: colors.bg === "#2a1a3a" ? "#fff" : "#0d2218",
+              border: "none",
+              borderRadius: "4px",
+              fontWeight: "bold",
+              fontSize: "13px",
+              letterSpacing: "0.08em",
+              cursor: "pointer",
+              transition: "opacity 0.15s ease",
+              opacity: hovered ? 0.9 : 1,
+            }}
+          >
+            資料請求する
+          </button>
+        )}
       </div>
     </div>
   );
