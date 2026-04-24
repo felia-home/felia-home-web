@@ -40,17 +40,24 @@ function priceToNumber(p: PrivateProperty): number {
   return 0;
 }
 
-function formatPrice(p: PrivateProperty): string {
+function formatPriceNum(p: PrivateProperty): string {
   if (p.price_display && String(p.price_display).trim()) {
     const pd = String(p.price_display).trim();
-    if (pd.match(/万円|億|円|未定|応相談|価格|予定/)) return pd;
-    if (pd.match(/^[\d,\.〜～・\-]+$/)) return `${pd}万円`;
-    return pd;
+    return pd.replace(/万円$/, "").trim();
   }
   if (p.price != null && Number(p.price) > 0) {
-    return `${Number(p.price).toLocaleString()}万円`;
+    return Number(p.price).toLocaleString();
   }
   return "価格応相談";
+}
+
+function needsManEn(p: PrivateProperty): boolean {
+  if (p.price_display) {
+    const pd = String(p.price_display).trim();
+    if (pd.match(/億|円|未定|応相談|価格/)) return false;
+    return true;
+  }
+  return p.price != null && Number(p.price) > 0;
 }
 
 function typeLabel(p: PrivateProperty): string {
@@ -483,7 +490,6 @@ function PrivateCard({
   const type = typeLabel(property);
   const colors = typeColors(property);
   const location = [property.area, property.town].filter(Boolean).join(" ");
-  const priceText = formatPrice(property);
   const infoDate = property.info_date ? new Date(property.info_date) : null;
   const dateLabel = infoDate && !isNaN(infoDate.getTime())
     ? `${infoDate.getFullYear()}/${String(infoDate.getMonth() + 1).padStart(2, "0")}/${String(infoDate.getDate()).padStart(2, "0")}`
@@ -594,15 +600,20 @@ function PrivateCard({
           <p style={{ fontSize: "11px", color: "#aaa", margin: "0 0 4px", letterSpacing: "0.08em" }}>
             販売価格
           </p>
-          <p style={{
-            margin: 0,
-            fontSize: priceText.length > 12 ? "16px" : "20px",
-            fontWeight: "bold",
-            color: "#1a1a1a",
-            letterSpacing: "-0.01em",
-            lineHeight: 1.3,
-          }}>
-            {priceText}
+          <p style={{ margin: 0, lineHeight: 1.3, display: "flex", alignItems: "baseline", gap: "2px", flexWrap: "wrap" }}>
+            <span style={{
+              fontSize: "22px",
+              fontWeight: "bold",
+              color: "#1a1a1a",
+              letterSpacing: "-0.01em",
+            }}>
+              {formatPriceNum(property)}
+            </span>
+            {needsManEn(property) && (
+              <span style={{ fontSize: "13px", color: "#666", fontWeight: "500" }}>
+                万円
+              </span>
+            )}
           </p>
         </div>
 
