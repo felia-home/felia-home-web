@@ -568,19 +568,25 @@ export async function getRecruitStaff(): Promise<RecruitStaff[]> {
 
 export interface PrivateProperty {
   id: string;
-  property_no: string;
-  property_type?: string;
-  area?: string;
-  town?: string;
-  price?: number;
-  price_display?: string;
-  area_land_m2?: number;
-  area_build_m2?: number;
-  commission?: number;
-  note?: string;
-  is_land: boolean;
-  is_house: boolean;
-  is_mansion: boolean;
+  property_no?: string | null;
+  listing_type?: string | null;
+  is_land?: boolean;
+  is_house?: boolean;
+  is_mansion?: boolean;
+  area?: string | null;
+  town?: string | null;
+  price?: number | null;
+  area_land_m2?: number | null;
+  area_build_m2?: number | null;
+  commission?: string | null;
+  note?: string | null;
+  price_display?: string | null;
+  transaction_type?: string | null;
+  info_date?: string | null;
+  seller_name?: string | null;
+  status?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export async function getPrivateProperties(): Promise<PrivateProperty[]> {
