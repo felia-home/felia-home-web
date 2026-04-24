@@ -1,4 +1,3 @@
-// components/layout/HeaderClient.tsx
 "use client";
 
 import { useState } from "react";
@@ -8,47 +7,83 @@ import { AccordionMenu } from "./AccordionMenu";
 import { useSession } from "next-auth/react";
 
 interface HeaderClientProps {
-  isLoggedIn: boolean;
+  isLoggedIn?: boolean;
   userName?: string | null;
 }
 
 export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClientProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
   const session = useSession();
   const isLoggedIn = session?.status === "authenticated";
 
+  const navItemStyle = (key: string): React.CSSProperties => ({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "2px",
+    padding: "4px 8px",
+    borderRadius: "6px",
+    backgroundColor: hoveredNav === key ? "#f9f9f9" : "transparent",
+    cursor: "pointer",
+    textDecoration: "none",
+    transition: "background-color 0.15s ease",
+  });
+
   return (
     <>
-      <header
-        className="sticky top-0 z-50 bg-white border-b"
-        style={{ borderColor: "#E5E5E5" }}
-      >
-        <div className="container-content">
-          <div className="flex items-center justify-between h-14 tb:h-[72px]">
+      <header style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        backgroundColor: "#fff",
+        borderBottom: "1px solid #E5E5E5",
+      }}>
+        <div style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "0 16px",
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            height: "64px",
+          }}>
 
             {/* ロゴ */}
-            <Link href="/" className="flex items-center gap-1">
-              <span
-                className="font-montserrat font-bold text-xl tb:text-2xl tracking-wider"
-                style={{ color: "#5BAD52" }}
-              >
+            <Link href="/" style={{ display: "flex", alignItems: "center", gap: "4px", textDecoration: "none" }}>
+              <span style={{
+                fontFamily: "'Montserrat', sans-serif",
+                fontWeight: "bold",
+                fontSize: "22px",
+                letterSpacing: "0.05em",
+                color: "#5BAD52",
+              }}>
                 Felia
               </span>
-              <span className="font-bold text-xl tb:text-2xl text-gray-700 tracking-wide">
+              <span style={{
+                fontWeight: "bold",
+                fontSize: "22px",
+                color: "#555",
+                letterSpacing: "0.03em",
+              }}>
                 Home
               </span>
             </Link>
 
             {/* ナビゲーション */}
-            <nav className="flex items-center gap-1 tb:gap-2">
+            <nav style={{ display: "flex", alignItems: "center", gap: "4px" }}>
 
               {/* 物件検索 */}
               <Link
                 href="/search"
-                className="flex flex-col items-center gap-0.5 px-2 py-1 rounded hover:bg-gray-50 transition-colors group"
+                style={navItemStyle("search")}
+                onMouseEnter={() => setHoveredNav("search")}
+                onMouseLeave={() => setHoveredNav(null)}
               >
-                <Search size={20} className="text-gray-500 group-hover:text-felia-green transition-colors" strokeWidth={1.8} />
-                <span className="hidden tb:block text-[10px] text-gray-500 group-hover:text-felia-green whitespace-nowrap">
+                <Search size={20} strokeWidth={1.8} color="#888" />
+                <span style={{ fontSize: "10px", color: "#888", whiteSpace: "nowrap" }}>
                   物件検索
                 </span>
               </Link>
@@ -56,10 +91,12 @@ export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClient
               {/* お気に入り */}
               <Link
                 href={isLoggedIn ? "/members/favorites" : "/members/login"}
-                className="flex flex-col items-center gap-0.5 px-2 py-1 rounded hover:bg-gray-50 transition-colors group"
+                style={navItemStyle("favorites")}
+                onMouseEnter={() => setHoveredNav("favorites")}
+                onMouseLeave={() => setHoveredNav(null)}
               >
-                <Heart size={20} className="text-gray-500 group-hover:text-red-400 transition-colors" strokeWidth={1.8} />
-                <span className="hidden tb:block text-[10px] text-gray-500 group-hover:text-red-400 whitespace-nowrap">
+                <Heart size={20} strokeWidth={1.8} color="#888" />
+                <span style={{ fontSize: "10px", color: "#888", whiteSpace: "nowrap" }}>
                   お気に入り
                 </span>
               </Link>
@@ -67,39 +104,41 @@ export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClient
               {/* 採用情報 */}
               <Link
                 href="/recruit"
-                className="hidden tb:flex flex-col items-center gap-0.5 px-2 py-1 rounded hover:bg-gray-50 transition-colors group"
+                style={{ ...navItemStyle("recruit"), display: "none" }}
+                className="tb-show"
+                onMouseEnter={() => setHoveredNav("recruit")}
+                onMouseLeave={() => setHoveredNav(null)}
               >
-                <span className="text-[11px] font-medium text-gray-600 group-hover:text-felia-green whitespace-nowrap" style={{ lineHeight: "20px" }}>
+                <span style={{ fontSize: "11px", color: "#666", whiteSpace: "nowrap", lineHeight: "20px" }}>
                   採用情報
                 </span>
               </Link>
 
-              {/* 非公開物件（ログイン時のみ） */}
+              {/* 非公開物件（ログイン時） */}
               {isLoggedIn && (
                 <Link
                   href="/private-selection"
-                  className="hidden tb:flex flex-col items-center gap-0.5 px-2 py-1 rounded hover:bg-gray-50 transition-colors group"
+                  style={navItemStyle("private")}
+                  onMouseEnter={() => setHoveredNav("private")}
+                  onMouseLeave={() => setHoveredNav(null)}
                 >
-                  <Lock size={18} strokeWidth={1.8} style={{ color: "#5BAD52" }} />
-                  <span className="text-[10px] font-medium whitespace-nowrap" style={{ color: "#5BAD52" }}>
+                  <Lock size={18} strokeWidth={1.8} color="#5BAD52" />
+                  <span style={{ fontSize: "10px", color: "#5BAD52", whiteSpace: "nowrap", fontWeight: "bold" }}>
                     非公開物件
                   </span>
                 </Link>
               )}
 
-              {/* ログイン状態によってボタンを切り替え */}
+              {/* ログイン状態によってボタン切り替え */}
               {isLoggedIn ? (
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "4px" }}>
                   <Link
                     href="/private-selection"
                     style={{
-                      fontSize: "13px",
-                      color: "#5BAD52",
-                      textDecoration: "none",
-                      fontWeight: "bold",
-                      whiteSpace: "nowrap",
+                      fontSize: "13px", color: "#5BAD52",
+                      textDecoration: "none", fontWeight: "bold",
+                      whiteSpace: "nowrap", padding: "4px 8px",
                     }}
-                    className="hidden tb:block"
                   >
                     プライベートセレクション
                   </Link>
@@ -116,13 +155,12 @@ export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClient
                       fontWeight: "bold",
                       whiteSpace: "nowrap",
                     }}
-                    className="hidden tb:block"
                   >
                     マイページ
                   </Link>
                 </div>
               ) : (
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "4px" }}>
                   <Link
                     href="/lp/register"
                     style={{
@@ -136,7 +174,6 @@ export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClient
                       fontWeight: "bold",
                       whiteSpace: "nowrap",
                     }}
-                    className="hidden tb:block"
                   >
                     無料会員登録
                   </Link>
@@ -148,7 +185,6 @@ export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClient
                       textDecoration: "none",
                       whiteSpace: "nowrap",
                     }}
-                    className="hidden tb:block"
                   >
                     ログイン
                   </Link>
@@ -158,13 +194,18 @@ export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClient
               {/* ハンバーガーメニュー */}
               <button
                 onClick={() => setMenuOpen(true)}
-                className="flex flex-col items-center gap-0.5 px-2 py-1 rounded hover:bg-gray-50 transition-colors group ml-1"
+                onMouseEnter={() => setHoveredNav("menu")}
+                onMouseLeave={() => setHoveredNav(null)}
+                style={{
+                  ...navItemStyle("menu"),
+                  background: "none",
+                  border: "none",
+                  marginLeft: "4px",
+                }}
                 aria-label="メニューを開く"
               >
-                <Menu size={22} className="text-gray-600 group-hover:text-felia-green transition-colors" strokeWidth={1.8} />
-                <span className="hidden tb:block text-[10px] text-gray-500 group-hover:text-felia-green">
-                  メニュー
-                </span>
+                <Menu size={22} strokeWidth={1.8} color="#666" />
+                <span style={{ fontSize: "10px", color: "#888" }}>メニュー</span>
               </button>
             </nav>
           </div>
