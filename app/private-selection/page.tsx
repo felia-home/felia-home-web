@@ -70,7 +70,8 @@ const AREAS = [
 ];
 
 export default function PrivateSelectionPage() {
-  const { status } = useSession();
+  const session = useSession();
+  const status = session?.status ?? "loading";
   const router = useRouter();
 
   const [properties, setProperties] = useState<PrivateProperty[]>([]);
