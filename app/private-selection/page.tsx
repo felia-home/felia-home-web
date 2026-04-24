@@ -77,6 +77,7 @@ export default function PrivateSelectionPage() {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<string>("");
   const [filterArea, setFilterArea] = useState<string>("");
+  const [company, setCompany] = useState<{ phone: string; name: string } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -94,6 +95,11 @@ export default function PrivateSelectionPage() {
       })
       .catch(() => setProperties([]))
       .finally(() => setLoading(false));
+    // 会社情報取得
+    fetch("/api/company-info")
+      .then((r) => r.json())
+      .then((d) => setCompany(d.company ?? null))
+      .catch(() => null);
   }, [status]);
 
   const filtered = useMemo(() => {
@@ -237,7 +243,7 @@ export default function PrivateSelectionPage() {
         ) : (
           <div className="private-selection-grid">
             {filtered.map((p) => (
-              <PrivateCard key={p.id} property={p} />
+              <PrivateCard key={p.id} property={p} phone={company?.phone ?? "03-5981-8601"} />
             ))}
           </div>
         )}
@@ -246,7 +252,8 @@ export default function PrivateSelectionPage() {
   );
 }
 
-function PrivateCard({ property }: { property: PrivateProperty }) {
+function PrivateCard({ property, phone }: { property: PrivateProperty; phone: string }) {
+  const phoneTel = phone.replace(/-/g, "");
   const tl = typeLabel(property);
   const location = [property.area, property.town].filter(Boolean).join(" ");
   const priceText = formatPrice(property);
@@ -381,7 +388,7 @@ function PrivateCard({ property }: { property: PrivateProperty }) {
             メールで問い合わせる
           </Link>
           <a
-            href="tel:0357816301"
+            href={`tel:${phoneTel}`}
             style={{
               display: "block",
               textAlign: "center",
@@ -394,7 +401,7 @@ function PrivateCard({ property }: { property: PrivateProperty }) {
               border: "1px solid #c0bbb4",
             }}
           >
-            📞 03-5781-6301
+            📞 {phone}
           </a>
         </div>
       </div>
