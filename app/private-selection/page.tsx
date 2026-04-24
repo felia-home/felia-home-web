@@ -40,24 +40,45 @@ function priceToNumber(p: PrivateProperty): number {
   return 0;
 }
 
-function formatPriceNum(p: PrivateProperty): string {
-  if (p.price_display && String(p.price_display).trim()) {
-    const pd = String(p.price_display).trim();
-    return pd.replace(/万円$/, "").trim();
+function convertToOku(man: number): { num: string; suffix: string } {
+  if (man >= 10000) {
+    const oku = Math.floor(man / 10000);
+    const remain = man % 10000;
+    if (remain === 0) {
+      return { num: `${oku}億`, suffix: "円" };
+    }
+    return { num: `${oku}億${remain.toLocaleString()}万`, suffix: "円" };
   }
-  if (p.price != null && Number(p.price) > 0) {
-    return Number(p.price).toLocaleString();
-  }
-  return "価格応相談";
+  return { num: man.toLocaleString(), suffix: "万円" };
 }
 
-function needsManEn(p: PrivateProperty): boolean {
-  if (p.price_display) {
+function formatPriceJP(p: PrivateProperty): { num: string; suffix: string } | { freeText: string } {
+  if (p.price_display && String(p.price_display).trim()) {
     const pd = String(p.price_display).trim();
-    if (pd.match(/億|円|未定|応相談|価格/)) return false;
-    return true;
+
+    if (pd.match(/未定|応相談|価格|相談/)) {
+      return { freeText: pd };
+    }
+
+    if (pd.match(/^[\d,]+$/)) {
+      const man = parseInt(pd.replace(/,/g, ""), 10);
+      if (!isNaN(man)) return convertToOku(man);
+    }
+
+    const singleMatch = pd.match(/^([\d,]+)万円?$/);
+    if (singleMatch) {
+      const man = parseInt(singleMatch[1].replace(/,/g, ""), 10);
+      if (!isNaN(man)) return convertToOku(man);
+    }
+
+    return { freeText: pd };
   }
-  return p.price != null && Number(p.price) > 0;
+
+  if (p.price != null && Number(p.price) > 0) {
+    return convertToOku(Number(p.price));
+  }
+
+  return { freeText: "価格応相談" };
 }
 
 function typeLabel(p: PrivateProperty): string {
@@ -600,21 +621,34 @@ function PrivateCard({
           <p style={{ fontSize: "11px", color: "#aaa", margin: "0 0 4px", letterSpacing: "0.08em" }}>
             販売価格
           </p>
-          <p style={{ margin: 0, lineHeight: 1.3, display: "flex", alignItems: "baseline", gap: "2px", flexWrap: "wrap" }}>
-            <span style={{
-              fontSize: "22px",
-              fontWeight: "bold",
-              color: "#1a1a1a",
-              letterSpacing: "-0.01em",
-            }}>
-              {formatPriceNum(property)}
-            </span>
-            {needsManEn(property) && (
-              <span style={{ fontSize: "13px", color: "#666", fontWeight: "500" }}>
-                万円
-              </span>
-            )}
-          </p>
+          {(() => {
+            const result = formatPriceJP(property);
+            if ("freeText" in result) {
+              return (
+                <p style={{
+                  margin: 0, lineHeight: 1.3,
+                  fontSize: result.freeText.length > 10 ? "16px" : "20px",
+                  fontWeight: "bold", color: "#1a1a1a",
+                }}>
+                  {result.freeText}
+                </p>
+              );
+            }
+            return (
+              <p style={{ margin: 0, lineHeight: 1.3, display: "flex", alignItems: "baseline", gap: "2px", flexWrap: "wrap" }}>
+                <span style={{
+                  fontSize: "22px", fontWeight: "bold",
+                  color: "#1a1a1a", letterSpacing: "-0.01em",
+                  fontFamily: "'Montserrat', sans-serif",
+                }}>
+                  {result.num}
+                </span>
+                <span style={{ fontSize: "13px", color: "#666", fontWeight: "500" }}>
+                  {result.suffix}
+                </span>
+              </p>
+            );
+          })()}
         </div>
 
         {/* スペック */}
