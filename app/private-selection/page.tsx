@@ -61,6 +61,19 @@ function typeLabel(p: PrivateProperty): string {
   return "物件";
 }
 
+function typeColors(p: PrivateProperty): { bg: string; badge: string; line: string } {
+  if (p.is_mansion) return { bg: "#2a1a3a", badge: "#c4a8d4", line: "#9b6bb5" };
+  if (p.is_house)   return { bg: "#1a2a3a", badge: "#8ab4d4", line: "#4a90b8" };
+  return                   { bg: "#1a3a2a", badge: "#C9A84C", line: "#C9A84C" };
+}
+
+const TYPE_FILTER_BG: Record<string, string> = {
+  "": "#0d2218",
+  "土地": "#1a3a2a",
+  "戸建て": "#1a2a3a",
+  "マンション": "#2a1a3a",
+};
+
 const AREAS = [
   "渋谷区", "新宿区", "杉並区", "世田谷区",
   "文京区", "豊島区", "中野区", "目黒区",
@@ -78,7 +91,6 @@ export default function PrivateSelectionPage() {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState<string>("");
   const [filterArea, setFilterArea] = useState<string>("");
-  const [company, setCompany] = useState<{ phone: string; name: string } | null>(null);
   const [requestedNos, setRequestedNos] = useState<Set<string>>(new Set());
   const [confirmModal, setConfirmModal] = useState<{ property: PrivateProperty } | null>(null);
   const [requesting, setRequesting] = useState(false);
@@ -102,12 +114,6 @@ export default function PrivateSelectionPage() {
       })
       .catch(() => setProperties([]))
       .finally(() => setLoading(false));
-
-    // 会社情報取得
-    fetch("/api/company-info")
-      .then((r) => r.json())
-      .then((d) => setCompany(d.company ?? null))
-      .catch(() => null);
 
     // 資料請求済み一覧取得
     fetch("/api/member/inquiry")
@@ -167,8 +173,6 @@ export default function PrivateSelectionPage() {
       </div>
     );
   }
-
-  const phone = company?.phone ?? "03-5981-8601";
 
   return (
     <div style={{ backgroundColor: "#f7f5f0", minHeight: "100vh" }}>
@@ -384,8 +388,8 @@ export default function PrivateSelectionPage() {
               fontSize: "13px",
               border: "1px solid #e0dbd4",
               borderRadius: "4px",
-              backgroundColor: "#fff",
-              color: "#333",
+              backgroundColor: filterType ? TYPE_FILTER_BG[filterType] : "#fff",
+              color: filterType ? "#fff" : "#333",
               cursor: "pointer",
               minWidth: "120px",
             }}
@@ -455,7 +459,6 @@ export default function PrivateSelectionPage() {
               <PrivateCard
                 key={p.id}
                 property={p}
-                phone={phone}
                 isRequested={requestedNos.has(String(p.property_no))}
                 onRequest={() => setConfirmModal({ property: p })}
               />
@@ -469,16 +472,14 @@ export default function PrivateSelectionPage() {
 
 function PrivateCard({
   property,
-  phone,
   isRequested,
   onRequest,
 }: {
   property: PrivateProperty;
-  phone: string;
   isRequested: boolean;
   onRequest: () => void;
 }) {
-  const phoneTel = phone.replace(/-/g, "");
+  const colors = typeColors(property);
   const tl = typeLabel(property);
   const location = [property.area, property.town].filter(Boolean).join(" ");
   const priceText = formatPrice(property);
@@ -493,12 +494,13 @@ function PrivateCard({
       borderRadius: "4px",
       overflow: "hidden",
       border: "1px solid #e0dbd4",
+      borderLeft: `4px solid ${colors.line}`,
       display: "flex",
       flexDirection: "column",
     }}>
       {/* 上部：物件種別・番号 */}
       <div style={{
-        backgroundColor: "#0d2218",
+        backgroundColor: colors.bg,
         padding: "20px 24px",
         display: "flex",
         justifyContent: "space-between",
@@ -507,8 +509,8 @@ function PrivateCard({
         <div>
           <span style={{
             display: "inline-block",
-            border: "1px solid #C9A84C",
-            color: "#C9A84C",
+            border: `1px solid ${colors.badge}`,
+            color: colors.badge,
             fontSize: "10px",
             padding: "3px 10px",
             borderRadius: "2px",
@@ -594,11 +596,9 @@ function PrivateCard({
         </div>
 
         {/* CTA */}
-        <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
-          {/* 資料請求ボタン */}
+        <div style={{ marginTop: "20px" }}>
           {isRequested ? (
             <div style={{
-              display: "block",
               textAlign: "center",
               padding: "12px",
               backgroundColor: "#f0f0ec",
@@ -630,23 +630,6 @@ function PrivateCard({
               資料請求する
             </button>
           )}
-
-          <a
-            href={`tel:${phoneTel}`}
-            style={{
-              display: "block",
-              textAlign: "center",
-              padding: "10px",
-              backgroundColor: "transparent",
-              color: "#0d2218",
-              borderRadius: "3px",
-              textDecoration: "none",
-              fontSize: "13px",
-              border: "1px solid #c0bbb4",
-            }}
-          >
-            📞 {phone}
-          </a>
         </div>
       </div>
     </div>
