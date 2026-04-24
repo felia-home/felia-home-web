@@ -570,6 +570,7 @@ export interface PrivateProperty {
   id: string;
   property_no?: string | null;
   listing_type?: string | null;
+  property_type?: string | null;
   is_land?: boolean;
   is_house?: boolean;
   is_mansion?: boolean;
