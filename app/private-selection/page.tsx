@@ -56,21 +56,41 @@ function formatPriceJP(p: PrivateProperty): { num: string; suffix: string } | { 
   if (p.price_display && String(p.price_display).trim()) {
     const pd = String(p.price_display).trim();
 
+    // 「未定」「応相談」「価格」「相談」系 → そのまま
     if (pd.match(/未定|応相談|価格|相談/)) {
       return { freeText: pd };
     }
 
+    // すでに億・兆表記あり → そのまま
+    if (pd.match(/億|兆/)) {
+      return { freeText: pd };
+    }
+
+    // 純粋な数値 → 億変換
     if (pd.match(/^[\d,]+$/)) {
       const man = parseInt(pd.replace(/,/g, ""), 10);
       if (!isNaN(man)) return convertToOku(man);
     }
 
+    // 数値＋万円 → 万円を除いて億変換
     const singleMatch = pd.match(/^([\d,]+)万円?$/);
     if (singleMatch) {
       const man = parseInt(singleMatch[1].replace(/,/g, ""), 10);
       if (!isNaN(man)) return convertToOku(man);
     }
 
+    // 範囲・複数表示（数値と区切り記号のみ）→ 万円付加してfreeText
+    if (pd.match(/^[\d,\s・〜～\-〜~\.]+$/)) {
+      const formatted = pd.replace(/(\d+)/g, (match) => parseInt(match, 10).toLocaleString());
+      return { freeText: `${formatted}万円` };
+    }
+
+    // 万円・万が含まれているテキスト → そのまま
+    if (pd.includes("万円") || pd.includes("万")) {
+      return { freeText: pd };
+    }
+
+    // その他 → そのまま
     return { freeText: pd };
   }
 
