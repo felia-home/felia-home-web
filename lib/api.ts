@@ -576,7 +576,7 @@ export interface PrivateProperty {
   is_mansion?: boolean;
   area?: string | null;
   town?: string | null;
-  price?: number | null;
+  price?: number | string | null;
   area_land_m2?: number | null;
   area_build_m2?: number | null;
   commission?: string | null;

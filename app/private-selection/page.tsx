@@ -6,6 +6,19 @@ import { authOptions } from "@/lib/auth";
 import { getPrivateProperties, verifyPrivateSelectionToken } from "@/lib/api";
 import type { PrivateProperty } from "@/lib/api";
 
+// 価格表示ヘルパー
+function formatPrice(property: PrivateProperty): string | null {
+  if (property.price_display && String(property.price_display).trim()) {
+    const pd = String(property.price_display).trim();
+    if (pd.includes("万円") || pd.includes("円")) return pd;
+    return `${pd}万円`;
+  }
+  if (property.price != null) {
+    return `${Number(property.price).toLocaleString()}万円`;
+  }
+  return null;
+}
+
 export const metadata = {
   title: "Felia Home Private Selection | フェリアホーム会員限定",
   robots: { index: false, follow: false },
@@ -172,22 +185,24 @@ function PrivatePropertyCard({ property }: { property: PrivateProperty }) {
           <div>
             {/* 価格 */}
             <div style={{ marginBottom: "16px" }}>
-              {property.price != null ? (
-                <p style={{ margin: 0 }}>
-                  <span style={{
-                    fontFamily: "'Montserrat', sans-serif",
-                    fontSize: "28px",
-                    fontWeight: "700",
-                    color: "#0d2218",
-                    letterSpacing: "-0.02em",
-                  }}>
-                    {property.price.toLocaleString()}
-                  </span>
-                  <span style={{ fontSize: "13px", color: "#666", marginLeft: "4px" }}>万円</span>
-                </p>
-              ) : (
-                <p style={{ fontSize: "16px", color: "#888", margin: 0, fontStyle: "italic" }}>価格応相談</p>
-              )}
+              {(() => {
+                const priceText = formatPrice(property);
+                return priceText ? (
+                  <p style={{ margin: 0 }}>
+                    <span style={{
+                      fontFamily: "'Montserrat', sans-serif",
+                      fontSize: "24px",
+                      fontWeight: "700",
+                      color: "#0d2218",
+                      letterSpacing: "-0.02em",
+                    }}>
+                      {priceText}
+                    </span>
+                  </p>
+                ) : (
+                  <p style={{ fontSize: "16px", color: "#888", margin: 0, fontStyle: "italic" }}>価格応相談</p>
+                );
+              })()}
             </div>
 
             {/* スペック */}

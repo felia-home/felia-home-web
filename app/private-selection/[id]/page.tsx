@@ -4,6 +4,20 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { getPrivatePropertyById, verifyPrivateSelectionToken } from "@/lib/api";
+import type { PrivateProperty } from "@/lib/api";
+
+// 価格表示ヘルパー
+function formatPrice(property: PrivateProperty): string | null {
+  if (property.price_display && String(property.price_display).trim()) {
+    const pd = String(property.price_display).trim();
+    if (pd.includes("万円") || pd.includes("円")) return pd;
+    return `${pd}万円`;
+  }
+  if (property.price != null) {
+    return `${Number(property.price).toLocaleString()}万円`;
+  }
+  return null;
+}
 
 export const metadata = {
   title: "非公開物件詳細 | フェリアホームプライベートセレクション",
@@ -102,22 +116,24 @@ export default async function PrivatePropertyDetailPage({
             </p>
           )}
 
-          {property.price != null && (
-            <div>
-              <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", margin: "0 0 4px", letterSpacing: "0.1em" }}>販売価格</p>
-              <p style={{ margin: 0 }}>
-                <span style={{
-                  fontFamily: "'Montserrat', sans-serif",
-                  fontSize: "clamp(32px, 5vw, 48px)",
-                  fontWeight: "700", color: "#fff",
-                  letterSpacing: "-0.02em",
-                }}>
-                  {property.price.toLocaleString()}
-                </span>
-                <span style={{ fontSize: "16px", color: "rgba(255,255,255,0.6)", marginLeft: "6px" }}>万円</span>
-              </p>
-            </div>
-          )}
+          {(() => {
+            const priceText = formatPrice(property);
+            return priceText ? (
+              <div>
+                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", margin: "0 0 4px", letterSpacing: "0.1em" }}>販売価格</p>
+                <p style={{ margin: 0 }}>
+                  <span style={{
+                    fontFamily: "'Montserrat', sans-serif",
+                    fontSize: "clamp(28px, 4vw, 44px)",
+                    fontWeight: "700", color: "#fff",
+                    letterSpacing: "-0.02em",
+                  }}>
+                    {priceText}
+                  </span>
+                </p>
+              </div>
+            ) : null;
+          })()}
         </div>
       </div>
 
@@ -145,7 +161,7 @@ export default async function PrivatePropertyDetailPage({
                   { label: "物件種別", value: typeLabel },
                   { label: "所在地", value: location || "詳細はお問い合わせください" },
                   { label: "土地面積", value: property.area_land_m2 ? `${property.area_land_m2}㎡` : null },
-                  { label: "販売価格", value: property.price != null ? `${property.price.toLocaleString()}万円` : "応相談" },
+                  { label: "販売価格", value: formatPrice(property) ?? "応相談" },
                   { label: "仲介手数料", value: property.commission ?? null },
                   { label: "取引態様", value: property.transaction_type ?? null },
                   { label: "売主", value: property.seller_name ?? null },
