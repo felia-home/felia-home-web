@@ -40,14 +40,14 @@ function priceToNumber(p: PrivateProperty): number {
   return 0;
 }
 
-function convertToOku(man: number): { num: string; suffix: string } {
+function convertToOku(man: number): { num: string; suffix: string } | { freeText: string } {
   if (man >= 10000) {
     const oku = Math.floor(man / 10000);
     const remain = man % 10000;
     if (remain === 0) {
-      return { num: `${oku}億`, suffix: "円" };
+      return { freeText: `${oku}億円` };
     }
-    return { num: `${oku}億${remain.toLocaleString()}万`, suffix: "円" };
+    return { freeText: `${oku}億${remain.toLocaleString()}万円` };
   }
   return { num: man.toLocaleString(), suffix: "万円" };
 }
@@ -647,8 +647,10 @@ function PrivateCard({
               return (
                 <p style={{
                   margin: 0, lineHeight: 1.3,
-                  fontSize: result.freeText.length > 10 ? "16px" : "20px",
-                  fontWeight: "bold", color: "#1a1a1a",
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#1a1a1a",
+                  letterSpacing: "-0.01em",
                 }}>
                   {result.freeText}
                 </p>
