@@ -35,17 +35,17 @@ export const getFeliaSectionProperties = getFeaturedProperties;
 
 export async function getNewProperties() {
   const res = await fetchFromAdmin<{ properties: Property[] }>(
-    "/api/properties?flag=new"
+    "/api/properties?flag=new&published_hp=true"
   );
   return res.properties ?? [];
 }
 
 export async function getPropertiesByArea(area: string) {
-  return fetchFromAdmin<Property[]>(`/api/properties?area=${encodeURIComponent(area)}`);
+  return fetchFromAdmin<Property[]>(`/api/properties?area=${encodeURIComponent(area)}&published_hp=true`);
 }
 
 export async function getPropertiesByLine(line: string) {
-  return fetchFromAdmin<Property[]>(`/api/properties?line=${encodeURIComponent(line)}`);
+  return fetchFromAdmin<Property[]>(`/api/properties?line=${encodeURIComponent(line)}&published_hp=true`);
 }
 
 export async function getPropertyById(id: string) {

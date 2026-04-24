@@ -51,7 +51,7 @@ const AREA_INFO: Record<string, { name: string; description: string; tags: strin
 async function getAreaProperties(areaName: string): Promise<{ properties: Property[]; total: number }> {
   try {
     const adminUrl = process.env.ADMIN_API_URL ?? "http://localhost:3001";
-    const params = new URLSearchParams({ status: "PUBLISHED", search: areaName });
+    const params = new URLSearchParams({ status: "PUBLISHED", search: areaName, published_hp: "true" });
     const res = await fetch(`${adminUrl}/api/properties?${params}`, {
       next: { revalidate: 300 },
     });
