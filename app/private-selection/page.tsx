@@ -79,6 +79,10 @@ export default function PrivateSelectionPage() {
   const [filterType, setFilterType] = useState<string>("");
   const [filterArea, setFilterArea] = useState<string>("");
   const [company, setCompany] = useState<{ phone: string; name: string } | null>(null);
+  const [requestedNos, setRequestedNos] = useState<Set<string>>(new Set());
+  const [confirmModal, setConfirmModal] = useState<{ property: PrivateProperty } | null>(null);
+  const [requesting, setRequesting] = useState(false);
+  const [requestResult, setRequestResult] = useState<"success" | "already" | "error" | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -88,6 +92,8 @@ export default function PrivateSelectionPage() {
 
   useEffect(() => {
     if (status !== "authenticated") return;
+
+    // 物件一覧取得
     fetch("/api/private-properties")
       .then((r) => r.json())
       .then((data) => {
@@ -96,20 +102,54 @@ export default function PrivateSelectionPage() {
       })
       .catch(() => setProperties([]))
       .finally(() => setLoading(false));
+
     // 会社情報取得
     fetch("/api/company-info")
       .then((r) => r.json())
       .then((d) => setCompany(d.company ?? null))
       .catch(() => null);
+
+    // 資料請求済み一覧取得
+    fetch("/api/member/inquiry")
+      .then((r) => r.json())
+      .then((d) => {
+        const nos = new Set<string>(
+          (d.inquiries ?? []).map((i: any) => String(i.property_ref))
+        );
+        setRequestedNos(nos);
+      })
+      .catch(() => null);
   }, [status]);
+
+  const handleInquiry = async (property: PrivateProperty) => {
+    setRequesting(true);
+    setRequestResult(null);
+    try {
+      const res = await fetch("/api/member/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ property_no: property.property_no }),
+      });
+      const data = await res.json();
+      if (data.already_requested) {
+        setRequestResult("already");
+      } else if (data.success) {
+        setRequestResult("success");
+        setRequestedNos((prev) => new Set([...prev, String(property.property_no)]));
+      } else {
+        setRequestResult("error");
+      }
+    } catch {
+      setRequestResult("error");
+    } finally {
+      setRequesting(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     let list = [...properties];
     if (filterType) {
-      list = list.filter((p) => {
-        const tl = typeLabel(p);
-        return tl === filterType;
-      });
+      list = list.filter((p) => typeLabel(p) === filterType);
     }
     if (filterArea) {
       list = list.filter((p) =>
@@ -120,7 +160,7 @@ export default function PrivateSelectionPage() {
     return list;
   }, [properties, filterType, filterArea]);
 
-  if (status === "loading" || (status === "unauthenticated")) {
+  if (status === "loading" || status === "unauthenticated") {
     return (
       <div style={{ minHeight: "100vh", backgroundColor: "#f7f5f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <p style={{ color: "#888", fontSize: "14px" }}>読み込み中...</p>
@@ -128,8 +168,176 @@ export default function PrivateSelectionPage() {
     );
   }
 
+  const phone = company?.phone ?? "03-5981-8601";
+
   return (
     <div style={{ backgroundColor: "#f7f5f0", minHeight: "100vh" }}>
+
+      {/* 確認モーダル */}
+      {confirmModal && (
+        <div
+          onClick={() => { setConfirmModal(null); setRequestResult(null); }}
+          style={{
+            position: "fixed", inset: 0,
+            backgroundColor: "rgba(0,0,0,0.6)",
+            zIndex: 9999,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: "24px",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: "8px",
+              padding: "40px 32px",
+              maxWidth: "480px",
+              width: "100%",
+              textAlign: "center",
+            }}
+          >
+            {requestResult === null && (
+              <>
+                <div style={{ width: "48px", height: "1px", backgroundColor: "#C9A84C", margin: "0 auto 20px" }} />
+                <h3 style={{
+                  fontFamily: "'Noto Serif JP', serif",
+                  fontSize: "18px", fontWeight: "600",
+                  color: "#0d2218", margin: "0 0 12px",
+                }}>
+                  資料請求の確認
+                </h3>
+                <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.8, margin: "0 0 8px" }}>
+                  以下の物件の資料請求をします。
+                </p>
+                <div style={{
+                  backgroundColor: "#f7f5f0",
+                  borderRadius: "6px",
+                  padding: "16px",
+                  margin: "0 0 24px",
+                }}>
+                  <p style={{ fontSize: "13px", color: "#888", margin: "0 0 4px" }}>
+                    No.{confirmModal.property.property_no}
+                  </p>
+                  <p style={{
+                    fontFamily: "'Noto Serif JP', serif",
+                    fontSize: "16px", fontWeight: "600",
+                    color: "#0d2218", margin: 0,
+                  }}>
+                    {[confirmModal.property.area, confirmModal.property.town].filter(Boolean).join(" ")}
+                  </p>
+                </div>
+                <p style={{ fontSize: "12px", color: "#aaa", margin: "0 0 24px", lineHeight: 1.7 }}>
+                  担当者よりメールにてご連絡いたします。<br />
+                  内容を確認の上、よろしければOKを押してください。
+                </p>
+                <div style={{ display: "flex", gap: "12px" }}>
+                  <button
+                    onClick={() => { setConfirmModal(null); setRequestResult(null); }}
+                    style={{
+                      flex: 1, padding: "13px",
+                      border: "1px solid #e0dbd4",
+                      borderRadius: "4px",
+                      backgroundColor: "#fff",
+                      color: "#888", fontSize: "14px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    キャンセル
+                  </button>
+                  <button
+                    onClick={() => handleInquiry(confirmModal.property)}
+                    disabled={requesting}
+                    style={{
+                      flex: 1, padding: "13px",
+                      backgroundColor: "#C9A84C",
+                      border: "none",
+                      borderRadius: "4px",
+                      color: "#0d2218",
+                      fontWeight: "bold",
+                      fontSize: "14px",
+                      cursor: requesting ? "not-allowed" : "pointer",
+                      opacity: requesting ? 0.7 : 1,
+                    }}
+                  >
+                    {requesting ? "送信中..." : "OK・資料請求する"}
+                  </button>
+                </div>
+              </>
+            )}
+
+            {requestResult === "success" && (
+              <>
+                <div style={{ fontSize: "48px", marginBottom: "16px" }}>✅</div>
+                <h3 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "18px", color: "#0d2218", margin: "0 0 12px" }}>
+                  資料請求が完了しました
+                </h3>
+                <p style={{ fontSize: "13px", color: "#666", lineHeight: 1.8, margin: "0 0 24px" }}>
+                  担当者よりメールにてご連絡いたします。<br />
+                  今しばらくお待ちください。
+                </p>
+                <button
+                  onClick={() => { setConfirmModal(null); setRequestResult(null); }}
+                  style={{
+                    width: "100%", padding: "13px",
+                    backgroundColor: "#0d2218", color: "#fff",
+                    border: "none", borderRadius: "4px",
+                    fontSize: "14px", cursor: "pointer", fontWeight: "bold",
+                  }}
+                >
+                  閉じる
+                </button>
+              </>
+            )}
+
+            {requestResult === "already" && (
+              <>
+                <div style={{ fontSize: "48px", marginBottom: "16px" }}>📬</div>
+                <h3 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "18px", color: "#0d2218", margin: "0 0 12px" }}>
+                  すでに資料請求済みです
+                </h3>
+                <p style={{ fontSize: "13px", color: "#666", lineHeight: 1.8, margin: "0 0 24px" }}>
+                  この物件はすでに資料請求されています。<br />
+                  担当者よりご連絡をお待ちください。
+                </p>
+                <button
+                  onClick={() => { setConfirmModal(null); setRequestResult(null); }}
+                  style={{
+                    width: "100%", padding: "13px",
+                    backgroundColor: "#0d2218", color: "#fff",
+                    border: "none", borderRadius: "4px",
+                    fontSize: "14px", cursor: "pointer", fontWeight: "bold",
+                  }}
+                >
+                  閉じる
+                </button>
+              </>
+            )}
+
+            {requestResult === "error" && (
+              <>
+                <div style={{ fontSize: "48px", marginBottom: "16px" }}>⚠️</div>
+                <h3 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "18px", color: "#0d2218", margin: "0 0 12px" }}>
+                  エラーが発生しました
+                </h3>
+                <p style={{ fontSize: "13px", color: "#666", lineHeight: 1.8, margin: "0 0 24px" }}>
+                  しばらくしてから再度お試しください。
+                </p>
+                <button
+                  onClick={() => { setConfirmModal(null); setRequestResult(null); }}
+                  style={{
+                    width: "100%", padding: "13px",
+                    backgroundColor: "#0d2218", color: "#fff",
+                    border: "none", borderRadius: "4px",
+                    fontSize: "14px", cursor: "pointer", fontWeight: "bold",
+                  }}
+                >
+                  閉じる
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ページヘッダー */}
       <div style={{
@@ -244,7 +452,13 @@ export default function PrivateSelectionPage() {
         ) : (
           <div className="private-selection-grid">
             {filtered.map((p) => (
-              <PrivateCard key={p.id} property={p} phone={company?.phone ?? "03-5981-8601"} />
+              <PrivateCard
+                key={p.id}
+                property={p}
+                phone={phone}
+                isRequested={requestedNos.has(String(p.property_no))}
+                onRequest={() => setConfirmModal({ property: p })}
+              />
             ))}
           </div>
         )}
@@ -253,7 +467,17 @@ export default function PrivateSelectionPage() {
   );
 }
 
-function PrivateCard({ property, phone }: { property: PrivateProperty; phone: string }) {
+function PrivateCard({
+  property,
+  phone,
+  isRequested,
+  onRequest,
+}: {
+  property: PrivateProperty;
+  phone: string;
+  isRequested: boolean;
+  onRequest: () => void;
+}) {
   const phoneTel = phone.replace(/-/g, "");
   const tl = typeLabel(property);
   const location = [property.area, property.town].filter(Boolean).join(" ");
@@ -371,23 +595,42 @@ function PrivateCard({ property, phone }: { property: PrivateProperty; phone: st
 
         {/* CTA */}
         <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
-          <Link
-            href={`/contact?property_id=${property.id}&type=private&property_no=${property.property_no ?? ""}`}
-            style={{
+          {/* 資料請求ボタン */}
+          {isRequested ? (
+            <div style={{
               display: "block",
               textAlign: "center",
               padding: "12px",
-              backgroundColor: "#0d2218",
-              color: "#fff",
+              backgroundColor: "#f0f0ec",
               borderRadius: "3px",
-              textDecoration: "none",
               fontSize: "13px",
-              fontWeight: "bold",
-              letterSpacing: "0.05em",
-            }}
-          >
-            メールで問い合わせる
-          </Link>
+              color: "#aaa",
+              border: "1px solid #e0dbd4",
+            }}>
+              ✓ 資料請求済み
+            </div>
+          ) : (
+            <button
+              onClick={onRequest}
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "center",
+                padding: "12px",
+                backgroundColor: "#C9A84C",
+                color: "#0d2218",
+                border: "none",
+                borderRadius: "3px",
+                fontWeight: "bold",
+                fontSize: "13px",
+                letterSpacing: "0.05em",
+                cursor: "pointer",
+              }}
+            >
+              資料請求する
+            </button>
+          )}
+
           <a
             href={`tel:${phoneTel}`}
             style={{
