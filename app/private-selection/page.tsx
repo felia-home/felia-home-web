@@ -114,7 +114,7 @@ export default function PrivateSelectionPage() {
       .then((r) => r.json())
       .then((d) => {
         const nos = new Set<string>(
-          (d.inquiries ?? []).map((i: any) => String(i.property_ref))
+          Array.from((d.inquiries ?? []).map((i: any) => String(i.property_ref)))
         );
         setRequestedNos(nos);
       })
@@ -135,7 +135,7 @@ export default function PrivateSelectionPage() {
         setRequestResult("already");
       } else if (data.success) {
         setRequestResult("success");
-        setRequestedNos((prev) => new Set([...prev, String(property.property_no)]));
+        setRequestedNos((prev) => new Set(Array.from(prev).concat(String(property.property_no))));
       } else {
         setRequestResult("error");
       }
