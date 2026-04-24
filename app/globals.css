@@ -236,3 +236,13 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Private Selection Hero */
+@media (max-width: 767px) {
+  .private-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .private-hero-grid > div:last-child {
+    min-height: 240px;
+  }
+}

@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 interface PrivateProperty {
   id: string;
@@ -391,36 +392,110 @@ export default function PrivateSelectionPage() {
         </div>
       )}
 
-      {/* ページヘッダー */}
-      <div style={{
-        background: "linear-gradient(160deg, #0d2218 0%, #1a3d28 60%, #2d5e4a 100%)",
-        padding: "80px 24px 64px",
-        textAlign: "center",
-        color: "#fff",
-        position: "relative",
+      {/* ヒーローバナー */}
+      <div className="private-hero-grid" style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        minHeight: "420px",
         overflow: "hidden",
       }}>
-        <div style={{ position: "absolute", top: "-60px", right: "-60px", width: "300px", height: "300px", borderRadius: "50%", backgroundColor: "rgba(201,168,76,0.05)" }} />
-        <p style={{
-          fontSize: "11px", letterSpacing: "0.4em",
-          color: "#C9A84C", margin: "0 0 16px",
-          fontFamily: "'Montserrat', sans-serif", fontWeight: "600",
+        {/* 左：テキスト */}
+        <div style={{
+          background: "linear-gradient(135deg, #050e08 0%, #0d2218 60%, #1a3a28 100%)",
+          padding: "64px 56px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          position: "relative",
+          overflow: "hidden",
         }}>
-          PRIVATE SELECTION
-        </p>
-        <h1 style={{
-          fontFamily: "'Noto Serif JP', serif",
-          fontSize: "clamp(24px, 4vw, 38px)",
-          fontWeight: "600", color: "#fff",
-          margin: "0 0 16px", lineHeight: 1.3,
+          {/* 金の装飾ライン */}
+          <div style={{
+            position: "absolute",
+            top: 0, left: 0,
+            width: "3px",
+            height: "100%",
+            background: "linear-gradient(180deg, transparent 0%, #C9A84C 30%, #e8c96d 50%, #C9A84C 70%, transparent 100%)",
+          }} />
+          <div style={{
+            position: "absolute",
+            bottom: "-40px", right: "-40px",
+            width: "200px", height: "200px",
+            borderRadius: "50%",
+            border: "1px solid rgba(201,168,76,0.1)",
+          }} />
+          <div style={{
+            position: "absolute",
+            bottom: "-80px", right: "-80px",
+            width: "300px", height: "300px",
+            borderRadius: "50%",
+            border: "1px solid rgba(201,168,76,0.05)",
+          }} />
+
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <p style={{
+              fontSize: "11px",
+              letterSpacing: "0.4em",
+              color: "#C9A84C",
+              margin: "0 0 20px",
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: "600",
+            }}>
+              PRIVATE SELECTION
+            </p>
+            <h1 style={{
+              fontFamily: "'Noto Serif JP', serif",
+              fontSize: "clamp(22px, 3vw, 34px)",
+              fontWeight: "600",
+              color: "#fff",
+              margin: "0 0 16px",
+              lineHeight: 1.35,
+              letterSpacing: "0.02em",
+            }}>
+              会員限定・<br />非公開物件
+            </h1>
+            <div style={{ width: "32px", height: "1px", backgroundColor: "#C9A84C", margin: "0 0 20px" }} />
+            <p style={{
+              fontSize: "13px",
+              color: "rgba(255,255,255,0.55)",
+              lineHeight: 1.9,
+              margin: 0,
+              maxWidth: "320px",
+            }}>
+              一般には公開されていない、<br />
+              フェリアホーム独自ルートの物件情報です。<br />
+              詳細・内覧のご希望はお気軽にお問い合わせください。
+            </p>
+          </div>
+        </div>
+
+        {/* 右：写真 */}
+        <div style={{
+          position: "relative",
+          overflow: "hidden",
         }}>
-          会員限定・非公開物件
-        </h1>
-        <div style={{ width: "40px", height: "1px", backgroundColor: "#C9A84C", margin: "0 auto 20px" }} />
-        <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)", margin: 0, lineHeight: 1.8 }}>
-          一般には公開されていない、フェリアホーム独自ルートの物件情報です。<br />
-          詳細・内覧のご希望はお気軽にお問い合わせください。
-        </p>
+          <Image
+            src="/images/lp/houseA.png"
+            alt="非公開物件イメージ"
+            fill
+            quality={90}
+            style={{ objectFit: "cover", objectPosition: "center" }}
+            sizes="50vw"
+            priority
+          />
+          {/* 左側グラデーションオーバーレイ */}
+          <div style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(90deg, rgba(13,34,24,0.6) 0%, rgba(13,34,24,0.1) 40%, transparent 100%)",
+          }} />
+          {/* 暗めオーバーレイ */}
+          <div style={{
+            position: "absolute",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.25)",
+          }} />
+        </div>
       </div>
 
       {/* フィルター */}
