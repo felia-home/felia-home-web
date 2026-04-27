@@ -62,6 +62,20 @@ function formatPriceJP(p: PrivateProperty): { num: string; suffix: string } | { 
       return { freeText: pd };
     }
 
+    // 「目安XXXXX」「約XXXXX」「参考価格XXXXX」→ 億変換してプレフィックス付与
+    const prefixMatch = pd.match(/^(目安|約|参考価格)?[\s　]*([\d,]+)$/);
+    if (prefixMatch && prefixMatch[1]) {
+      const prefix = prefixMatch[1];
+      const num = parseInt(prefixMatch[2].replace(/,/g, ""), 10);
+      if (!isNaN(num)) {
+        const result = convertToOku(num);
+        if ("freeText" in result) {
+          return { freeText: `${prefix}${result.freeText}` };
+        }
+        return { freeText: `${prefix}${result.num}${result.suffix}` };
+      }
+    }
+
     // すでに億・兆表記あり → そのまま
     if (pd.match(/億|兆/)) {
       return { freeText: pd };
