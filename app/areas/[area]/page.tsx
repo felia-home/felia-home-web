@@ -6,19 +6,12 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getAreaContent, areaContents } from "@/lib/areaContents";
-import { getProperties, getAreas } from "@/lib/api";
-import type { Property } from "@/lib/api";
-import { ReinsSection } from "@/components/area/ReinsSection";
+import { getAreas } from "@/lib/api";
+import { AreaPropertiesClient } from "@/components/area/AreaPropertiesClient";
 
 interface PageProps {
   params: { area: string };
 }
-
-const PROPERTY_TYPE_MAP: Record<string, string> = {
-  LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
-  MANSION: "マンション", USED_MANSION: "中古マンション",
-  NEW_MANSION: "新築マンション", OTHER: "その他",
-};
 
 // ローカル画像（/public/areas/ 配下）
 const LOCAL_AREA_IMAGES: Record<string, string> = {
@@ -70,15 +63,6 @@ export default async function AreaPage({ params }: PageProps) {
 
   if (!areaContents[areaName]) notFound();
 
-  // 物件取得（areaパラメータで区名フィルター）
-  let properties: Property[] = [];
-  let total = 0;
-  try {
-    const result = await getProperties({ city: areaName, limit: 9 });
-    properties = result.properties ?? [];
-    total = result.total ?? 0;
-  } catch {}
-
   // admin APIのエリア画像URL取得
   let adminImageUrl: string | null = null;
   try {
@@ -90,7 +74,7 @@ export default async function AreaPage({ params }: PageProps) {
     adminImageUrl = areaData?.image_url ?? null;
   } catch {}
 
-  // ログイン会員判定（REINS取得はClient Component側で実施）
+  // ログイン会員判定（物件取得はClient Component側で実施）
   const session = await getServerSession(authOptions);
   const isLoggedIn = !!session?.user;
 
@@ -108,7 +92,6 @@ export default async function AreaPage({ params }: PageProps) {
         overflow: "hidden",
         background: heroImageUrl ? undefined : heroGradient,
       }}>
-        {/* 背景画像 */}
         {heroImageUrl && (
           <>
             <Image
@@ -131,7 +114,6 @@ export default async function AreaPage({ params }: PageProps) {
           <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.2)" }} />
         )}
 
-        {/* コンテンツ */}
         <div style={{
           position: "relative", zIndex: 1,
           maxWidth: "1200px", margin: "0 auto",
@@ -182,7 +164,6 @@ export default async function AreaPage({ params }: PageProps) {
             </p>
           )}
 
-          {/* ハイライトバッジ */}
           {content.highlights && content.highlights.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
               {content.highlights.map((h: string, i: number) => (
@@ -214,151 +195,12 @@ export default async function AreaPage({ params }: PageProps) {
       )}
 
       {/* 物件一覧 */}
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 24px 80px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
-          <h2 style={{ fontSize: "20px", fontWeight: "bold", color: "#333", margin: 0 }}>
-            {areaName}の物件一覧
-            <span style={{ marginLeft: "8px", fontSize: "14px", fontWeight: "normal", color: "#888" }}>
-              （{total}件）
-            </span>
-          </h2>
-          {total > 9 && (
-            <Link
-              href={`/search?city=${encodeURIComponent(areaName)}`}
-              style={{ fontSize: "13px", color: "#5BAD52", textDecoration: "none" }}
-            >
-              すべて見る →
-            </Link>
-          )}
-        </div>
-
-        {total === 0 && !isLoggedIn ? (
-          <div style={{
-            textAlign: "center", padding: "80px 0",
-            backgroundColor: "#fff", borderRadius: "12px",
-            border: "1px solid #e8e8e8",
-          }}>
-            <p style={{ fontSize: "40px", margin: "0 0 16px" }}>🏠</p>
-            <p style={{ fontSize: "16px", color: "#888", margin: "0 0 8px" }}>
-              現在このエリアの物件は準備中です
-            </p>
-            <p style={{ fontSize: "13px", color: "#aaa", margin: "0 0 24px" }}>
-              新着物件が入り次第、随時更新いたします。
-            </p>
-            <Link
-              href="/search"
-              style={{
-                display: "inline-block", padding: "12px 28px",
-                backgroundColor: "#5BAD52", color: "#fff",
-                borderRadius: "6px", textDecoration: "none",
-                fontSize: "14px", fontWeight: "bold",
-              }}
-            >
-              他のエリアで探す
-            </Link>
-          </div>
-        ) : (
-          <>
-            {/* 通常物件グリッド */}
-            {properties.length > 0 && (
-              <div className="properties-search-grid">
-                {properties.map((property) => (
-                  <AreaPropertyCard key={property.id} property={property} />
-                ))}
-              </div>
-            )}
-
-            {/* REINS物件（ログイン時のみ・Client Component） */}
-            {isLoggedIn && (
-              <div style={{ marginTop: "8px" }} className="properties-search-grid">
-                <ReinsSection areaName={areaName} />
-              </div>
-            )}
-
-            {total > 9 && (
-              <div style={{ textAlign: "center", marginTop: "40px" }}>
-                <Link
-                  href={`/search?city=${encodeURIComponent(areaName)}`}
-                  style={{
-                    display: "inline-block", padding: "14px 40px",
-                    backgroundColor: "#5BAD52", color: "#fff",
-                    borderRadius: "6px", textDecoration: "none",
-                    fontWeight: "bold", fontSize: "14px",
-                  }}
-                >
-                  {areaName}の物件をすべて見る（{total}件）
-                </Link>
-              </div>
-            )}
-          </>
-        )}
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 24px 80px" }}>
+        <h2 style={{ fontSize: "20px", fontWeight: "bold", color: "#333", margin: "0 0 20px" }}>
+          {areaName}の物件一覧
+        </h2>
+        <AreaPropertiesClient areaName={areaName} isLoggedIn={isLoggedIn} />
       </div>
     </main>
-  );
-}
-
-function AreaPropertyCard({ property }: { property: Property }) {
-  const mainImage = (property.images as any)?.[0]?.url ?? property.mainImage ?? null;
-  const typeLabel = PROPERTY_TYPE_MAP[property.property_type ?? ""] ?? "";
-  const location = [property.city, property.town].filter(Boolean).join("");
-
-  return (
-    <Link href={`/properties/${property.id}`} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
-      <div style={{
-        backgroundColor: "#fff", borderRadius: "12px",
-        overflow: "hidden", border: "1px solid #e8e8e8",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-        height: "100%", display: "flex", flexDirection: "column",
-      }}>
-        <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
-          {mainImage ? (
-            <Image src={mainImage} alt={property.title ?? "物件"} fill quality={80}
-              style={{ objectFit: "cover" }} sizes="(max-width: 768px) 100vw, 33vw" />
-          ) : (
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#bbb", flexDirection: "column", gap: "8px" }}>
-              <span style={{ fontSize: "32px" }}>🏠</span>
-              <span style={{ fontSize: "12px" }}>画像準備中</span>
-            </div>
-          )}
-          {typeLabel && (
-            <div style={{ position: "absolute", top: "10px", left: "10px" }}>
-              <span style={{ backgroundColor: "#5BAD52", color: "#fff", fontSize: "10px", padding: "3px 10px", borderRadius: "20px", fontWeight: "bold" }}>
-                {typeLabel}
-              </span>
-            </div>
-          )}
-        </div>
-        <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
-          {property.title && (
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#333", margin: "0 0 8px", lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {property.title}
-            </p>
-          )}
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "12px", flex: 1 }}>
-            {location && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📍 {location}</p>}
-            {property.station_name1 && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                🚃 {property.station_name1}駅 徒歩{property.station_walk1}分
-              </p>
-            )}
-            {property.rooms && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚪 {property.rooms}</p>
-            )}
-          </div>
-          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px" }}>
-            {property.price != null ? (
-              <p style={{ margin: 0 }}>
-                <span style={{ fontSize: "20px", fontWeight: "bold", color: "#5BAD52" }}>
-                  {property.price.toLocaleString()}
-                </span>
-                <span style={{ fontSize: "12px", color: "#5BAD52", marginLeft: "2px" }}>万円</span>
-              </p>
-            ) : (
-              <p style={{ fontSize: "14px", color: "#888", margin: 0 }}>応相談</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </Link>
   );
 }
