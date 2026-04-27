@@ -1,7 +1,7 @@
 "use client";
 
 // app/reins/page.tsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -84,6 +84,8 @@ export default function ReinsPage() {
   const [filterType, setFilterType] = useState("");
   const [filterArea, setFilterArea] = useState("");
   const [filterPriceMax, setFilterPriceMax] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   const status = session?.status ?? "loading";
 
@@ -93,25 +95,33 @@ export default function ReinsPage() {
     }
   }, [status, router]);
 
+  const fetchReins = useCallback(async (p = 1) => {
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (filterType) params.set("source_type", filterType);
+    if (filterArea) params.set("area", filterArea);
+    if (filterPriceMax) params.set("price_max", filterPriceMax);
+    params.set("page", String(p));
+    params.set("limit", "18");
+
+    try {
+      const res = await fetch(`/api/reins?${params.toString()}`);
+      const data = await res.json();
+      setProperties(data.properties ?? []);
+      setTotal(data.total ?? 0);
+      setTotalPages(Math.ceil((data.total ?? 0) / 18));
+      setPage(p);
+    } catch {
+      setProperties([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [filterType, filterArea, filterPriceMax]);
+
   useEffect(() => {
     if (status !== "authenticated") return;
-    fetch("/api/reins")
-      .then((r) => r.json())
-      .then((d) => {
-        setProperties(d.properties ?? []);
-        setTotal(d.total ?? 0);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [status]);
-
-  const filtered = useMemo(() => {
-    let list = [...properties];
-    if (filterType) list = list.filter((p) => p.source_type === filterType);
-    if (filterArea) list = list.filter((p) => p.area?.includes(filterArea));
-    if (filterPriceMax) list = list.filter((p) => p.price != null && p.price <= parseInt(filterPriceMax));
-    return list;
-  }, [properties, filterType, filterArea, filterPriceMax]);
+    fetchReins(1);
+  }, [filterType, filterArea, filterPriceMax, status, fetchReins]);
 
   if (status === "loading" || status === "unauthenticated") {
     return (
@@ -220,7 +230,7 @@ export default function ReinsPage() {
 
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
             <span style={{ fontSize: "13px", color: "#555" }}>
-              <span style={{ fontSize: "20px", fontWeight: "bold", color: "#2d4a6a" }}>{filtered.length}</span>
+              <span style={{ fontSize: "20px", fontWeight: "bold", color: "#2d4a6a" }}>{properties.length}</span>
               <span style={{ marginLeft: "2px" }}>件表示</span>
               <span style={{ fontSize: "11px", color: "#aaa", marginLeft: "6px" }}>/ 全{total.toLocaleString()}件</span>
             </span>
@@ -243,16 +253,51 @@ export default function ReinsPage() {
             <div style={{ width: "40px", height: "40px", border: "3px solid #e8e8e8", borderTop: "3px solid #2d4a6a", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
             <p style={{ color: "#888", fontSize: "14px" }}>レインズ物件を読み込み中...</p>
           </div>
-        ) : filtered.length === 0 ? (
+        ) : properties.length === 0 ? (
           <div style={{ textAlign: "center", padding: "80px 0", backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #e8e8e8" }}>
             <p style={{ fontSize: "16px", color: "#888" }}>条件に合う物件が見つかりませんでした</p>
           </div>
         ) : (
-          <div className="properties-search-grid">
-            {filtered.map((property) => (
-              <ReinsCard key={property.id} property={property} />
-            ))}
-          </div>
+          <>
+            <div className="properties-search-grid">
+              {properties.map((property) => (
+                <ReinsCard key={property.id} property={property} />
+              ))}
+            </div>
+
+            {/* ページネーション */}
+            {totalPages > 1 && (
+              <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "40px" }}>
+                <button
+                  onClick={() => { fetchReins(page - 1); window.scrollTo(0, 0); }}
+                  disabled={page <= 1}
+                  style={{
+                    padding: "10px 16px", border: "1px solid #e0e0e0",
+                    borderRadius: "6px", backgroundColor: "#fff",
+                    color: page <= 1 ? "#ccc" : "#555",
+                    cursor: page <= 1 ? "not-allowed" : "pointer", fontSize: "13px",
+                  }}
+                >
+                  ← 前へ
+                </button>
+                <span style={{ padding: "10px 16px", fontSize: "13px", color: "#555" }}>
+                  {page} / {totalPages}ページ
+                </span>
+                <button
+                  onClick={() => { fetchReins(page + 1); window.scrollTo(0, 0); }}
+                  disabled={page >= totalPages}
+                  style={{
+                    padding: "10px 16px", border: "1px solid #e0e0e0",
+                    borderRadius: "6px", backgroundColor: "#fff",
+                    color: page >= totalPages ? "#ccc" : "#555",
+                    cursor: page >= totalPages ? "not-allowed" : "pointer", fontSize: "13px",
+                  }}
+                >
+                  次へ →
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 

@@ -97,14 +97,13 @@ export default async function AreaPage({ params }: PageProps) {
   let reinsProperties: any[] = [];
   if (isLoggedIn && memberId) {
     try {
-      const res = await fetch(
-        `${process.env.ADMIN_API_URL}/api/hp/reins?member_id=${memberId}&area=${encodeURIComponent(areaName)}`,
-        { cache: "no-store" }
-      );
+      const adminUrl = new URL(`${process.env.ADMIN_API_URL}/api/hp/reins`);
+      adminUrl.searchParams.set("member_id", memberId);
+      adminUrl.searchParams.set("area", areaName);
+      adminUrl.searchParams.set("limit", "6");
+      const res = await fetch(adminUrl.toString(), { cache: "no-store" });
       const data = await res.json();
-      const all = data.properties ?? [];
-      // areaパラメータが効かない場合に備えてエリア名でフィルター
-      reinsProperties = all.filter((p: any) => !p.area || p.area.includes(areaName));
+      reinsProperties = data.properties ?? [];
     } catch {}
   }
 
