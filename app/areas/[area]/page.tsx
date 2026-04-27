@@ -115,7 +115,7 @@ export default async function AreaPage({ params }: PageProps) {
             />
             <div style={{
               position: "absolute", inset: 0,
-              background: "linear-gradient(135deg, rgba(13,34,18,0.85) 0%, rgba(26,74,36,0.65) 50%, rgba(45,122,58,0.35) 100%)",
+              background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.65) 100%)",
             }} />
           </>
         )}
