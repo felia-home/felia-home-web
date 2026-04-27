@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getAreaContent, areaContents } from "@/lib/areaContents";
-import { getProperties } from "@/lib/api";
+import { getProperties, getAreas } from "@/lib/api";
 import type { Property } from "@/lib/api";
 
 interface PageProps {
@@ -17,13 +17,33 @@ const PROPERTY_TYPE_MAP: Record<string, string> = {
   NEW_MANSION: "新築マンション", OTHER: "その他",
 };
 
-const AREA_IMAGES: Record<string, string> = {
-  "渋谷区": "/images/areas/shibuya.jpg",
-  "新宿区": "/images/areas/shinjuku.jpg",
-  "港区": "/images/areas/minato.jpg",
-  "世田谷区": "/images/areas/setagaya.jpg",
-  "目黒区": "/images/areas/meguro.jpg",
-  "杉並区": "/images/areas/suginami.jpg",
+// ローカル画像（/public/areas/ 配下）
+const LOCAL_AREA_IMAGES: Record<string, string> = {
+  "渋谷区": "/areas/shibuya.jpg",
+  "新宿区": "/areas/shinjuku.jpg",
+  "北区":   "/areas/kita.jpg",
+};
+
+// エリアごとのグラデーション（画像なしの場合）
+const AREA_GRADIENTS: Record<string, string> = {
+  "千代田区": "linear-gradient(135deg, #1a3a5c 0%, #2d6a9f 100%)",
+  "中央区":   "linear-gradient(135deg, #5c1a1a 0%, #9f2d2d 100%)",
+  "港区":     "linear-gradient(135deg, #1a1a5c 0%, #2d2d9f 100%)",
+  "新宿区":   "linear-gradient(135deg, #1a4a24 0%, #2d7a3a 100%)",
+  "文京区":   "linear-gradient(135deg, #3a1a5c 0%, #6a2d9f 100%)",
+  "台東区":   "linear-gradient(135deg, #5c3a1a 0%, #9f6a2d 100%)",
+  "品川区":   "linear-gradient(135deg, #1a5c3a 0%, #2d9f6a 100%)",
+  "目黒区":   "linear-gradient(135deg, #1a4a24 0%, #5BAD52 100%)",
+  "大田区":   "linear-gradient(135deg, #1a3a5c 0%, #5BAD52 100%)",
+  "世田谷区": "linear-gradient(135deg, #1a4a24 0%, #2d7a3a 100%)",
+  "渋谷区":   "linear-gradient(135deg, #1a4a24 0%, #2d7a3a 100%)",
+  "中野区":   "linear-gradient(135deg, #5c1a3a 0%, #9f2d6a 100%)",
+  "杉並区":   "linear-gradient(135deg, #1a5c1a 0%, #2d9f2d 100%)",
+  "豊島区":   "linear-gradient(135deg, #3a5c1a 0%, #6a9f2d 100%)",
+  "北区":     "linear-gradient(135deg, #1a3a5c 0%, #2d6a9f 100%)",
+  "荒川区":   "linear-gradient(135deg, #5c4a1a 0%, #9f7a2d 100%)",
+  "板橋区":   "linear-gradient(135deg, #1a1a4a 0%, #2d2d7a 100%)",
+  "練馬区":   "linear-gradient(135deg, #1a4a24 0%, #5BAD52 100%)",
 };
 
 export async function generateStaticParams() {
@@ -38,7 +58,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${areaName}の不動産・物件情報 | フェリアホーム`,
     description: content.description,
-    keywords: content.keywords?.join(", "),
   };
 }
 
@@ -48,6 +67,7 @@ export default async function AreaPage({ params }: PageProps) {
 
   if (!areaContents[areaName]) notFound();
 
+  // 物件取得（areaパラメータで区名フィルター）
   let properties: Property[] = [];
   let total = 0;
   try {
@@ -56,7 +76,17 @@ export default async function AreaPage({ params }: PageProps) {
     total = result.total ?? 0;
   } catch {}
 
-  const hasAreaImage = !!AREA_IMAGES[areaName];
+  // admin APIのエリア画像URL取得
+  let adminImageUrl: string | null = null;
+  try {
+    const areas = await getAreas();
+    const areaData = areas.find((a) => a.area_name === areaName);
+    adminImageUrl = areaData?.image_url ?? null;
+  } catch {}
+
+  // 画像優先順位: admin API > ローカル > グラデーション
+  const heroImageUrl = adminImageUrl ?? LOCAL_AREA_IMAGES[areaName] ?? null;
+  const heroGradient = AREA_GRADIENTS[areaName] ?? "linear-gradient(135deg, #1a4a24 0%, #2d7a3a 100%)";
 
   return (
     <main style={{ backgroundColor: "#f8f8f8", minHeight: "100vh" }}>
@@ -66,28 +96,32 @@ export default async function AreaPage({ params }: PageProps) {
         position: "relative",
         height: "400px",
         overflow: "hidden",
-        background: hasAreaImage
-          ? undefined
-          : "linear-gradient(135deg, #1a4a24 0%, #2d7a3a 50%, #5BAD52 100%)",
+        background: heroImageUrl ? undefined : heroGradient,
       }}>
-        {hasAreaImage && (
+        {/* 背景画像 */}
+        {heroImageUrl && (
           <>
             <Image
-              src={AREA_IMAGES[areaName]}
+              src={heroImageUrl}
               alt={`${areaName}のイメージ`}
               fill
               quality={85}
-              style={{ objectFit: "cover" }}
+              style={{ objectFit: "cover", objectPosition: "center" }}
               sizes="100vw"
               priority
             />
             <div style={{
               position: "absolute", inset: 0,
-              background: "linear-gradient(135deg, rgba(13,34,18,0.88) 0%, rgba(26,74,36,0.7) 50%, rgba(45,122,58,0.4) 100%)",
+              background: "linear-gradient(135deg, rgba(13,34,18,0.85) 0%, rgba(26,74,36,0.65) 50%, rgba(45,122,58,0.35) 100%)",
             }} />
           </>
         )}
 
+        {!heroImageUrl && (
+          <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.2)" }} />
+        )}
+
+        {/* コンテンツ */}
         <div style={{
           position: "relative", zIndex: 1,
           maxWidth: "1200px", margin: "0 auto",
@@ -99,7 +133,11 @@ export default async function AreaPage({ params }: PageProps) {
           paddingBottom: "48px",
         }}>
           {/* パンくず */}
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "20px", fontSize: "12px", color: "rgba(255,255,255,0.55)" }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: "6px",
+            marginBottom: "20px", fontSize: "12px",
+            color: "rgba(255,255,255,0.55)",
+          }}>
             <Link href="/" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>ホーム</Link>
             <span>›</span>
             <Link href="/search" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>物件検索</Link>
@@ -116,37 +154,36 @@ export default async function AreaPage({ params }: PageProps) {
           </p>
 
           <h1 style={{
-            fontSize: "clamp(32px, 5vw, 52px)",
+            fontSize: "clamp(36px, 6vw, 60px)",
             fontWeight: "bold", color: "#fff",
-            margin: "0 0 10px", lineHeight: 1.2,
+            margin: "0 0 10px", lineHeight: 1.15,
             fontFamily: "'Noto Serif JP', serif",
+            textShadow: "0 2px 16px rgba(0,0,0,0.3)",
           }}>
             {areaName}
           </h1>
 
           {content.catchCopy && (
             <p style={{
-              fontSize: "16px", color: "rgba(255,255,255,0.8)",
-              margin: "0 0 20px",
+              fontSize: "16px", color: "rgba(255,255,255,0.85)",
+              margin: "0 0 20px", textShadow: "0 1px 8px rgba(0,0,0,0.3)",
             }}>
               {content.catchCopy}
             </p>
           )}
 
+          {/* ハイライトバッジ */}
           {content.highlights && content.highlights.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
               {content.highlights.map((h: string, i: number) => (
-                <div
-                  key={i}
-                  style={{
-                    display: "flex", alignItems: "center", gap: "6px",
-                    padding: "5px 12px",
-                    backgroundColor: "rgba(255,255,255,0.12)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    borderRadius: "20px",
-                  }}
-                >
-                  <span style={{ fontSize: "10px", color: "#5BAD52", fontFamily: "'Montserrat', sans-serif" }}>0{i + 1}</span>
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: "6px",
+                  padding: "5px 12px",
+                  backgroundColor: "rgba(255,255,255,0.12)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  borderRadius: "20px",
+                }}>
+                  <span style={{ fontSize: "10px", color: "#5BAD52", fontFamily: "'Montserrat', sans-serif", fontWeight: "600" }}>0{i + 1}</span>
                   <span style={{ fontSize: "12px", color: "#fff", fontWeight: "500" }}>{h}</span>
                 </div>
               ))}
@@ -158,7 +195,7 @@ export default async function AreaPage({ params }: PageProps) {
       {/* エリア説明 */}
       {content.description && (
         <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e8e8e8" }}>
-          <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 24px" }}>
+          <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "28px 24px" }}>
             <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.9, margin: 0, maxWidth: "800px" }}>
               {content.description}
             </p>
@@ -168,11 +205,7 @@ export default async function AreaPage({ params }: PageProps) {
 
       {/* 物件一覧 */}
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 24px 80px" }}>
-        <div style={{
-          display: "flex", alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "24px",
-        }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
           <h2 style={{ fontSize: "20px", fontWeight: "bold", color: "#333", margin: 0 }}>
             {areaName}の物件一覧
             <span style={{ marginLeft: "8px", fontSize: "14px", fontWeight: "normal", color: "#888" }}>
@@ -182,11 +215,7 @@ export default async function AreaPage({ params }: PageProps) {
           {total > 9 && (
             <Link
               href={`/search?city=${encodeURIComponent(areaName)}`}
-              style={{
-                fontSize: "13px", color: "#5BAD52",
-                textDecoration: "none", display: "flex",
-                alignItems: "center", gap: "4px",
-              }}
+              style={{ fontSize: "13px", color: "#5BAD52", textDecoration: "none" }}
             >
               すべて見る →
             </Link>
@@ -225,7 +254,6 @@ export default async function AreaPage({ params }: PageProps) {
                 <AreaPropertyCard key={property.id} property={property} />
               ))}
             </div>
-
             {total > 9 && (
               <div style={{ textAlign: "center", marginTop: "40px" }}>
                 <Link
@@ -254,71 +282,39 @@ function AreaPropertyCard({ property }: { property: Property }) {
   const location = [property.city, property.town].filter(Boolean).join("");
 
   return (
-    <Link
-      href={`/properties/${property.id}`}
-      style={{ textDecoration: "none", color: "inherit", display: "block" }}
-    >
+    <Link href={`/properties/${property.id}`} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
       <div style={{
-        backgroundColor: "#fff",
-        borderRadius: "12px",
-        overflow: "hidden",
-        border: "1px solid #e8e8e8",
+        backgroundColor: "#fff", borderRadius: "12px",
+        overflow: "hidden", border: "1px solid #e8e8e8",
         boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        transition: "box-shadow 0.2s ease, transform 0.2s ease",
+        height: "100%", display: "flex", flexDirection: "column",
       }}>
-        {/* 画像 */}
         <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
           {mainImage ? (
-            <Image
-              src={mainImage}
-              alt={property.title ?? "物件"}
-              fill
-              quality={80}
-              style={{ objectFit: "cover" }}
-              sizes="(max-width: 768px) 100vw, 33vw"
-            />
+            <Image src={mainImage} alt={property.title ?? "物件"} fill quality={80}
+              style={{ objectFit: "cover" }} sizes="(max-width: 768px) 100vw, 33vw" />
           ) : (
-            <div style={{
-              position: "absolute", inset: 0,
-              display: "flex", alignItems: "center",
-              justifyContent: "center", color: "#bbb",
-              flexDirection: "column", gap: "8px",
-            }}>
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#bbb", flexDirection: "column", gap: "8px" }}>
               <span style={{ fontSize: "32px" }}>🏠</span>
               <span style={{ fontSize: "12px" }}>画像準備中</span>
             </div>
           )}
           {typeLabel && (
             <div style={{ position: "absolute", top: "10px", left: "10px" }}>
-              <span style={{
-                backgroundColor: "#5BAD52", color: "#fff",
-                fontSize: "10px", padding: "3px 10px",
-                borderRadius: "20px", fontWeight: "bold",
-              }}>
+              <span style={{ backgroundColor: "#5BAD52", color: "#fff", fontSize: "10px", padding: "3px 10px", borderRadius: "20px", fontWeight: "bold" }}>
                 {typeLabel}
               </span>
             </div>
           )}
         </div>
-
-        {/* 情報 */}
         <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
           {property.title && (
-            <p style={{
-              fontSize: "13px", fontWeight: "bold", color: "#333",
-              margin: "0 0 8px", lineHeight: 1.4,
-              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-            }}>
+            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#333", margin: "0 0 8px", lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {property.title}
             </p>
           )}
           <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "12px", flex: 1 }}>
-            {location && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📍 {location}</p>
-            )}
+            {location && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📍 {location}</p>}
             {property.station_name1 && (
               <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
                 🚃 {property.station_name1}駅 徒歩{property.station_walk1}分
