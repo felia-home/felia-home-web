@@ -8,6 +8,7 @@ import { authOptions } from "@/lib/auth";
 import { getAreaContent, areaContents } from "@/lib/areaContents";
 import { getProperties, getAreas } from "@/lib/api";
 import type { Property } from "@/lib/api";
+import { ReinsSection } from "@/components/area/ReinsSection";
 
 interface PageProps {
   params: { area: string };
@@ -89,23 +90,9 @@ export default async function AreaPage({ params }: PageProps) {
     adminImageUrl = areaData?.image_url ?? null;
   } catch {}
 
-  // ログイン会員のみREINS物件取得
+  // ログイン会員判定（REINS取得はClient Component側で実施）
   const session = await getServerSession(authOptions);
   const isLoggedIn = !!session?.user;
-  const memberId = (session?.user as any)?.id ?? null;
-
-  let reinsProperties: any[] = [];
-  if (isLoggedIn && memberId) {
-    try {
-      const adminUrl = new URL(`${process.env.ADMIN_API_URL}/api/hp/reins`);
-      adminUrl.searchParams.set("member_id", memberId);
-      adminUrl.searchParams.set("area", areaName);
-      adminUrl.searchParams.set("limit", "6");
-      const res = await fetch(adminUrl.toString(), { cache: "no-store" });
-      const data = await res.json();
-      reinsProperties = data.properties ?? [];
-    } catch {}
-  }
 
   // 画像優先順位: admin API > ローカル > グラデーション
   const heroImageUrl = adminImageUrl ?? LOCAL_AREA_IMAGES[areaName] ?? null;
@@ -226,171 +213,87 @@ export default async function AreaPage({ params }: PageProps) {
         </div>
       )}
 
-      {/* 物件一覧（通常 + REINS統合） */}
+      {/* 物件一覧 */}
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 24px 80px" }}>
-        {(() => {
-          const totalCount = total + reinsProperties.length;
-          return (
-            <>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
-                <h2 style={{ fontSize: "20px", fontWeight: "bold", color: "#333", margin: 0 }}>
-                  {areaName}の物件一覧
-                  <span style={{ marginLeft: "8px", fontSize: "14px", fontWeight: "normal", color: "#888" }}>
-                    （{totalCount}件）
-                  </span>
-                </h2>
-                {total > 9 && (
-                  <Link
-                    href={`/search?city=${encodeURIComponent(areaName)}`}
-                    style={{ fontSize: "13px", color: "#5BAD52", textDecoration: "none" }}
-                  >
-                    すべて見る →
-                  </Link>
-                )}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+          <h2 style={{ fontSize: "20px", fontWeight: "bold", color: "#333", margin: 0 }}>
+            {areaName}の物件一覧
+            <span style={{ marginLeft: "8px", fontSize: "14px", fontWeight: "normal", color: "#888" }}>
+              （{total}件）
+            </span>
+          </h2>
+          {total > 9 && (
+            <Link
+              href={`/search?city=${encodeURIComponent(areaName)}`}
+              style={{ fontSize: "13px", color: "#5BAD52", textDecoration: "none" }}
+            >
+              すべて見る →
+            </Link>
+          )}
+        </div>
+
+        {total === 0 && !isLoggedIn ? (
+          <div style={{
+            textAlign: "center", padding: "80px 0",
+            backgroundColor: "#fff", borderRadius: "12px",
+            border: "1px solid #e8e8e8",
+          }}>
+            <p style={{ fontSize: "40px", margin: "0 0 16px" }}>🏠</p>
+            <p style={{ fontSize: "16px", color: "#888", margin: "0 0 8px" }}>
+              現在このエリアの物件は準備中です
+            </p>
+            <p style={{ fontSize: "13px", color: "#aaa", margin: "0 0 24px" }}>
+              新着物件が入り次第、随時更新いたします。
+            </p>
+            <Link
+              href="/search"
+              style={{
+                display: "inline-block", padding: "12px 28px",
+                backgroundColor: "#5BAD52", color: "#fff",
+                borderRadius: "6px", textDecoration: "none",
+                fontSize: "14px", fontWeight: "bold",
+              }}
+            >
+              他のエリアで探す
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* 通常物件グリッド */}
+            {properties.length > 0 && (
+              <div className="properties-search-grid">
+                {properties.map((property) => (
+                  <AreaPropertyCard key={property.id} property={property} />
+                ))}
               </div>
+            )}
 
-              {totalCount === 0 ? (
-                <div style={{
-                  textAlign: "center", padding: "80px 0",
-                  backgroundColor: "#fff", borderRadius: "12px",
-                  border: "1px solid #e8e8e8",
-                }}>
-                  <p style={{ fontSize: "40px", margin: "0 0 16px" }}>🏠</p>
-                  <p style={{ fontSize: "16px", color: "#888", margin: "0 0 8px" }}>
-                    現在このエリアの物件は準備中です
-                  </p>
-                  <p style={{ fontSize: "13px", color: "#aaa", margin: "0 0 24px" }}>
-                    新着物件が入り次第、随時更新いたします。
-                  </p>
-                  <Link
-                    href="/search"
-                    style={{
-                      display: "inline-block", padding: "12px 28px",
-                      backgroundColor: "#5BAD52", color: "#fff",
-                      borderRadius: "6px", textDecoration: "none",
-                      fontSize: "14px", fontWeight: "bold",
-                    }}
-                  >
-                    他のエリアで探す
-                  </Link>
-                </div>
-              ) : (
-                <>
-                  <div className="properties-search-grid">
-                    {properties.map((property) => (
-                      <AreaPropertyCard key={property.id} property={property} />
-                    ))}
-                    {reinsProperties.map((property: any) => (
-                      <ReinsPropertyCard key={`reins-${property.id}`} property={property} />
-                    ))}
-                  </div>
+            {/* REINS物件（ログイン時のみ・Client Component） */}
+            {isLoggedIn && (
+              <div style={{ marginTop: "8px" }} className="properties-search-grid">
+                <ReinsSection areaName={areaName} />
+              </div>
+            )}
 
-                  {total > 9 && (
-                    <div style={{ textAlign: "center", marginTop: "40px" }}>
-                      <Link
-                        href={`/search?city=${encodeURIComponent(areaName)}`}
-                        style={{
-                          display: "inline-block", padding: "14px 40px",
-                          backgroundColor: "#5BAD52", color: "#fff",
-                          borderRadius: "6px", textDecoration: "none",
-                          fontWeight: "bold", fontSize: "14px",
-                        }}
-                      >
-                        {areaName}の物件をすべて見る（{total}件）
-                      </Link>
-                    </div>
-                  )}
-                </>
-              )}
-            </>
-          );
-        })()}
+            {total > 9 && (
+              <div style={{ textAlign: "center", marginTop: "40px" }}>
+                <Link
+                  href={`/search?city=${encodeURIComponent(areaName)}`}
+                  style={{
+                    display: "inline-block", padding: "14px 40px",
+                    backgroundColor: "#5BAD52", color: "#fff",
+                    borderRadius: "6px", textDecoration: "none",
+                    fontWeight: "bold", fontSize: "14px",
+                  }}
+                >
+                  {areaName}の物件をすべて見る（{total}件）
+                </Link>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </main>
-  );
-}
-
-function ReinsPropertyCard({ property }: { property: any }) {
-  const location = [property.area, property.address].filter(Boolean).join(" ");
-
-  const placeholderColors: Record<string, string> = {
-    MANSION: "#1a2a3a",
-    HOUSE: "#1a2a1a",
-    LAND: "#1a1a0a",
-  };
-  const bgColor = placeholderColors[property.source_type] ?? "#1a2a3a";
-
-  return (
-    <Link
-      href={`/contact?reins_id=${property.id}&type=reins&address=${encodeURIComponent(property.address ?? "")}`}
-      style={{ textDecoration: "none", color: "inherit", display: "block" }}
-    >
-      <div style={{
-        backgroundColor: "#fff", borderRadius: "10px",
-        overflow: "hidden", border: "1px solid #e8e8e8",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-        height: "100%", display: "flex", flexDirection: "column",
-      }}>
-        {/* プレースホルダー画像 */}
-        <div style={{
-          position: "relative", aspectRatio: "4/3",
-          backgroundColor: bgColor, flexShrink: 0,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <span style={{ fontSize: "48px", opacity: 0.3 }}>
-            {property.source_type === "MANSION" ? "🏢" : property.source_type === "HOUSE" ? "🏡" : "🌿"}
-          </span>
-          <div style={{ position: "absolute", top: "10px", left: "10px", display: "flex", gap: "4px" }}>
-            <span style={{
-              backgroundColor: "#2d4a6a", color: "#fff",
-              fontSize: "10px", padding: "3px 8px",
-              borderRadius: "3px", fontWeight: "bold",
-              fontFamily: "'Montserrat', sans-serif",
-            }}>
-              REINS
-            </span>
-            <span style={{
-              backgroundColor: "rgba(255,255,255,0.9)", color: "#2d4a6a",
-              fontSize: "10px", padding: "3px 8px", borderRadius: "3px", fontWeight: "bold",
-            }}>
-              {property.property_type}
-            </span>
-          </div>
-        </div>
-
-        {/* 情報 */}
-        <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
-          {property.building_name && (
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#333", margin: "0 0 6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {property.building_name}
-            </p>
-          )}
-          <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "12px", flex: 1 }}>
-            {location && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📍 {location}</p>}
-            {property.station_name && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                🚃 {property.station_line} {property.station_name}駅
-                {property.walk_minutes && ` 徒歩${property.walk_minutes}分`}
-              </p>
-            )}
-            {property.rooms && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚪 {property.rooms}</p>}
-            {property.area_m2 && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📐 {property.area_m2}㎡</p>}
-          </div>
-          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px" }}>
-            {property.price != null ? (
-              <p style={{ margin: 0 }}>
-                <span style={{ fontSize: "20px", fontWeight: "bold", color: "#2d4a6a" }}>
-                  {property.price.toLocaleString()}
-                </span>
-                <span style={{ fontSize: "12px", color: "#2d4a6a", marginLeft: "2px" }}>万円</span>
-              </p>
-            ) : (
-              <p style={{ fontSize: "14px", color: "#888", margin: 0 }}>応相談</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </Link>
   );
 }
 
