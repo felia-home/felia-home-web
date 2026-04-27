@@ -395,51 +395,78 @@ export default function PrivateSelectionPage() {
       {/* ヒーローバナー */}
       <div style={{
         position: "relative",
-        height: "480px",
-        display: "flex",
+        height: "520px",
         overflow: "hidden",
         backgroundColor: "#050e08",
       }}>
-        {/* 左：ダーク背景＋テキスト */}
-        <div style={{
-          width: "45%",
-          flexShrink: 0,
-          backgroundColor: "#050e08",
-          display: "flex",
-          alignItems: "center",
-          padding: "0 64px",
-          position: "relative",
-          zIndex: 2,
-        }}>
-          {/* 金の幾何学装飾SVG */}
-          <svg
-            style={{
-              position: "absolute",
-              top: 0, left: 0,
-              width: "100%", height: "100%",
-              opacity: 0.4,
-              pointerEvents: "none",
-            }}
-            viewBox="0 0 500 480"
-            preserveAspectRatio="xMidYMid slice"
-          >
-            <line x1="0" y1="480" x2="200" y2="0" stroke="#C9A84C" strokeWidth="0.5" />
-            <line x1="40" y1="480" x2="240" y2="0" stroke="#C9A84C" strokeWidth="0.3" />
-            <line x1="-40" y1="480" x2="160" y2="0" stroke="#C9A84C" strokeWidth="0.3" />
-            <line x1="32" y1="0" x2="32" y2="480" stroke="#C9A84C" strokeWidth="1" />
-            <line x1="32" y1="48" x2="500" y2="48" stroke="#C9A84C" strokeWidth="0.4" />
-            <line x1="32" y1="432" x2="500" y2="432" stroke="#C9A84C" strokeWidth="0.4" />
-            <circle cx="420" cy="240" r="120" fill="none" stroke="#C9A84C" strokeWidth="0.3" />
-            <circle cx="420" cy="240" r="80" fill="none" stroke="#C9A84C" strokeWidth="0.2" />
-          </svg>
+        {/* 背景写真（フル幅） */}
+        <Image
+          src="/images/lp/houseA.png"
+          alt="非公開物件イメージ"
+          fill
+          quality={90}
+          style={{ objectFit: "cover", objectPosition: "center center" }}
+          sizes="100vw"
+          priority
+        />
 
-          {/* テキスト */}
-          <div style={{ position: "relative", zIndex: 1 }}>
+        {/* 左側暗いグラデーションオーバーレイ */}
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(100deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.75) 35%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.1) 100%)",
+          zIndex: 1,
+        }} />
+
+        {/* 金の波状装飾SVG（左下） */}
+        <svg
+          style={{
+            position: "absolute",
+            bottom: 0, left: 0,
+            width: "400px", height: "300px",
+            zIndex: 2,
+            opacity: 0.6,
+            pointerEvents: "none",
+          }}
+          viewBox="0 0 400 300"
+        >
+          <path d="M -20 280 Q 80 200 160 240 Q 240 280 320 200 Q 380 140 420 160" fill="none" stroke="#C9A84C" strokeWidth="1"/>
+          <path d="M -20 260 Q 80 180 160 220 Q 240 260 320 180 Q 380 120 420 140" fill="none" stroke="#C9A84C" strokeWidth="0.5"/>
+          <path d="M -20 300 Q 100 220 180 260 Q 260 300 340 220 Q 390 160 430 180" fill="none" stroke="#C9A84C" strokeWidth="0.5"/>
+        </svg>
+
+        {/* 金の波状装飾SVG（右下） */}
+        <svg
+          style={{
+            position: "absolute",
+            bottom: 0, right: 0,
+            width: "300px", height: "200px",
+            zIndex: 2,
+            opacity: 0.4,
+            pointerEvents: "none",
+          }}
+          viewBox="0 0 300 200"
+        >
+          <path d="M 300 180 Q 220 120 160 160 Q 100 200 40 140 Q 0 100 -20 120" fill="none" stroke="#C9A84C" strokeWidth="1"/>
+          <path d="M 300 160 Q 220 100 160 140 Q 100 180 40 120 Q 0 80 -20 100" fill="none" stroke="#C9A84C" strokeWidth="0.5"/>
+        </svg>
+
+        {/* テキストコンテンツ（左下寄り） */}
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "flex-end",
+          padding: "0 72px 72px",
+          zIndex: 3,
+          maxWidth: "680px",
+        }}>
+          <div>
             <p style={{
-              fontSize: "10px",
-              letterSpacing: "0.5em",
+              fontSize: "11px",
+              letterSpacing: "0.4em",
               color: "#C9A84C",
-              margin: "0 0 24px",
+              margin: "0 0 16px",
               fontFamily: "'Montserrat', sans-serif",
               fontWeight: "600",
             }}>
@@ -447,68 +474,58 @@ export default function PrivateSelectionPage() {
             </p>
             <h1 style={{
               fontFamily: "'Noto Serif JP', serif",
-              fontSize: "clamp(24px, 3.5vw, 38px)",
+              fontSize: "clamp(28px, 4vw, 46px)",
               fontWeight: "600",
               color: "#fff",
-              margin: "0 0 20px",
-              lineHeight: 1.4,
-              letterSpacing: "0.03em",
+              margin: "0 0 16px",
+              lineHeight: 1.25,
+              letterSpacing: "0.02em",
+              textShadow: "0 2px 20px rgba(0,0,0,0.5)",
             }}>
-              会員限定・<br />非公開物件
+              会員限定・非公開物件
             </h1>
             <div style={{
-              width: "36px", height: "1px",
+              width: "40px", height: "1px",
               backgroundColor: "#C9A84C",
-              margin: "0 0 24px",
+              margin: "0 0 20px",
             }} />
             <p style={{
-              fontSize: "13px",
-              color: "rgba(255,255,255,0.55)",
-              lineHeight: 2,
-              margin: 0,
-              letterSpacing: "0.03em",
+              fontSize: "14px",
+              color: "rgba(255,255,255,0.75)",
+              lineHeight: 1.9,
+              margin: "0 0 28px",
+              textShadow: "0 1px 8px rgba(0,0,0,0.5)",
             }}>
-              一般には公開されていない、<br />
-              フェリアホーム独自ルートの<br />
-              物件情報です。
+              一般には公開されていない、フェリアホーム独自ルートの<br />
+              物件情報です。詳細・内覧のご希望はお気軽にお問い合わせください。
             </p>
+            {/* ゴールド枠ボタン */}
+            <a
+              href="#filter"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "12px",
+                padding: "14px 28px",
+                border: "1px solid #C9A84C",
+                color: "#C9A84C",
+                textDecoration: "none",
+                fontSize: "13px",
+                letterSpacing: "0.1em",
+                fontWeight: "500",
+                transition: "all 0.2s ease",
+                backgroundColor: "rgba(201,168,76,0.08)",
+              }}
+            >
+              物件一覧を見る
+              <span style={{ fontSize: "16px" }}>›</span>
+            </a>
           </div>
-        </div>
-
-        {/* 右：写真 */}
-        <div style={{
-          flex: 1,
-          position: "relative",
-          overflow: "hidden",
-        }}>
-          <Image
-            src="/images/lp/houseA.png"
-            alt="非公開物件イメージ"
-            fill
-            quality={90}
-            style={{ objectFit: "cover", objectPosition: "center center" }}
-            sizes="55vw"
-            priority
-          />
-          {/* 左側境界グラデーション */}
-          <div style={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(90deg, #050e08 0%, rgba(5,14,8,0.3) 30%, transparent 60%)",
-            zIndex: 1,
-          }} />
-          {/* 全体暗めオーバーレイ */}
-          <div style={{
-            position: "absolute",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.2)",
-            zIndex: 1,
-          }} />
         </div>
       </div>
 
       {/* フィルター */}
-      <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e0dbd4" }}>
+      <div id="filter" style={{ backgroundColor: "#fff", borderBottom: "1px solid #e0dbd4" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px 24px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
           <span style={{ fontSize: "13px", color: "#888", whiteSpace: "nowrap" }}>絞り込み：</span>
 
