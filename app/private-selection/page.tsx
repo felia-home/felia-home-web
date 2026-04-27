@@ -80,10 +80,29 @@ function formatPriceJP(p: PrivateProperty): { num: string; suffix: string } | { 
       if (!isNaN(man)) return convertToOku(man);
     }
 
-    // 範囲・複数表示（数値と区切り記号のみ）→ 万円付加してfreeText
-    if (pd.match(/^[\d,\s・〜～\-〜~\.]+$/)) {
-      const formatted = pd.replace(/(\d+)/g, (match) => parseInt(match, 10).toLocaleString());
-      return { freeText: `${formatted}万円` };
+    // 範囲・複数表示（数値と区切り記号のみ）→ 各数値を億変換してfreeText
+    if (pd.match(/^[\d,\s・〜～\-~\.]+$/)) {
+      const separator = pd.includes("〜") ? "〜"
+        : pd.includes("～") ? "～"
+        : pd.includes("・") ? "・"
+        : pd.includes("-") ? "〜"
+        : null;
+
+      if (separator) {
+        const parts = pd.split(/[・〜～\-~]/);
+        const converted = parts.map((part) => {
+          const num = parseInt(part.replace(/,/g, ""), 10);
+          if (isNaN(num)) return part.trim();
+          const result = convertToOku(num);
+          if ("freeText" in result) return result.freeText;
+          return `${result.num}${result.suffix}`;
+        });
+        const dispSep = pd.includes("・") ? "・" : "〜";
+        return { freeText: converted.join(dispSep) };
+      }
+
+      const num = parseInt(pd.replace(/,/g, ""), 10);
+      if (!isNaN(num)) return convertToOku(num);
     }
 
     // 万円・万が含まれているテキスト → そのまま
@@ -752,13 +771,16 @@ function PrivateCard({
                   fontWeight: "bold",
                   color: "#1a1a1a",
                   letterSpacing: "-0.01em",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}>
                   {result.freeText}
                 </p>
               );
             }
             return (
-              <p style={{ margin: 0, lineHeight: 1.3, display: "flex", alignItems: "baseline", gap: "2px", flexWrap: "wrap" }}>
+              <p style={{ margin: 0, lineHeight: 1.3, display: "flex", alignItems: "baseline", gap: "2px", flexWrap: "nowrap" }}>
                 <span style={{
                   fontSize: "22px", fontWeight: "bold",
                   color: "#1a1a1a", letterSpacing: "-0.01em",
