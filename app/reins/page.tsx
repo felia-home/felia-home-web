@@ -333,7 +333,9 @@ function ReinsCard({ property }: { property: ReinsProperty }) {
               <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📐 {property.area_m2}㎡</p>
             )}
             {property.built_year_text && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📅 {property.built_year_text}</p>
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
+                📅 {property.built_year_text.replace(/(\d+)$/, "$1月")}
+              </p>
             )}
           </div>
 
