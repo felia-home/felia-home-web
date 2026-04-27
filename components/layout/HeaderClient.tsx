@@ -129,6 +129,21 @@ export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClient
                 </Link>
               )}
 
+              {/* REINS物件（ログイン時） */}
+              {isLoggedIn && (
+                <Link
+                  href="/reins"
+                  style={navItemStyle("reins")}
+                  onMouseEnter={() => setHoveredNav("reins")}
+                  onMouseLeave={() => setHoveredNav(null)}
+                >
+                  <span style={{ fontSize: "18px" }}>🏢</span>
+                  <span style={{ fontSize: "10px", color: "#2d4a6a", whiteSpace: "nowrap", fontWeight: "bold" }}>
+                    REINS
+                  </span>
+                </Link>
+              )}
+
               {/* ログイン状態によってボタン切り替え */}
               {isLoggedIn ? (
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "4px" }}>
