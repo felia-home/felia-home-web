@@ -1,15 +1,30 @@
 // app/areas/[area]/page.tsx
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAreaContent, areaContents } from "@/lib/areaContents";
 import { getProperties } from "@/lib/api";
-import { PropertyCard } from "@/components/property/PropertyCard";
-import { MapPin, ChevronRight } from "lucide-react";
+import type { Property } from "@/lib/api";
 
 interface PageProps {
   params: { area: string };
 }
+
+const PROPERTY_TYPE_MAP: Record<string, string> = {
+  LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
+  MANSION: "マンション", USED_MANSION: "中古マンション",
+  NEW_MANSION: "新築マンション", OTHER: "その他",
+};
+
+const AREA_IMAGES: Record<string, string> = {
+  "渋谷区": "/images/areas/shibuya.jpg",
+  "新宿区": "/images/areas/shinjuku.jpg",
+  "港区": "/images/areas/minato.jpg",
+  "世田谷区": "/images/areas/setagaya.jpg",
+  "目黒区": "/images/areas/meguro.jpg",
+  "杉並区": "/images/areas/suginami.jpg",
+};
 
 export async function generateStaticParams() {
   return Object.keys(areaContents).map((area) => ({
@@ -21,110 +36,312 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const areaName = decodeURIComponent(params.area);
   const content = getAreaContent(areaName);
   return {
-    title: `${areaName}の不動産情報`,
+    title: `${areaName}の不動産・物件情報 | フェリアホーム`,
     description: content.description,
-    keywords: content.keywords.join(", "),
+    keywords: content.keywords?.join(", "),
   };
 }
 
 export default async function AreaPage({ params }: PageProps) {
   const areaName = decodeURIComponent(params.area);
-  const content  = getAreaContent(areaName);
+  const content = getAreaContent(areaName);
 
   if (!areaContents[areaName]) notFound();
 
-  let result = { properties: [] as any[], total: 0, page: 1, limit: 12, totalPages: 0 };
+  let properties: Property[] = [];
+  let total = 0;
   try {
-    result = await getProperties({ area: areaName, limit: 12 });
+    const result = await getProperties({ area: areaName, limit: 9 });
+    properties = result.properties ?? [];
+    total = result.total ?? 0;
   } catch {}
 
+  const hasAreaImage = !!AREA_IMAGES[areaName];
+
   return (
-    <div className="bg-white min-h-screen">
+    <main style={{ backgroundColor: "#f8f8f8", minHeight: "100vh" }}>
 
       {/* ヒーロー */}
-      <div
-        className="relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #1a3a1a 0%, #2d5a2d 50%, #5BAD52 100%)" }}
-      >
-        <div className="container-content py-12 tb:py-16 relative z-10">
-          {/* パンくず */}
-          <nav className="flex items-center gap-1.5 text-xs mb-4" style={{ color: "rgba(255,255,255,0.6)" }}>
-            <Link href="/" className="hover:text-white transition-colors">ホーム</Link>
-            <ChevronRight size={10} />
-            <Link href="/properties" className="hover:text-white transition-colors">物件一覧</Link>
-            <ChevronRight size={10} />
-            <span className="text-white">{areaName}</span>
-          </nav>
+      <div style={{
+        position: "relative",
+        height: "400px",
+        overflow: "hidden",
+        background: hasAreaImage
+          ? undefined
+          : "linear-gradient(135deg, #1a4a24 0%, #2d7a3a 50%, #5BAD52 100%)",
+      }}>
+        {hasAreaImage && (
+          <>
+            <Image
+              src={AREA_IMAGES[areaName]}
+              alt={`${areaName}のイメージ`}
+              fill
+              quality={85}
+              style={{ objectFit: "cover" }}
+              sizes="100vw"
+              priority
+            />
+            <div style={{
+              position: "absolute", inset: 0,
+              background: "linear-gradient(135deg, rgba(13,34,18,0.88) 0%, rgba(26,74,36,0.7) 50%, rgba(45,122,58,0.4) 100%)",
+            }} />
+          </>
+        )}
 
-          <div className="flex items-start gap-3 mb-4">
-            <MapPin size={28} className="flex-shrink-0 mt-1" style={{ color: "rgba(255,255,255,0.8)" }} />
-            <div>
-              <p className="text-xs tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.6)" }}>
-                AREA GUIDE
-              </p>
-              <h1 className="font-bold text-white" style={{ fontSize: "clamp(28px, 4vw, 48px)" }}>
-                {areaName}
-              </h1>
-              <p className="text-white/80 mt-1" style={{ fontSize: "clamp(14px, 2vw, 18px)" }}>
-                {content.catchCopy}
-              </p>
-            </div>
+        <div style={{
+          position: "relative", zIndex: 1,
+          maxWidth: "1200px", margin: "0 auto",
+          padding: "0 24px",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
+          paddingBottom: "48px",
+        }}>
+          {/* パンくず */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "20px", fontSize: "12px", color: "rgba(255,255,255,0.55)" }}>
+            <Link href="/" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>ホーム</Link>
+            <span>›</span>
+            <Link href="/search" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>物件検索</Link>
+            <span>›</span>
+            <span style={{ color: "rgba(255,255,255,0.9)" }}>{areaName}</span>
           </div>
 
-          <p
-            className="leading-relaxed max-w-2xl"
-            style={{ color: "rgba(255,255,255,0.7)", fontSize: "clamp(13px, 1.6vw, 15px)" }}
-          >
-            {content.description}
+          <p style={{
+            fontSize: "11px", letterSpacing: "0.3em",
+            color: "rgba(255,255,255,0.6)", margin: "0 0 10px",
+            fontFamily: "'Montserrat', sans-serif", fontWeight: "600",
+          }}>
+            AREA GUIDE
           </p>
 
-          {/* ハイライト */}
-          <div className="flex flex-wrap gap-3 mt-5">
-            {content.highlights.map((h, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-                style={{ backgroundColor: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}
-              >
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>0{i + 1}</span>
-                <span className="text-white text-xs font-medium">{h}</span>
-              </div>
-            ))}
-          </div>
+          <h1 style={{
+            fontSize: "clamp(32px, 5vw, 52px)",
+            fontWeight: "bold", color: "#fff",
+            margin: "0 0 10px", lineHeight: 1.2,
+            fontFamily: "'Noto Serif JP', serif",
+          }}>
+            {areaName}
+          </h1>
+
+          {content.catchCopy && (
+            <p style={{
+              fontSize: "16px", color: "rgba(255,255,255,0.8)",
+              margin: "0 0 20px",
+            }}>
+              {content.catchCopy}
+            </p>
+          )}
+
+          {content.highlights && content.highlights.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+              {content.highlights.map((h: string, i: number) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "6px",
+                    padding: "5px 12px",
+                    backgroundColor: "rgba(255,255,255,0.12)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    borderRadius: "20px",
+                  }}
+                >
+                  <span style={{ fontSize: "10px", color: "#5BAD52", fontFamily: "'Montserrat', sans-serif" }}>0{i + 1}</span>
+                  <span style={{ fontSize: "12px", color: "#fff", fontWeight: "500" }}>{h}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* エリア説明 */}
+      {content.description && (
+        <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e8e8e8" }}>
+          <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 24px" }}>
+            <p style={{ fontSize: "14px", color: "#555", lineHeight: 1.9, margin: 0, maxWidth: "800px" }}>
+              {content.description}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* 物件一覧 */}
-      <div className="container-content py-10">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-bold text-gray-800 text-xl">
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 24px 80px" }}>
+        <div style={{
+          display: "flex", alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "24px",
+        }}>
+          <h2 style={{ fontSize: "20px", fontWeight: "bold", color: "#333", margin: 0 }}>
             {areaName}の物件一覧
-            <span className="ml-2 text-base font-normal text-gray-500">
-              （{result.total}件）
+            <span style={{ marginLeft: "8px", fontSize: "14px", fontWeight: "normal", color: "#888" }}>
+              （{total}件）
             </span>
           </h2>
-          <Link
-            href={`/properties?area=${encodeURIComponent(areaName)}`}
-            className="text-sm flex items-center gap-1 hover:gap-2 transition-all"
-            style={{ color: "#5BAD52" }}
-          >
-            すべて見る <ChevronRight size={14} />
-          </Link>
+          {total > 9 && (
+            <Link
+              href={`/search?city=${encodeURIComponent(areaName)}`}
+              style={{
+                fontSize: "13px", color: "#5BAD52",
+                textDecoration: "none", display: "flex",
+                alignItems: "center", gap: "4px",
+              }}
+            >
+              すべて見る →
+            </Link>
+          )}
         </div>
 
-        {result.properties.length === 0 ? (
-          <div className="py-16 text-center">
-            <MapPin size={40} className="mx-auto mb-3" style={{ color: "#E5E5E5" }} />
-            <p className="text-gray-400">現在このエリアの物件は準備中です</p>
+        {properties.length === 0 ? (
+          <div style={{
+            textAlign: "center", padding: "80px 0",
+            backgroundColor: "#fff", borderRadius: "12px",
+            border: "1px solid #e8e8e8",
+          }}>
+            <p style={{ fontSize: "40px", margin: "0 0 16px" }}>🏠</p>
+            <p style={{ fontSize: "16px", color: "#888", margin: "0 0 8px" }}>
+              現在このエリアの物件は準備中です
+            </p>
+            <p style={{ fontSize: "13px", color: "#aaa", margin: "0 0 24px" }}>
+              新着物件が入り次第、随時更新いたします。
+            </p>
+            <Link
+              href="/search"
+              style={{
+                display: "inline-block", padding: "12px 28px",
+                backgroundColor: "#5BAD52", color: "#fff",
+                borderRadius: "6px", textDecoration: "none",
+                fontSize: "14px", fontWeight: "bold",
+              }}
+            >
+              他のエリアで探す
+            </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 tb:grid-cols-2 pc:grid-cols-3 gap-4 tb:gap-5">
-            {result.properties.map((property: any) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
+          <>
+            <div className="properties-search-grid">
+              {properties.map((property) => (
+                <AreaPropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+
+            {total > 9 && (
+              <div style={{ textAlign: "center", marginTop: "40px" }}>
+                <Link
+                  href={`/search?city=${encodeURIComponent(areaName)}`}
+                  style={{
+                    display: "inline-block", padding: "14px 40px",
+                    backgroundColor: "#5BAD52", color: "#fff",
+                    borderRadius: "6px", textDecoration: "none",
+                    fontWeight: "bold", fontSize: "14px",
+                  }}
+                >
+                  {areaName}の物件をすべて見る（{total}件）
+                </Link>
+              </div>
+            )}
+          </>
         )}
       </div>
-    </div>
+    </main>
+  );
+}
+
+function AreaPropertyCard({ property }: { property: Property }) {
+  const mainImage = (property.images as any)?.[0]?.url ?? property.mainImage ?? null;
+  const typeLabel = PROPERTY_TYPE_MAP[property.property_type ?? ""] ?? "";
+  const location = [property.city, property.town].filter(Boolean).join("");
+
+  return (
+    <Link
+      href={`/properties/${property.id}`}
+      style={{ textDecoration: "none", color: "inherit", display: "block" }}
+    >
+      <div style={{
+        backgroundColor: "#fff",
+        borderRadius: "12px",
+        overflow: "hidden",
+        border: "1px solid #e8e8e8",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        transition: "box-shadow 0.2s ease, transform 0.2s ease",
+      }}>
+        {/* 画像 */}
+        <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
+          {mainImage ? (
+            <Image
+              src={mainImage}
+              alt={property.title ?? "物件"}
+              fill
+              quality={80}
+              style={{ objectFit: "cover" }}
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          ) : (
+            <div style={{
+              position: "absolute", inset: 0,
+              display: "flex", alignItems: "center",
+              justifyContent: "center", color: "#bbb",
+              flexDirection: "column", gap: "8px",
+            }}>
+              <span style={{ fontSize: "32px" }}>🏠</span>
+              <span style={{ fontSize: "12px" }}>画像準備中</span>
+            </div>
+          )}
+          {typeLabel && (
+            <div style={{ position: "absolute", top: "10px", left: "10px" }}>
+              <span style={{
+                backgroundColor: "#5BAD52", color: "#fff",
+                fontSize: "10px", padding: "3px 10px",
+                borderRadius: "20px", fontWeight: "bold",
+              }}>
+                {typeLabel}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* 情報 */}
+        <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
+          {property.title && (
+            <p style={{
+              fontSize: "13px", fontWeight: "bold", color: "#333",
+              margin: "0 0 8px", lineHeight: 1.4,
+              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+            }}>
+              {property.title}
+            </p>
+          )}
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "12px", flex: 1 }}>
+            {location && (
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📍 {location}</p>
+            )}
+            {property.station_name1 && (
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
+                🚃 {property.station_name1}駅 徒歩{property.station_walk1}分
+              </p>
+            )}
+            {property.rooms && (
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚪 {property.rooms}</p>
+            )}
+          </div>
+          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px" }}>
+            {property.price != null ? (
+              <p style={{ margin: 0 }}>
+                <span style={{ fontSize: "20px", fontWeight: "bold", color: "#5BAD52" }}>
+                  {property.price.toLocaleString()}
+                </span>
+                <span style={{ fontSize: "12px", color: "#5BAD52", marginLeft: "2px" }}>万円</span>
+              </p>
+            ) : (
+              <p style={{ fontSize: "14px", color: "#888", margin: 0 }}>応相談</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }
