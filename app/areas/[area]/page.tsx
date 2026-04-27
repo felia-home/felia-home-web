@@ -79,8 +79,11 @@ export default async function AreaPage({ params }: PageProps) {
   // admin APIのエリア画像URL取得
   let adminImageUrl: string | null = null;
   try {
-    const areas = await getAreas();
-    const areaData = areas.find((a) => a.area_name === areaName);
+    const res = await getAreas();
+    const areas = Array.isArray(res) ? res : (res as any)?.areas ?? [];
+    const areaData = areas.find((a: any) =>
+      a.area_name === areaName || a.name === areaName
+    );
     adminImageUrl = areaData?.image_url ?? null;
   } catch {}
 
