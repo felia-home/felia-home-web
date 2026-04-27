@@ -244,6 +244,7 @@ export async function getCompanyInfo(): Promise<CompanyInfo | null> {
 
 export interface PropertyListParams {
   area?: string;
+  city?: string;
   line?: string;
   flag?: "featured" | "new";
   type?: string;
@@ -268,6 +269,7 @@ export async function getProperties(
 ): Promise<PropertyListResponse> {
   const query = new URLSearchParams();
   if (params.area)     query.set("area",      params.area);
+  if (params.city)     query.set("city",      params.city);
   if (params.line)     query.set("line",      params.line);
   if (params.flag)     query.set("flag",      params.flag);
   if (params.type)     query.set("type",      params.type);

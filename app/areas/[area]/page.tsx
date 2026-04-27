@@ -71,7 +71,7 @@ export default async function AreaPage({ params }: PageProps) {
   let properties: Property[] = [];
   let total = 0;
   try {
-    const result = await getProperties({ area: areaName, limit: 9 });
+    const result = await getProperties({ city: areaName, limit: 9 });
     properties = result.properties ?? [];
     total = result.total ?? 0;
   } catch {}
