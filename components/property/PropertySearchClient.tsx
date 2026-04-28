@@ -641,14 +641,14 @@ export default function PropertySearchClient() {
 
 function PropertyCard({ property }: { property: Property }) {
   const [hovered, setHovered] = useState(false);
-  const mainImage = property.images?.find(i => i.is_main)?.url ?? property.images?.[0]?.url ?? null;
+  const mainImage = property.images?.find((i) => i.is_main)?.url ?? property.images?.[0]?.url ?? null;
   const typeLabel = PROPERTY_TYPE_MAP[property.property_type] ?? property.property_type;
   const location = [property.city, property.town].filter(Boolean).join("") || "";
 
   return (
     <Link
       href={`/properties/${property.id}`}
-      style={{ textDecoration: "none", color: "inherit", display: "block" }}
+      style={{ textDecoration: "none", color: "inherit", display: "block", height: "100%" }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -664,80 +664,79 @@ function PropertyCard({ property }: { property: Property }) {
         display: "flex",
         flexDirection: "column",
       }}>
-        {/* 画像 */}
+        {/* 画像エリア：固定比率 */}
         <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
           <PropertyImage
             src={mainImage}
-            alt={property.title ?? "物件画像"}
+            alt={property.title ?? "物件"}
             seed={property.id}
             sizes="(max-width: 768px) 100vw, 33vw"
           />
-
           <div style={{ position: "absolute", top: "10px", left: "10px", display: "flex", gap: "4px", flexWrap: "wrap" }}>
-            <span style={{
-              backgroundColor: "#5BAD52", color: "#fff",
-              fontSize: "10px", padding: "2px 8px",
-              borderRadius: "20px", fontWeight: "bold",
-            }}>
-              {typeLabel}
-            </span>
+            {typeLabel && (
+              <span style={{ backgroundColor: "#5BAD52", color: "#fff", fontSize: "10px", padding: "2px 8px", borderRadius: "20px", fontWeight: "bold" }}>
+                {typeLabel}
+              </span>
+            )}
             {property.is_felia_selection && (
-              <span style={{
-                backgroundColor: "#1a4a24", color: "#C9A84C",
-                fontSize: "10px", padding: "2px 8px",
-                borderRadius: "20px", fontWeight: "bold",
-              }}>
+              <span style={{ backgroundColor: "#1a4a24", color: "#C9A84C", fontSize: "10px", padding: "2px 8px", borderRadius: "20px", fontWeight: "bold" }}>
                 厳選
               </span>
             )}
             {property.is_open_house && (
-              <span style={{
-                backgroundColor: "#E67E22", color: "#fff",
-                fontSize: "10px", padding: "2px 8px",
-                borderRadius: "20px", fontWeight: "bold",
-              }}>
+              <span style={{ backgroundColor: "#E67E22", color: "#fff", fontSize: "10px", padding: "2px 8px", borderRadius: "20px", fontWeight: "bold" }}>
                 現地販売会
               </span>
             )}
           </div>
         </div>
 
-        {/* 情報 */}
+        {/* 情報エリア */}
         <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
-          {property.title && (
-            <p style={{
-              fontSize: "13px", fontWeight: "bold", color: "#333",
-              margin: "0 0 8px", lineHeight: 1.4,
-              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-            }}>
-              {property.title}
-            </p>
-          )}
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "3px", marginBottom: "10px", flex: 1 }}>
-            {location && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                📍 {location}
-              </p>
-            )}
-            {property.station_name1 && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                🚃 {property.station_name1}駅 徒歩{property.station_walk1}分
-              </p>
-            )}
-            {property.rooms && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                🚪 {property.rooms}
-              </p>
-            )}
-            {property.building_year && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                📅 {property.building_year}年築
+          {/* タイトル：2行固定高さ */}
+          <div style={{ minHeight: "40px", marginBottom: "10px" }}>
+            {property.title && (
+              <p style={{
+                fontSize: "13px", fontWeight: "bold", color: "#333",
+                margin: 0, lineHeight: 1.5,
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+              }}>
+                {property.title}
               </p>
             )}
           </div>
 
-          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px" }}>
+          {/* スペック */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1, marginBottom: "10px" }}>
+            {location && (
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📍 {location}</p>
+            )}
+            {(property as any).station_name1 && (
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
+                🚃 {(property as any).station_name1}駅 徒歩{(property as any).station_walk1}分
+              </p>
+            )}
+            {(property as any).rooms && (
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚪 {(property as any).rooms}</p>
+            )}
+            {((property as any).area_build_m2 || (property as any).area_land_m2) && (
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
+                📐 {(property as any).area_build_m2 ?? (property as any).area_land_m2}㎡
+              </p>
+            )}
+            {(property as any).building_year && (
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
+                📅 {(property as any).building_year}年築
+              </p>
+            )}
+          </div>
+
+          {/* 価格：常に下端 */}
+          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px", marginTop: "auto" }}>
             {property.price != null ? (
               <p style={{ margin: 0 }}>
                 <span style={{ fontSize: "20px", fontWeight: "bold", color: "#5BAD52" }}>
