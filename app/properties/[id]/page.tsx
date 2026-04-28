@@ -328,7 +328,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               {/* CTAボタン */}
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 <Link
-                  href={`/contact?property_id=${property.id}&type=viewing`}
+                  href={`/contact?type=visit&property_id=${property.id}&propertyNo=${(property as any).property_no ?? ""}`}
                   style={{
                     display: "block",
                     textAlign: "center",
@@ -344,7 +344,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                   🏠 来店・内覧予約
                 </Link>
                 <Link
-                  href={`/contact?property_id=${property.id}&type=document`}
+                  href={`/contact?type=document&property_id=${property.id}&propertyNo=${(property as any).property_no ?? ""}`}
                   style={{
                     display: "block",
                     textAlign: "center",
@@ -361,7 +361,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                   📄 資料請求
                 </Link>
                 <Link
-                  href={`/contact?property_id=${property.id}&type=inquiry`}
+                  href={`/contact?type=property&property_id=${property.id}`}
                   style={{
                     display: "block",
                     textAlign: "center",
