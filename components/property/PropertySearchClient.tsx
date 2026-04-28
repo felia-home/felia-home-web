@@ -241,7 +241,7 @@ export default function PropertySearchClient() {
 
       {/* 検索パネル */}
       <div style={{ backgroundColor: "#f8f8f8", borderBottom: "3px solid #5BAD52", padding: "32px 24px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
           {/* キーワード検索 */}
           <div style={{ marginBottom: "24px" }}>
@@ -485,7 +485,7 @@ export default function PropertySearchClient() {
       </div>
 
       {/* 結果エリア */}
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "28px 24px 80px" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "28px 24px 80px" }}>
 
         {/* 件数 */}
         {searched && !loading && (
