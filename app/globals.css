@@ -246,3 +246,13 @@
     min-height: 240px;
   }
 }
+
+/* Access店舗グリッド */
+.access-store-grid {
+  grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 767px) {
+  .access-store-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
