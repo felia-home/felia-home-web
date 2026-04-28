@@ -9,6 +9,7 @@ const nextConfig = {
       { protocol: "http",  hostname: "localhost" },
       { protocol: "https", hostname: "pub-893cf744fd3d496f9ceeeedf86b3c3dc.r2.dev" },
       { protocol: "https", hostname: "*.r2.dev" },
+      { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
 };
