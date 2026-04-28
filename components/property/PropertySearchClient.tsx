@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
+import { PropertyImage } from "@/components/ui/PropertyImage";
 import Link from "next/link";
 
 const PROPERTY_TYPES = [
@@ -613,27 +613,13 @@ function PropertyCard({ property }: { property: Property }) {
       }}>
         {/* 画像 */}
         <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
-          {mainImage ? (
-            <Image
-              src={mainImage}
-              alt={property.title ?? "物件"}
-              fill
-              quality={80}
-              style={{ objectFit: "cover" }}
-              sizes="(max-width: 768px) 100vw, 33vw"
-            />
-          ) : (
-            <div style={{
-              position: "absolute", inset: 0,
-              display: "flex", alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "column", gap: "8px",
-              color: "#bbb",
-            }}>
-              <span style={{ fontSize: "32px" }}>🏠</span>
-              <span style={{ fontSize: "12px" }}>画像なし</span>
-            </div>
-          )}
+          <PropertyImage
+            src={mainImage}
+            alt={property.title ?? "物件画像"}
+            seed={property.id}
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+
           <div style={{ position: "absolute", top: "10px", left: "10px", display: "flex", gap: "4px", flexWrap: "wrap" }}>
             <span style={{
               backgroundColor: "#5BAD52", color: "#fff",

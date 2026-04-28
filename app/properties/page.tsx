@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getNewProperties } from "@/lib/api";
 import type { Property } from "@/lib/api";
+import { PropertyImage } from "@/components/ui/PropertyImage";
 
 export const revalidate = 60;
 
@@ -142,26 +142,13 @@ function PropertyCard({ property }: { property: Property }) {
       }}>
         {/* 画像 */}
         <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
-          {mainImage ? (
-            <Image
-              src={mainImage}
-              alt={property.title ?? "物件"}
-              fill
-              quality={80}
-              style={{ objectFit: "cover" }}
-              sizes="(max-width: 768px) 100vw, 33vw"
-            />
-          ) : (
-            <div style={{
-              position: "absolute", inset: 0,
-              display: "flex", alignItems: "center",
-              justifyContent: "center", color: "#bbb",
-              flexDirection: "column", gap: "8px",
-            }}>
-              <span style={{ fontSize: "32px" }}>🏠</span>
-              <span style={{ fontSize: "12px" }}>画像準備中</span>
-            </div>
-          )}
+          <PropertyImage
+            src={mainImage}
+            alt={property.title ?? "物件画像"}
+            seed={property.id}
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+
           <div style={{ position: "absolute", top: "10px", left: "10px", display: "flex", gap: "4px" }}>
             {typeLabel && (
               <span style={{

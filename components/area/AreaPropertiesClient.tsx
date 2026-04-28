@@ -3,7 +3,7 @@
 // components/area/AreaPropertiesClient.tsx
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { PropertyImage } from "@/components/ui/PropertyImage";
 
 interface NormalProperty {
   id: string;
@@ -282,15 +282,12 @@ function NormalCard({ property }: { property: NormalProperty }) {
         transition: "all 0.2s ease", height: "100%", display: "flex", flexDirection: "column",
       }}>
         <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
-          {mainImage ? (
-            <Image src={mainImage} alt={property.title ?? "物件"} fill quality={80}
-              style={{ objectFit: "cover" }} sizes="33vw" />
-          ) : (
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "8px", color: "#bbb" }}>
-              <span style={{ fontSize: "32px" }}>🏠</span>
-              <span style={{ fontSize: "12px" }}>画像準備中</span>
-            </div>
-          )}
+          <PropertyImage
+            src={mainImage}
+            alt={property.title ?? "物件画像"}
+            seed={property.id}
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
           {typeLabel && (
             <div style={{ position: "absolute", top: "10px", left: "10px" }}>
               <span style={{ backgroundColor: "#5BAD52", color: "#fff", fontSize: "10px", padding: "3px 10px", borderRadius: "20px", fontWeight: "bold" }}>{typeLabel}</span>
@@ -328,8 +325,6 @@ function NormalCard({ property }: { property: NormalProperty }) {
 function ReinsCard({ property }: { property: ReinsProperty }) {
   const [hovered, setHovered] = useState(false);
   const location = [property.area, property.town ?? property.address].filter(Boolean).join(" ");
-  const bgColor = property.source_type === "MANSION" ? "#1a2a3a" : property.source_type === "HOUSE" ? "#1a2a1a" : "#1a1a0a";
-  const emoji = property.source_type === "MANSION" ? "🏢" : property.source_type === "HOUSE" ? "🏡" : "🌿";
   const area = property.area_build_m2 ?? property.area_m2 ?? property.area_land_m2;
 
   return (
@@ -345,9 +340,14 @@ function ReinsCard({ property }: { property: ReinsProperty }) {
         transform: hovered ? "translateY(-2px)" : "translateY(0)",
         transition: "all 0.2s ease", height: "100%", display: "flex", flexDirection: "column",
       }}>
-        <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: bgColor, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: "48px", opacity: 0.25 }}>{emoji}</span>
-          <div style={{ position: "absolute", top: "10px", left: "10px", display: "flex", gap: "4px" }}>
+        <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
+          <PropertyImage
+            src={null}
+            alt="物件画像"
+            seed={property.id}
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+          <div style={{ position: "absolute", top: "10px", left: "10px", display: "flex", gap: "4px", zIndex: 1 }}>
             <span style={{ backgroundColor: "#2d4a6a", color: "#fff", fontSize: "10px", padding: "3px 8px", borderRadius: "3px", fontWeight: "bold", fontFamily: "'Montserrat', sans-serif" }}>REINS</span>
             <span style={{ backgroundColor: "rgba(255,255,255,0.9)", color: "#2d4a6a", fontSize: "10px", padding: "3px 8px", borderRadius: "3px", fontWeight: "bold" }}>{property.property_type}</span>
           </div>

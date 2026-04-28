@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getFeliaSectionProperties } from "@/lib/api";
 import type { Property } from "@/lib/api";
+import { PropertyImage } from "@/components/ui/PropertyImage";
 
 export const revalidate = 60;
 
@@ -119,24 +119,14 @@ function FeliaSelectionCard({ property }: { property: Property }) {
         aspectRatio: "4/3",
         backgroundColor: "#f0f0f0",
       }}>
-        {mainImage ? (
-          <Image
-            src={mainImage}
-            alt={property.title ?? "物件画像"}
-            fill
-            quality={85}
-            style={{ objectFit: "contain" }}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div style={{
-            position: "absolute", inset: 0,
-            display: "flex", alignItems: "center",
-            justifyContent: "center", color: "#bbb", fontSize: "13px",
-          }}>
-            画像なし
-          </div>
-        )}
+        <PropertyImage
+          src={mainImage}
+          alt={property.title ?? "物件画像"}
+          seed={property.id}
+          quality={85}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+
 
         {/* バッジ */}
         <div style={{
