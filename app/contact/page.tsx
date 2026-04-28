@@ -1,9 +1,10 @@
 // app/contact/page.tsx
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   User, Mail, Phone, MessageSquare,
   CheckCircle, Lock, Home, ChevronRight,
@@ -11,13 +12,19 @@ import {
 
 function ContactForm() {
   const searchParams = useSearchParams();
-  const propertyId   = searchParams.get("propertyId") || "";
+  const propertyId   = searchParams.get("property_id") ?? searchParams.get("propertyId") ?? "";
+  const reinsId      = searchParams.get("reins_id") ?? searchParams.get("reinsId") ?? "";
   const propertyNo   = searchParams.get("propertyNo") || "";
   const type         = searchParams.get("type") || "general";
   const token        = searchParams.get("token") || "";
 
   const isPrivate  = type === "private";
-  const isProperty = type === "property" || !!propertyId;
+  const isReins    = type === "reins" || !!reinsId;
+  const isProperty = type === "property" || !!propertyId || isReins;
+
+  const session = useSession();
+  const isLoggedIn = session?.status === "authenticated";
+  const memberId = (session?.data?.user as any)?.id ?? null;
 
   const [form, setForm] = useState({
     name: "", email: "", phone: "", message: "",
@@ -28,6 +35,23 @@ function ContactForm() {
 
   const update = (key: string, value: string) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  // ログイン時にプロフィール自動入力
+  useEffect(() => {
+    if (!isLoggedIn || !memberId) return;
+    fetch("/api/members/profile")
+      .then((r) => r.json())
+      .then((data) => {
+        const member = data.member ?? data;
+        setForm((prev) => ({
+          ...prev,
+          name: member.name ?? prev.name,
+          email: member.email ?? prev.email,
+          phone: member.phone ?? member.tel ?? prev.phone,
+        }));
+      })
+      .catch(() => {});
+  }, [isLoggedIn, memberId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +68,7 @@ function ContactForm() {
           phone:       form.phone || undefined,
           message:     form.message,
           propertyId:  propertyId || undefined,
+          reinsId:     reinsId || undefined,
           propertyNo:  propertyNo || undefined,
           inquiryType: isPrivate ? "PROPERTY" : isProperty ? "PROPERTY" : "GENERAL",
           token:       token || undefined,
@@ -170,23 +195,49 @@ function ContactForm() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
 
-              <ContactField
-                label="お名前" required icon={<User size={14} />}
-                type="text" value={form.name} placeholder="山田 太郎"
-                onChange={(v) => update("name", v)}
-              />
+              {isLoggedIn ? (
+                <div style={{
+                  backgroundColor: "#f0f5f2",
+                  border: "1px solid #5BAD52",
+                  borderRadius: "8px",
+                  padding: "16px 20px",
+                  marginBottom: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                }}>
+                  <span style={{ fontSize: "20px" }}>✓</span>
+                  <div>
+                    <p style={{ fontSize: "13px", fontWeight: "bold", color: "#2d7a3a", margin: "0 0 2px" }}>
+                      会員情報で送信します
+                    </p>
+                    <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
+                      {form.name}　{form.email}
+                      {form.phone && `　${form.phone}`}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <ContactField
+                    label="お名前" required icon={<User size={14} />}
+                    type="text" value={form.name} placeholder="山田 太郎"
+                    onChange={(v) => update("name", v)}
+                  />
 
-              <ContactField
-                label="メールアドレス" required icon={<Mail size={14} />}
-                type="email" value={form.email} placeholder="example@email.com"
-                onChange={(v) => update("email", v)}
-              />
+                  <ContactField
+                    label="メールアドレス" required icon={<Mail size={14} />}
+                    type="email" value={form.email} placeholder="example@email.com"
+                    onChange={(v) => update("email", v)}
+                  />
 
-              <ContactField
-                label="電話番号" icon={<Phone size={14} />}
-                type="tel" value={form.phone} placeholder="090-0000-0000"
-                onChange={(v) => update("phone", v)}
-              />
+                  <ContactField
+                    label="電話番号" icon={<Phone size={14} />}
+                    type="tel" value={form.phone} placeholder="090-0000-0000"
+                    onChange={(v) => update("phone", v)}
+                  />
+                </>
+              )}
 
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">
