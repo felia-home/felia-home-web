@@ -27,6 +27,23 @@ function formatDate(d: Date): string {
   return `${d.getMonth() + 1}月${d.getDate()}日（${dow[d.getDay()]}）`;
 }
 
+interface VisitCandidate {
+  date: string;
+  time: string;
+}
+
+const TIME_SLOTS = [
+  "09:30〜10:30",
+  "10:00〜11:00",
+  "11:00〜12:00",
+  "13:00〜14:00",
+  "14:00〜15:00",
+  "15:00〜16:00",
+  "16:00〜17:00",
+  "17:00〜18:00",
+  "18:00〜19:00",
+];
+
 // ---- メインフォーム ----
 function ContactForm() {
   const searchParams = useSearchParams();
@@ -54,7 +71,7 @@ function ContactForm() {
   const [property, setProperty]         = useState<any>(null);
 
   const businessDays = useMemo(() => getBusinessDays(21), []);
-  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [candidates, setCandidates] = useState<VisitCandidate[]>([]);
 
   const update = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -105,24 +122,16 @@ function ContactForm() {
       .catch(() => {});
   }, [propertyId, reinsId]);
 
-  const toggleDate = (dateStr: string) => {
-    setSelectedDates((prev) =>
-      prev.includes(dateStr)
-        ? prev.filter((d) => d !== dateStr)
-        : prev.length < 3 ? [...prev, dateStr] : prev
-    );
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isVisit && selectedDates.length === 0) {
-      setError("来店希望日を1つ以上選択してください");
+    if (isVisit && candidates.length === 0) {
+      setError("来店希望日時を1つ以上追加してください");
       return;
     }
     setError(""); setLoading(true);
     try {
       const visitMessage = isVisit
-        ? `【来店予約】\n希望日:\n${selectedDates.join("\n")}${form.message ? `\n\n備考: ${form.message}` : ""}`
+        ? `【来店予約】\n希望日時:\n${candidates.map((c, i) => `第${i + 1}希望: ${c.date} ${c.time}`).join("\n")}${form.message ? `\n\n備考: ${form.message}` : ""}`
         : isDocument
         ? `【資料請求】${form.message ? `\n備考: ${form.message}` : ""}`
         : form.message;
@@ -139,7 +148,7 @@ function ContactForm() {
           propertyNo: propertyNo || undefined,
           inquiryType: isProperty ? "PROPERTY" : "GENERAL",
           token: token || undefined,
-          visitDates: isVisit ? selectedDates : undefined,
+          visitDates: isVisit ? candidates.map((c) => `${c.date} ${c.time}`) : undefined,
         }),
       });
       const data = await res.json();
@@ -282,57 +291,56 @@ function ContactForm() {
               </div>
             )}
 
-            {/* 来店予約：日程選択カレンダー */}
+            {/* 来店予約：日付＋時間 */}
             {isVisit && (
               <div style={{ marginBottom: "20px" }}>
-                <p style={{ fontSize: "13px", fontWeight: "bold", color: "#444", margin: "0 0 12px" }}>
-                  来店希望日を選択（最大3つ）
-                  <span style={{ fontSize: "11px", color: "#aaa", marginLeft: "8px" }}>定休日：火・水曜日</span>
+                <p style={{ fontSize: "13px", fontWeight: "bold", color: "#444", margin: "0 0 4px" }}>
+                  来店希望日時を選択（最大3つ）
                 </p>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {businessDays.map((d) => {
-                    const str = formatDate(d);
-                    const selected = selectedDates.includes(str);
-                    const disabled = !selected && selectedDates.length >= 3;
-                    return (
-                      <button
-                        key={str}
-                        type="button"
-                        onClick={() => toggleDate(str)}
-                        disabled={disabled}
-                        style={{
-                          display: "flex", alignItems: "center", gap: "12px",
-                          padding: "12px 16px", borderRadius: "8px",
-                          border: selected ? "1.5px solid #5BAD52" : "1px solid #e0e0e0",
-                          backgroundColor: selected ? "#e8f5e6" : disabled ? "#fafafa" : "#fff",
-                          color: selected ? "#2d7a3a" : disabled ? "#ccc" : "#333",
-                          cursor: disabled ? "not-allowed" : "pointer",
-                          fontSize: "14px", fontWeight: selected ? "bold" : "normal",
-                          transition: "all 0.15s ease",
-                          textAlign: "left",
-                        }}
-                      >
-                        <span style={{
-                          width: "20px", height: "20px", borderRadius: "50%",
-                          border: selected ? "none" : "1.5px solid #ccc",
-                          backgroundColor: selected ? "#5BAD52" : "transparent",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          flexShrink: 0, fontSize: "12px", color: "#fff",
-                        }}>
-                          {selected ? "✓" : ""}
-                        </span>
-                        {str}
-                      </button>
-                    );
-                  })}
-                </div>
-                {selectedDates.length > 0 && (
-                  <div style={{ marginTop: "12px", padding: "10px 14px", backgroundColor: "#f0f5f2", borderRadius: "6px" }}>
-                    <p style={{ fontSize: "12px", color: "#2d7a3a", fontWeight: "bold", margin: "0 0 4px" }}>選択中の候補日</p>
-                    {selectedDates.map((d, i) => (
-                      <p key={d} style={{ fontSize: "13px", color: "#333", margin: "2px 0" }}>
-                        第{i + 1}希望: {d}
-                      </p>
+                <p style={{ fontSize: "11px", color: "#aaa", margin: "0 0 12px" }}>
+                  定休日：火・水曜日
+                </p>
+
+                {candidates.length < 3 && (
+                  <AddCandidateForm
+                    businessDays={businessDays}
+                    timeSlots={TIME_SLOTS}
+                    existingCandidates={candidates}
+                    onAdd={(c) => setCandidates((prev) => [...prev, c])}
+                  />
+                )}
+
+                {candidates.length > 0 && (
+                  <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <p style={{ fontSize: "12px", fontWeight: "bold", color: "#2d7a3a", margin: 0 }}>選択中の候補日時</p>
+                    {candidates.map((c, i) => (
+                      <div key={i} style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "10px 14px",
+                        backgroundColor: "#f0f5f2",
+                        borderRadius: "6px",
+                        border: "1px solid #5BAD52",
+                      }}>
+                        <div>
+                          <span style={{ fontSize: "12px", color: "#5BAD52", fontWeight: "bold", marginRight: "8px" }}>
+                            第{i + 1}希望
+                          </span>
+                          <span style={{ fontSize: "13px", color: "#333" }}>
+                            {c.date}　{c.time}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setCandidates((prev) => prev.filter((_, idx) => idx !== i))}
+                          style={{
+                            background: "none", border: "none",
+                            color: "#aaa", fontSize: "16px",
+                            cursor: "pointer", padding: "0 4px",
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -364,14 +372,14 @@ function ContactForm() {
 
             <button
               type="submit"
-              disabled={loading || (isVisit && selectedDates.length === 0)}
+              disabled={loading || (isVisit && candidates.length === 0)}
               style={{
                 display: "block", width: "100%", padding: "15px",
                 backgroundColor: isDocument ? "#1a4a24" : isVisit ? "#2d4a6a" : "#5BAD52",
                 color: "#fff", border: "none", borderRadius: "8px",
                 fontSize: "16px", fontWeight: "bold",
-                cursor: (loading || (isVisit && selectedDates.length === 0)) ? "not-allowed" : "pointer",
-                opacity: (loading || (isVisit && selectedDates.length === 0)) ? 0.6 : 1,
+                cursor: (loading || (isVisit && candidates.length === 0)) ? "not-allowed" : "pointer",
+                opacity: (loading || (isVisit && candidates.length === 0)) ? 0.6 : 1,
                 transition: "all 0.15s ease",
               }}
             >
@@ -404,6 +412,101 @@ const inp: React.CSSProperties = {
   outline: "none", boxSizing: "border-box",
   backgroundColor: "#fff",
 };
+
+function AddCandidateForm({
+  businessDays,
+  timeSlots,
+  existingCandidates,
+  onAdd,
+}: {
+  businessDays: Date[];
+  timeSlots: string[];
+  existingCandidates: VisitCandidate[];
+  onAdd: (c: VisitCandidate) => void;
+}) {
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+
+  const handleAdd = () => {
+    if (!selectedDate || !selectedTime) return;
+    onAdd({ date: selectedDate, time: selectedTime });
+    setSelectedDate("");
+    setSelectedTime("");
+  };
+
+  return (
+    <div style={{
+      border: "1px dashed #e0e0e0",
+      borderRadius: "8px",
+      padding: "16px",
+      backgroundColor: "#fafafa",
+    }}>
+      <p style={{ fontSize: "12px", color: "#888", margin: "0 0 12px" }}>
+        第{existingCandidates.length + 1}希望を追加
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <select
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          style={{
+            padding: "10px 14px", borderRadius: "6px",
+            border: "1px solid #e0e0e0", fontSize: "14px",
+            color: selectedDate ? "#333" : "#aaa",
+            backgroundColor: "#fff", cursor: "pointer",
+            outline: "none",
+          }}
+        >
+          <option value="">来店希望日を選択</option>
+          {businessDays.map((d) => {
+            const str = formatDate(d);
+            const alreadySelected = existingCandidates.some((c) => c.date === str);
+            return (
+              <option key={str} value={str} disabled={alreadySelected}>
+                {str}{alreadySelected ? "（選択済み）" : ""}
+              </option>
+            );
+          })}
+        </select>
+
+        <select
+          value={selectedTime}
+          onChange={(e) => setSelectedTime(e.target.value)}
+          disabled={!selectedDate}
+          style={{
+            padding: "10px 14px", borderRadius: "6px",
+            border: "1px solid #e0e0e0", fontSize: "14px",
+            color: selectedTime ? "#333" : "#aaa",
+            backgroundColor: !selectedDate ? "#f5f5f5" : "#fff",
+            cursor: !selectedDate ? "not-allowed" : "pointer",
+            outline: "none",
+          }}
+        >
+          <option value="">来店希望時間を選択</option>
+          {timeSlots.map((t) => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={!selectedDate || !selectedTime}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: selectedDate && selectedTime ? "#5BAD52" : "#e0e0e0",
+            color: selectedDate && selectedTime ? "#fff" : "#aaa",
+            border: "none", borderRadius: "6px",
+            fontSize: "13px", fontWeight: "bold",
+            cursor: selectedDate && selectedTime ? "pointer" : "not-allowed",
+            transition: "all 0.15s ease",
+          }}
+        >
+          + この日時を追加
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
