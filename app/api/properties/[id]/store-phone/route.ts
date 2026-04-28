@@ -6,17 +6,40 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const res = await fetch(
+    // 物件情報から store_id を取得
+    const propRes = await fetch(
       `${process.env.ADMIN_API_URL}/api/properties/${params.id}`,
       { cache: "no-store" }
     );
-    const data = await res.json();
-    const property = data.property ?? data;
+    const propData = await propRes.json();
+    const property = propData.property ?? propData;
+    const storeId = property.store_id ?? property.store?.id ?? null;
 
-    // 店舗電話番号 → 会社電話番号の優先順
-    const phone = property.store?.phone
-      ?? property.seller_contact
-      ?? null;
+    if (!storeId) {
+      return NextResponse.json({ phone: null });
+    }
+
+    // 本店情報
+    const companyRes = await fetch(
+      `${process.env.ADMIN_API_URL}/api/hp/company`,
+      { cache: "no-store" }
+    );
+    const companyData = await companyRes.json();
+
+    // 支店一覧
+    const branchRes = await fetch(
+      `${process.env.ADMIN_API_URL}/api/hp/company-branches`,
+      { cache: "no-store" }
+    );
+    const branchData = await branchRes.json();
+    const branches = branchData.branches ?? [];
+
+    // storeIdで支店をマッチ、なければ本店電話番号
+    const matchedBranch = branches.find(
+      (b: any) => b.id === storeId || b.store_id === storeId
+    );
+
+    const phone = matchedBranch?.phone ?? companyData.company?.phone ?? null;
 
     return NextResponse.json({ phone });
   } catch {
