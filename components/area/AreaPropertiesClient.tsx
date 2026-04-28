@@ -295,11 +295,23 @@ function NormalCard({ property }: { property: NormalProperty }) {
           )}
         </div>
         <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
-          {property.title && (
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#333", margin: "0 0 8px", lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {property.title}
-            </p>
-          )}
+          {/* タイトル固定高さ（なければ空白で高さ確保） */}
+          <div style={{ minHeight: "36px", marginBottom: "8px" }}>
+            {property.title && (
+              <p style={{
+                fontSize: "13px", fontWeight: "bold", color: "#333",
+                margin: 0, lineHeight: 1.4,
+                overflow: "hidden", textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+              }}>
+                {property.title}
+              </p>
+            )}
+          </div>
+
+          {/* スペック */}
           <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "12px", flex: 1 }}>
             {location && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📍 {location}</p>}
             {property.station_name1 && (
@@ -308,7 +320,9 @@ function NormalCard({ property }: { property: NormalProperty }) {
             {property.rooms && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚪 {property.rooms}</p>}
             {area && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📐 {area}㎡</p>}
           </div>
-          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px" }}>
+
+          {/* 価格（常に下端） */}
+          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px", marginTop: "auto" }}>
             {property.price != null ? (
               <p style={{ margin: 0 }}>
                 <span style={{ fontSize: "20px", fontWeight: "bold", color: "#5BAD52" }}>{property.price.toLocaleString()}</span>
@@ -353,11 +367,23 @@ function ReinsCard({ property }: { property: ReinsProperty }) {
           </div>
         </div>
         <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
-          {property.building_name && (
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#333", margin: "0 0 8px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {property.building_name}
-            </p>
-          )}
+          {/* 建物名固定高さ */}
+          <div style={{ minHeight: "36px", marginBottom: "8px" }}>
+            {property.building_name && (
+              <p style={{
+                fontSize: "13px", fontWeight: "bold", color: "#333",
+                margin: 0, lineHeight: 1.4,
+                overflow: "hidden", textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+              }}>
+                {property.building_name}
+              </p>
+            )}
+          </div>
+
+          {/* スペック */}
           <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "12px", flex: 1 }}>
             {location && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📍 {location}</p>}
             {property.station_name && (
@@ -369,7 +395,9 @@ function ReinsCard({ property }: { property: ReinsProperty }) {
               <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📅 {property.built_year_text.replace(/(\d+)$/, "$1月")}</p>
             )}
           </div>
-          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px" }}>
+
+          {/* 価格（常に下端） */}
+          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px", marginTop: "auto" }}>
             {property.price != null ? (
               <p style={{ margin: 0 }}>
                 <span style={{ fontSize: "20px", fontWeight: "bold", color: "#2d4a6a" }}>{property.price.toLocaleString()}</span>
