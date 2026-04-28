@@ -1,19 +1,26 @@
 // components/home/FreeBannerSection.tsx
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { getFreeBanners, type Banner } from "@/lib/api";
 import { FreeBannerItem } from "./FreeBannerItem";
 
+function isRegisterBanner(banner: Banner): boolean {
+  const url = banner.link_url ?? "";
+  return url.includes("/lp/register") || url.includes("/members/register");
+}
+
 export async function FreeBannerSection() {
+  const session = await getServerSession(authOptions);
+  const isLoggedIn = !!session?.user;
+
   let banners: Banner[] = [];
   try {
     banners = await getFreeBanners();
-  } catch {
-    // Admin API 未起動時はスキップ
-  }
-
-  console.log("FreeBanners:", banners);
+  } catch {}
 
   const visible = banners
     .filter((b) => !!b.image_url)
+    .filter((b) => !(isLoggedIn && isRegisterBanner(b)))
     .sort((a, b) => a.sort_order - b.sort_order)
     .slice(0, 4);
 
