@@ -21,6 +21,7 @@ export default function FeliaSelecitonSlider({
 }) {
   const [current, setCurrent] = useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [hoveredInquiry, setHoveredInquiry] = useState<string | null>(null);
 
   // 物件が切り替わったら画像インデックスをリセット
   useEffect(() => {
@@ -323,16 +324,19 @@ export default function FeliaSelecitonSlider({
             </Link>
             <Link
               href={`/contact?property_id=${p.id}&type=inquiry`}
+              onMouseEnter={() => setHoveredInquiry(p.id)}
+              onMouseLeave={() => setHoveredInquiry(null)}
               style={{
                 display: "block",
                 textAlign: "center",
                 padding: "10px",
-                backgroundColor: "#fff",
-                color: "#5BAD52",
+                backgroundColor: hoveredInquiry === p.id ? "#5BAD52" : "#fff",
+                color: hoveredInquiry === p.id ? "#fff" : "#5BAD52",
                 borderRadius: "8px",
                 textDecoration: "none",
                 fontSize: "13px",
                 border: "1px solid #5BAD52",
+                transition: "all 0.2s ease",
               }}
             >
               この物件に問い合わせる
