@@ -32,6 +32,7 @@ function ContactForm() {
   const [loading, setLoading] = useState(false);
   const [done, setDone]       = useState(false);
   const [error, setError]     = useState("");
+  const [contactPhone, setContactPhone] = useState<string>("03-5981-8601");
 
   const update = (key: string, value: string) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -52,6 +53,25 @@ function ContactForm() {
       })
       .catch(() => {});
   }, [isLoggedIn, memberId]);
+
+  // 連絡先電話番号（会社情報 → 物件担当店舗 の順で上書き）
+  useEffect(() => {
+    fetch("/api/company-info")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.company?.phone) setContactPhone(d.company.phone);
+      })
+      .catch(() => {});
+
+    if (propertyId) {
+      fetch(`/api/properties/${propertyId}/store-phone`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.phone) setContactPhone(d.phone);
+        })
+        .catch(() => {});
+    }
+  }, [propertyId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -287,12 +307,12 @@ function ContactForm() {
             <div className="mt-6 pt-6 border-t text-center" style={{ borderColor: "#F0F0F0" }}>
               <p className="text-xs text-gray-400 mb-2">お急ぎの方はお電話でどうぞ</p>
               <a
-                href="tel:03XXXXXXXX"
+                href={`tel:${contactPhone.replace(/-/g, "")}`}
                 className="font-bold text-lg flex items-center justify-center gap-2"
                 style={{ color: "#5BAD52" }}
               >
                 <Phone size={18} />
-                03-XXXX-XXXX
+                {contactPhone}
               </a>
               <p className="text-xs text-gray-400 mt-1">
                 受付時間 10:00〜18:00（水曜定休）
