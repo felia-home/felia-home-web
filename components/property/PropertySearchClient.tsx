@@ -94,6 +94,56 @@ export default function PropertySearchClient() {
   const [selectedLine, setSelectedLine] = useState("");
   const [conditions, setConditions] = useState<string[]>([]);
 
+  // アコーディオン開閉
+  const [openArea, setOpenArea] = useState(false);
+  const [openLine, setOpenLine] = useState(false);
+  const [openConditions, setOpenConditions] = useState(false);
+
+  const accordionHeader = (
+    label: string,
+    isOpen: boolean,
+    toggle: () => void,
+    selectedCount?: number
+  ): React.ReactNode => (
+    <button
+      onClick={toggle}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: "100%",
+        padding: "12px 0",
+        backgroundColor: "transparent",
+        border: "none",
+        borderBottom: isOpen ? "2px solid #5BAD52" : "1px solid #e0e0e0",
+        cursor: "pointer",
+        marginBottom: isOpen ? "14px" : "0",
+        transition: "border-color 0.15s ease",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <span style={{ fontSize: "13px", fontWeight: "bold", color: "#444" }}>{label}</span>
+        {selectedCount != null && selectedCount > 0 && (
+          <span style={{
+            backgroundColor: "#5BAD52", color: "#fff",
+            fontSize: "10px", padding: "2px 7px",
+            borderRadius: "10px", fontWeight: "bold",
+          }}>
+            {selectedCount}
+          </span>
+        )}
+      </div>
+      <span style={{
+        fontSize: "18px", color: "#aaa",
+        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "transform 0.2s ease",
+        display: "inline-block",
+      }}>
+        ›
+      </span>
+    </button>
+  );
+
   const doSearch = useCallback(async (page = 1) => {
     setLoading(true);
     setSearched(true);
@@ -279,117 +329,120 @@ export default function PropertySearchClient() {
           </div>
 
           {/* エリア */}
-          <div style={{ marginBottom: "28px" }}>
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
-              エリア
-            </p>
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              <button
-                onClick={() => setSelectedArea("")}
-                style={{
-                  padding: "7px 14px",
-                  borderRadius: "6px",
-                  border: selectedArea === "" ? "2px solid #5BAD52" : "1px solid #e0e0e0",
-                  backgroundColor: selectedArea === "" ? "#e8f5e6" : "#fff",
-                  color: selectedArea === "" ? "#3a8a32" : "#555",
-                  fontSize: "12px",
-                  fontWeight: selectedArea === "" ? "bold" : "normal",
-                  cursor: "pointer",
-                  transition: "all 0.15s ease",
-                }}
-              >
-                すべて
-              </button>
-              {AREAS.map((area) => (
+          <div style={{ marginBottom: "12px" }}>
+            {accordionHeader(
+              "エリア",
+              openArea,
+              () => setOpenArea((v) => !v),
+              selectedArea ? 1 : 0
+            )}
+            {openArea && (
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", paddingBottom: "16px" }}>
                 <button
-                  key={area}
-                  onClick={() => setSelectedArea(selectedArea === area ? "" : area)}
+                  onClick={() => setSelectedArea("")}
                   style={{
-                    padding: "7px 14px",
-                    borderRadius: "6px",
-                    border: selectedArea === area ? "2px solid #5BAD52" : "1px solid #e0e0e0",
-                    backgroundColor: selectedArea === area ? "#e8f5e6" : "#fff",
-                    color: selectedArea === area ? "#3a8a32" : "#555",
-                    fontSize: "12px",
-                    fontWeight: selectedArea === area ? "bold" : "normal",
-                    cursor: "pointer",
-                    transition: "all 0.15s ease",
+                    padding: "7px 14px", borderRadius: "6px",
+                    border: selectedArea === "" ? "2px solid #5BAD52" : "1px solid #e0e0e0",
+                    backgroundColor: selectedArea === "" ? "#e8f5e6" : "#fff",
+                    color: selectedArea === "" ? "#3a8a32" : "#555",
+                    fontSize: "12px", fontWeight: selectedArea === "" ? "bold" : "normal",
+                    cursor: "pointer", transition: "all 0.15s ease",
                   }}
                 >
-                  {area}
+                  すべて
                 </button>
-              ))}
-            </div>
+                {AREAS.map((area) => (
+                  <button
+                    key={area}
+                    onClick={() => setSelectedArea(selectedArea === area ? "" : area)}
+                    style={{
+                      padding: "7px 14px", borderRadius: "6px",
+                      border: selectedArea === area ? "2px solid #5BAD52" : "1px solid #e0e0e0",
+                      backgroundColor: selectedArea === area ? "#e8f5e6" : "#fff",
+                      color: selectedArea === area ? "#3a8a32" : "#555",
+                      fontSize: "12px", fontWeight: selectedArea === area ? "bold" : "normal",
+                      cursor: "pointer", transition: "all 0.15s ease",
+                    }}
+                  >
+                    {area}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* 沿線 */}
-          <div style={{ marginBottom: "20px" }}>
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
-              沿線
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {TRAIN_LINES.map((group) => (
-                <div key={group.group}>
-                  <p style={{ fontSize: "11px", color: "#aaa", margin: "0 0 6px", letterSpacing: "0.05em" }}>
-                    {group.group}
-                  </p>
-                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                    {group.lines.map((line) => (
-                      <button
-                        key={line}
-                        onClick={() => setSelectedLine(selectedLine === line ? "" : line)}
-                        style={{
-                          padding: "6px 12px",
-                          borderRadius: "4px",
-                          border: selectedLine === line ? "2px solid #5BAD52" : "1px solid #e0e0e0",
-                          backgroundColor: selectedLine === line ? "#e8f5e6" : "#fff",
-                          color: selectedLine === line ? "#3a8a32" : "#555",
-                          fontSize: "12px",
-                          fontWeight: selectedLine === line ? "bold" : "normal",
-                          cursor: "pointer",
-                          transition: "all 0.15s ease",
-                        }}
-                      >
-                        {line}
-                      </button>
-                    ))}
+          <div style={{ marginBottom: "12px" }}>
+            {accordionHeader(
+              "沿線",
+              openLine,
+              () => setOpenLine((v) => !v),
+              selectedLine ? 1 : 0
+            )}
+            {openLine && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", paddingBottom: "16px" }}>
+                {TRAIN_LINES.map((group) => (
+                  <div key={group.group}>
+                    <p style={{ fontSize: "11px", color: "#aaa", margin: "0 0 6px", letterSpacing: "0.05em" }}>
+                      {group.group}
+                    </p>
+                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                      {group.lines.map((line) => (
+                        <button
+                          key={line}
+                          onClick={() => setSelectedLine(selectedLine === line ? "" : line)}
+                          style={{
+                            padding: "6px 12px", borderRadius: "4px",
+                            border: selectedLine === line ? "2px solid #5BAD52" : "1px solid #e0e0e0",
+                            backgroundColor: selectedLine === line ? "#e8f5e6" : "#fff",
+                            color: selectedLine === line ? "#3a8a32" : "#555",
+                            fontSize: "12px", fontWeight: selectedLine === line ? "bold" : "normal",
+                            cursor: "pointer", transition: "all 0.15s ease",
+                          }}
+                        >
+                          {line}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* こだわり条件 */}
           <div style={{ marginBottom: "28px" }}>
-            <p style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px" }}>
-              こだわり条件
-            </p>
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              {CONDITIONS.map((cond) => {
-                const selected = conditions.includes(cond.value);
-                return (
-                  <button
-                    key={cond.value}
-                    onClick={() => setConditions(prev =>
-                      selected ? prev.filter(c => c !== cond.value) : [...prev, cond.value]
-                    )}
-                    style={{
-                      padding: "7px 14px",
-                      borderRadius: "20px",
-                      border: selected ? "2px solid #5BAD52" : "1px solid #e0e0e0",
-                      backgroundColor: selected ? "#e8f5e6" : "#fff",
-                      color: selected ? "#3a8a32" : "#555",
-                      fontSize: "12px",
-                      fontWeight: selected ? "bold" : "normal",
-                      cursor: "pointer",
-                      transition: "all 0.15s ease",
-                    }}
-                  >
-                    {cond.label}
-                  </button>
-                );
-              })}
-            </div>
+            {accordionHeader(
+              "こだわり条件",
+              openConditions,
+              () => setOpenConditions((v) => !v),
+              conditions.length
+            )}
+            {openConditions && (
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", paddingBottom: "16px" }}>
+                {CONDITIONS.map((cond) => {
+                  const selected = conditions.includes(cond.value);
+                  return (
+                    <button
+                      key={cond.value}
+                      onClick={() => setConditions((prev) =>
+                        selected ? prev.filter((c) => c !== cond.value) : [...prev, cond.value]
+                      )}
+                      style={{
+                        padding: "7px 14px", borderRadius: "20px",
+                        border: selected ? "2px solid #5BAD52" : "1px solid #e0e0e0",
+                        backgroundColor: selected ? "#e8f5e6" : "#fff",
+                        color: selected ? "#3a8a32" : "#555",
+                        fontSize: "12px", fontWeight: selected ? "bold" : "normal",
+                        cursor: "pointer", transition: "all 0.15s ease",
+                      }}
+                    >
+                      {cond.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* ボタン */}
