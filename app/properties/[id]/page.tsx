@@ -6,6 +6,19 @@ import Link from "next/link";
 import { getPropertyDetail, getPropertyImages, getStaffDetail } from "@/lib/api";
 import PropertyGallery from "@/components/property/PropertyGallery";
 import LoanSimulator from "@/components/property/LoanSimulator";
+import { PropertyImage } from "@/components/ui/PropertyImage";
+
+function buildFallbackTitle(p: {
+  title?: string | null;
+  city?: string | null;
+  town?: string | null;
+  price?: number | null;
+}): string {
+  if (p.title) return p.title;
+  const loc = [p.city, p.town].filter(Boolean).join("");
+  const price = p.price != null ? ` ${p.price.toLocaleString()}万円` : "";
+  return loc ? `${loc}${price}` : "物件詳細";
+}
 
 interface PageProps {
   params: { id: string };
@@ -51,8 +64,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const property = await getPropertyDetail(params.id);
     if (!property) return { title: "物件詳細" };
     const typeLabel = PROPERTY_TYPE_MAP[property.property_type] ?? property.property_type;
+    const baseTitle = property.title
+      ?? `${[property.city, property.town].filter(Boolean).join("")} ${typeLabel}`.trim();
     return {
-      title: `${property.city ?? ""}${property.rooms ?? ""} ${typeLabel} ${property.price != null ? property.price.toLocaleString() + "万円" : "応相談"} | フェリアホーム`,
+      title: `${baseTitle} ${property.price != null ? property.price.toLocaleString() + "万円" : "応相談"} | フェリアホーム`,
       description: `${typeLabel}｜${property.city ?? ""}${property.town ?? ""}｜${property.price != null ? property.price.toLocaleString() + "万円" : "応相談"}${property.area_build_m2 ? "｜" + property.area_build_m2 + "㎡" : ""}${property.station_name1 ? "｜" + property.station_name1 + "駅 徒歩" + property.station_walk1 + "分" : ""}`,
     };
   } catch {
@@ -71,6 +86,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   const staff = property.agent_id ? await getStaffDetail(property.agent_id) : null;
 
   const typeLabel = PROPERTY_TYPE_MAP[property.property_type] ?? property.property_type;
+  const displayTitle = buildFallbackTitle(property);
 
   // 住所表示（address_display_levelに応じてマスク）
   const displayAddress = (() => {
@@ -152,14 +168,25 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           <span>›</span>
           <Link href="/properties" style={{ color: "#888", textDecoration: "none" }}>物件一覧</Link>
           <span>›</span>
-          <span style={{ color: "#333" }}>{property.title}</span>
+          <span style={{ color: "#333" }}>{displayTitle}</span>
         </div>
       </div>
 
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 24px 80px" }}>
 
         {/* 画像ギャラリー */}
-        <PropertyGallery images={images} title={property.title} />
+        {images.length > 0 ? (
+          <PropertyGallery images={images} title={displayTitle} />
+        ) : (
+          <div style={{ position: "relative", aspectRatio: "16/9", borderRadius: "12px", overflow: "hidden" }}>
+            <PropertyImage
+              src={null}
+              alt={displayTitle}
+              seed={property.id}
+              sizes="(max-width: 1200px) 100vw, 800px"
+            />
+          </div>
+        )}
 
         {/* メインコンテンツ */}
         <div className="property-detail-grid" style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "24px", marginTop: "24px" }}>
@@ -185,7 +212,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 )}
               </div>
               <h1 style={{ fontSize: "22px", fontWeight: "bold", color: "#333", margin: "0 0 8px", lineHeight: 1.4 }}>
-                {property.title}
+                {displayTitle}
               </h1>
               {property.catch_copy && (
                 <p style={{ fontSize: "14px", color: "#666", margin: 0, lineHeight: 1.6, borderLeft: "3px solid #5BAD52", paddingLeft: "12px" }}>
