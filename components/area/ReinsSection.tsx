@@ -123,7 +123,7 @@ function ReinsPropertyCard({ property }: { property: ReinsProperty }) {
 
   return (
     <Link
-      href={`/contact?reins_id=${property.id}&type=reins&address=${encodeURIComponent(property.address ?? "")}`}
+      href={`/reins/${property.id}`}
       style={{ textDecoration: "none", color: "inherit", display: "block" }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
