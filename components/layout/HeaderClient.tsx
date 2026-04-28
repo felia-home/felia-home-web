@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search, Heart, Menu, Lock } from "lucide-react";
 import { AccordionMenu } from "./AccordionMenu";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 
 interface HeaderClientProps {
   isLoggedIn?: boolean;
@@ -173,6 +173,30 @@ export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClient
                   >
                     マイページ
                   </Link>
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    style={{
+                      padding: "8px 14px",
+                      backgroundColor: "transparent",
+                      color: "#888",
+                      border: "1px solid #ddd",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                      transition: "all 0.15s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#f5f5f5";
+                      (e.currentTarget as HTMLButtonElement).style.color = "#555";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+                      (e.currentTarget as HTMLButtonElement).style.color = "#888";
+                    }}
+                  >
+                    ログアウト
+                  </button>
                 </div>
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "4px" }}>

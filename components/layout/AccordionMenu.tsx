@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 
 interface MenuItem {
   label: string;
@@ -57,6 +58,8 @@ interface AccordionMenuProps {
 
 export function AccordionMenu({ isOpen, onClose }: AccordionMenuProps) {
   const [openItems, setOpenItems] = useState<string[]>([]);
+  const session = useSession();
+  const isLoggedIn = session?.status === "authenticated";
 
   // メニューが開いた時にスクロールを禁止
   useEffect(() => {
@@ -210,6 +213,27 @@ export function AccordionMenu({ isOpen, onClose }: AccordionMenuProps) {
             採用情報
           </Link>
         </div>
+
+        {/* ログアウト（ログイン時のみ） */}
+        {isLoggedIn && (
+          <button
+            onClick={() => { onClose(); signOut({ callbackUrl: "/" }); }}
+            style={{
+              display: "block",
+              width: "100%",
+              textAlign: "left",
+              padding: "14px 24px",
+              backgroundColor: "transparent",
+              border: "none",
+              borderTop: "1px solid #f0f0f0",
+              fontSize: "14px",
+              color: "#888",
+              cursor: "pointer",
+            }}
+          >
+            ログアウト
+          </button>
+        )}
       </div>
 
       {/* アニメーション定義 */}
