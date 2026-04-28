@@ -104,7 +104,7 @@ export function AreaPropertiesClient({
 
       let reinsProps: ReinsProperty[] = [];
       if (isLoggedIn) {
-        const reinsParams = new URLSearchParams({ area: areaName, limit: "200" });
+        const reinsParams = new URLSearchParams({ area: areaName, limit: "9999" });
         const reinsRes = await fetch(`/api/reins?${reinsParams}`);
         const reinsData = await reinsRes.json();
         reinsProps = (reinsData.properties ?? []).map((p: any) => ({ ...p, _type: "reins" }));
