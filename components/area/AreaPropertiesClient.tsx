@@ -104,10 +104,29 @@ export function AreaPropertiesClient({
 
       let reinsProps: ReinsProperty[] = [];
       if (isLoggedIn) {
-        const reinsParams = new URLSearchParams({ area: areaName, limit: "9999" });
-        const reinsRes = await fetch(`/api/reins?${reinsParams}`);
-        const reinsData = await reinsRes.json();
-        reinsProps = (reinsData.properties ?? []).map((p: any) => ({ ...p, _type: "reins" }));
+        try {
+          const LIMIT = 500;
+          // 1ページ目取得
+          const firstParams = new URLSearchParams({ area: areaName, limit: String(LIMIT), page: "1" });
+          const firstRes = await fetch(`/api/reins?${firstParams}`);
+          const firstData = await firstRes.json();
+          const totalPages = firstData.total_pages ?? Math.ceil((firstData.total ?? 0) / LIMIT);
+          reinsProps = (firstData.properties ?? []).map((p: any) => ({ ...p, _type: "reins" }));
+
+          // 2ページ目以降を並列取得
+          if (totalPages > 1) {
+            const pagePromises = Array.from({ length: totalPages - 1 }, (_, i) => {
+              const params = new URLSearchParams({ area: areaName, limit: String(LIMIT), page: String(i + 2) });
+              return fetch(`/api/reins?${params}`).then((r) => r.json());
+            });
+            const results = await Promise.all(pagePromises);
+            results.forEach((data) => {
+              reinsProps = [...reinsProps, ...(data.properties ?? []).map((p: any) => ({ ...p, _type: "reins" }))];
+            });
+          }
+        } catch {
+          reinsProps = [];
+        }
       }
 
       const all = [...normalProps, ...reinsProps];
