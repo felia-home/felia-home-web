@@ -104,8 +104,7 @@ export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClient
               {/* 採用情報 */}
               <Link
                 href="/recruit"
-                style={{ ...navItemStyle("recruit"), display: "none" }}
-                className="tb-show"
+                style={{ ...navItemStyle("recruit"), display: "flex" }}
                 onMouseEnter={() => setHoveredNav("recruit")}
                 onMouseLeave={() => setHoveredNav(null)}
               >
