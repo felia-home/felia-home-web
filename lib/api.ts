@@ -59,7 +59,12 @@ export async function getPropertyById(id: string): Promise<Property | null> {
       const imgRes = await fetchFromAdmin<{ images: any[] }>(`/api/properties/${id}/images`);
       const images = (imgRes as any).images ?? [];
       if (images.length > 0) {
-        property.images = images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
+        property.images = images
+          .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
+          .map((img: any) => ({
+            ...img,
+            caption: img.caption ?? img.ai_caption ?? null,
+          }));
       }
     } catch {}
 
@@ -506,10 +511,12 @@ export interface PropertyDetail {
 export interface PropertyImage {
   id: string;
   url: string;
-  filename: string;
+  filename?: string;
+  is_main?: boolean;
   order?: number;
   caption?: string | null;
-  is_main?: boolean;
+  ai_caption?: string | null;
+  room_type?: string | null;
 }
 
 export interface StaffDetail {
