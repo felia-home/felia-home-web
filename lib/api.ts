@@ -48,8 +48,13 @@ export async function getPropertiesByLine(line: string) {
   return fetchFromAdmin<Property[]>(`/api/properties?line=${encodeURIComponent(line)}&published_hp=true`);
 }
 
-export async function getPropertyById(id: string) {
-  return fetchFromAdmin<Property>(`/api/properties/${id}`);
+export async function getPropertyById(id: string): Promise<Property | null> {
+  try {
+    const res = await fetchFromAdmin<{ property: Property }>(`/api/properties/${id}`);
+    return (res as any).property ?? res ?? null;
+  } catch {
+    return null;
+  }
 }
 
 // ---- 現地販売会 ----

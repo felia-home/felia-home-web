@@ -52,13 +52,16 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   const p = property as any;
   const isLoggedIn = !!session?.user;
 
+  const propLat = p.latitude ?? p.lat;
+  const propLng = p.longitude ?? p.lng;
+
   // 近隣物件取得（admin直接呼び出しでサーバー間通信）
   let nearbyProperties: any[] = [];
   try {
     const nearbyParams = new URLSearchParams();
-    if (p.lat && p.lng) {
-      nearbyParams.set("lat", String(p.lat));
-      nearbyParams.set("lng", String(p.lng));
+    if (propLat && propLng) {
+      nearbyParams.set("lat", String(propLat));
+      nearbyParams.set("lng", String(propLng));
     } else if (p.city) {
       nearbyParams.set("city", p.city);
     }
@@ -120,8 +123,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   ].filter((s) => s.value);
 
   const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  const mapSrc = mapsKey && p.lat && p.lng
-    ? `https://www.google.com/maps/embed/v1/place?key=${mapsKey}&q=${p.lat},${p.lng}&zoom=15`
+  const mapSrc = mapsKey && propLat && propLng
+    ? `https://www.google.com/maps/embed/v1/place?key=${mapsKey}&q=${propLat},${propLng}&zoom=15`
     : null;
 
   const tourUrl = p.tour_url ?? null;
