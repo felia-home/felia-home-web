@@ -2,6 +2,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getPropertyById } from "@/lib/api";
@@ -90,6 +91,20 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       areaColumns = data.columns ?? [];
     }
   } catch {}
+
+  // 担当スタッフ取得
+  let agent: any = null;
+  const agentId = p.agent_id ?? null;
+  if (agentId) {
+    try {
+      const res = await fetch(
+        `${process.env.ADMIN_API_URL}/api/staff/${agentId}`,
+        { cache: "no-store" }
+      );
+      const data = await res.json();
+      agent = data.staff ?? null;
+    } catch {}
+  }
 
   const images = (p.images as any[]) ?? [];
   const typeLabel = PROPERTY_TYPE_MAP[p.property_type ?? ""] ?? "";
@@ -455,6 +470,84 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             {/* ローンシミュレーター */}
             {p.price != null && (
               <LoanSimulator price={p.price} />
+            )}
+
+            {/* 担当スタッフ */}
+            {agent && (
+              <div style={{
+                backgroundColor: "#fff",
+                borderRadius: "12px",
+                border: "1px solid #e8e8e8",
+                overflow: "hidden",
+              }}>
+                <div style={{ backgroundColor: "#f8f8f8", padding: "12px 20px", borderBottom: "1px solid #e8e8e8" }}>
+                  <p style={{ fontSize: "11px", fontWeight: "bold", color: "#888", margin: 0, letterSpacing: "0.1em" }}>
+                    STAFF
+                  </p>
+                </div>
+                <div style={{ padding: "16px 20px", display: "flex", gap: "14px", alignItems: "center" }}>
+                  <div style={{
+                    width: "60px", height: "60px",
+                    borderRadius: "50%",
+                    overflow: "hidden",
+                    flexShrink: 0,
+                    backgroundColor: "#f0f0f0",
+                    position: "relative",
+                  }}>
+                    {agent.image_url ? (
+                      <Image
+                        src={agent.image_url}
+                        alt={agent.name ?? "担当スタッフ"}
+                        fill
+                        style={{ objectFit: "cover" }}
+                        sizes="60px"
+                      />
+                    ) : (
+                      <div style={{
+                        width: "100%", height: "100%",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: "24px", color: "#bbb",
+                      }}>
+                        👤
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: "11px", color: "#5BAD52", margin: "0 0 2px", fontWeight: "bold" }}>
+                      担当スタッフ
+                    </p>
+                    <p style={{ fontSize: "15px", fontWeight: "bold", color: "#333", margin: "0 0 2px" }}>
+                      {agent.name}
+                    </p>
+                    {agent.title && (
+                      <p style={{ fontSize: "11px", color: "#888", margin: 0 }}>{agent.title}</p>
+                    )}
+                    {agent.catch_copy && (
+                      <p style={{ fontSize: "11px", color: "#666", margin: "4px 0 0", lineHeight: 1.6 }}>
+                        {agent.catch_copy}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                {agent.id && (
+                  <div style={{ padding: "0 20px 16px" }}>
+                    <Link
+                      href={`/staff/${agent.id}`}
+                      style={{
+                        display: "block", textAlign: "center",
+                        padding: "8px",
+                        border: "1px solid #e0e0e0",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        color: "#666",
+                        textDecoration: "none",
+                      }}
+                    >
+                      プロフィールを見る →
+                    </Link>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
