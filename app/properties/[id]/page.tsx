@@ -124,6 +124,17 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     } catch {}
   }
 
+  // 周辺環境写真取得
+  let envImages: any[] = [];
+  try {
+    const res = await fetch(
+      `${process.env.ADMIN_API_URL}/api/properties/${params.id}/env-images`,
+      { cache: "no-store" }
+    );
+    const data = await res.json();
+    envImages = data.images ?? [];
+  } catch {}
+
   const images = (p.images as any[]) ?? [];
   const typeLabel = PROPERTY_TYPE_MAP[p.property_type ?? ""] ?? "";
   const location = [p.city, p.town].filter(Boolean).join("");
@@ -368,6 +379,93 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 )}
               </div>
             </div>
+
+            {/* 周辺環境写真 */}
+            {envImages.length > 0 && (
+              <div style={{
+                backgroundColor: "#fff",
+                borderRadius: "12px",
+                border: "1px solid #e8e8e8",
+                overflow: "hidden",
+              }}>
+                <div style={{ backgroundColor: "#f8f8f8", padding: "14px 20px", borderBottom: "1px solid #e8e8e8" }}>
+                  <h2 style={{ fontSize: "15px", fontWeight: "bold", color: "#333", margin: 0 }}>
+                    🏪 周辺環境
+                  </h2>
+                </div>
+                <div style={{ padding: "16px 20px" }}>
+                  {(() => {
+                    const FACILITY_LABELS: Record<string, string> = {
+                      supermarket: "スーパー",
+                      convenience: "コンビニ",
+                      school: "学校",
+                      hospital: "病院",
+                      park: "公園",
+                      station: "駅",
+                      bank: "銀行",
+                      restaurant: "飲食店",
+                      pharmacy: "薬局",
+                      gym: "スポーツ施設",
+                      nursery: "保育園・幼稚園",
+                    };
+
+                    const groups: Record<string, any[]> = {};
+                    envImages.forEach((img) => {
+                      const type = img.facility_type ?? "other";
+                      if (!groups[type]) groups[type] = [];
+                      groups[type].push(img);
+                    });
+
+                    return Object.entries(groups).map(([type, imgs]) => (
+                      <div key={type} style={{ marginBottom: "20px" }}>
+                        <h3 style={{ fontSize: "13px", fontWeight: "bold", color: "#555", margin: "0 0 10px", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span style={{ display: "inline-block", width: "4px", height: "14px", backgroundColor: "#5BAD52", borderRadius: "2px" }} />
+                          {FACILITY_LABELS[type] ?? type}
+                        </h3>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "10px" }}>
+                          {imgs.map((img: any, i: number) => (
+                            <div key={i} style={{ borderRadius: "8px", overflow: "hidden", border: "1px solid #e8e8e8" }}>
+                              <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0" }}>
+                                {img.url ? (
+                                  <Image
+                                    src={img.url}
+                                    alt={img.facility_name ?? "周辺施設"}
+                                    fill
+                                    style={{ objectFit: "cover" }}
+                                    sizes="160px"
+                                  />
+                                ) : (
+                                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px" }}>
+                                    🏪
+                                  </div>
+                                )}
+                              </div>
+                              <div style={{ padding: "8px 10px" }}>
+                                {img.facility_name && (
+                                  <p style={{ fontSize: "12px", fontWeight: "bold", color: "#333", margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    {img.facility_name}
+                                  </p>
+                                )}
+                                {img.walk_minutes && (
+                                  <p style={{ fontSize: "11px", color: "#5BAD52", margin: "0 0 2px", fontWeight: "bold" }}>
+                                    徒歩{img.walk_minutes}分
+                                  </p>
+                                )}
+                                {img.caption && (
+                                  <p style={{ fontSize: "11px", color: "#888", margin: 0, lineHeight: 1.5 }}>
+                                    {img.caption}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              </div>
+            )}
 
             {/* ⑧ 物件概要 */}
             <div style={{ backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #e8e8e8", overflow: "hidden" }}>
