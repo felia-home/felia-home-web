@@ -10,6 +10,7 @@ import PropertyGallery from "@/components/property/PropertyGallery";
 import LoanSimulator from "@/components/property/LoanSimulator";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 import { AgentCard } from "@/components/property/AgentCard";
+import { AreaColumnAccordion } from "@/components/property/AreaColumnAccordion";
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
@@ -187,7 +188,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       </div>
 
       {/* ① タイトルカード */}
-      <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e8e8e8", padding: "20px 24px" }}>
+      <div style={{ backgroundColor: "#fff", padding: "20px 24px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "10px" }}>
             {typeLabel && (
@@ -295,21 +296,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
             {/* ⑥ 地域コラム */}
             {areaColumns.length > 0 && (
-              <div style={{ backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #e8e8e8", overflow: "hidden" }}>
-                <div style={{ backgroundColor: "#f8f8f8", padding: "14px 20px", borderBottom: "1px solid #e8e8e8" }}>
-                  <h2 style={{ fontSize: "15px", fontWeight: "bold", color: "#333", margin: 0 }}>
-                    📍 {p.city}エリアガイド
-                  </h2>
-                </div>
-                {areaColumns.map((col: any) => (
-                  <div key={col.id} style={{ padding: "20px", borderBottom: "1px solid #f0f0f0" }}>
-                    <h3 style={{ fontSize: "14px", fontWeight: "bold", color: "#333", margin: "0 0 10px" }}>{col.title}</h3>
-                    <p style={{ fontSize: "13px", color: "#555", lineHeight: 1.9, margin: 0, whiteSpace: "pre-wrap" }}>
-                      {col.content}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              <AreaColumnAccordion columns={areaColumns} />
             )}
 
             {/* ⑦ 地図 + 近隣物件 */}
