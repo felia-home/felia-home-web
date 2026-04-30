@@ -80,16 +80,31 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     }
   } catch {}
 
-  // エリアコラム取得
+  // エリアコラム取得（駅名ベース）
   let areaColumns: any[] = [];
   try {
-    if (p.city) {
-      const res = await fetch(
-        `${process.env.ADMIN_API_URL}/api/hp/area-columns?area=${encodeURIComponent(p.city)}`,
-        { cache: "no-store" }
+    const stationNames = [1, 2, 3]
+      .map((i) => p[`station_name${i}`])
+      .filter(Boolean);
+
+    if (stationNames.length > 0) {
+      const colResults = await Promise.all(
+        stationNames.map((station) =>
+          fetch(
+            `${process.env.ADMIN_API_URL}/api/hp/area-columns?station=${encodeURIComponent(station)}`,
+            { cache: "no-store" }
+          ).then((r) => r.json()).catch(() => ({ columns: [] }))
+        )
       );
-      const data = await res.json();
-      areaColumns = data.columns ?? [];
+      const seen = new Set<string>();
+      for (const result of colResults) {
+        for (const col of result.columns ?? []) {
+          if (!seen.has(col.id)) {
+            seen.add(col.id);
+            areaColumns.push(col);
+          }
+        }
+      }
     }
   } catch {}
 
