@@ -382,34 +382,70 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           <div style={{ position: "sticky", top: "80px", display: "flex", flexDirection: "column", gap: "16px" }}>
 
             {/* 価格・CTA */}
-            <div style={{ backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #e8e8e8", padding: "24px" }}>
+            <div style={{ backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #e8e8e8", overflow: "hidden" }}>
+              {/* 価格ヘッダー（濃い緑背景） */}
               {p.price != null && (
-                <div style={{ marginBottom: "16px" }}>
-                  <p style={{ fontSize: "11px", color: "#aaa", margin: "0 0 4px" }}>販売価格</p>
+                <div style={{
+                  backgroundColor: "#1a4a24",
+                  padding: "20px 24px",
+                  textAlign: "center",
+                }}>
+                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", margin: "0 0 6px", letterSpacing: "0.1em", fontFamily: "'Montserrat', sans-serif" }}>
+                    PRICE
+                  </p>
                   <p style={{ margin: 0 }}>
-                    <span style={{ fontSize: "32px", fontWeight: "bold", color: "#5BAD52", fontFamily: "'Montserrat', sans-serif" }}>
+                    <span style={{
+                      fontSize: "40px",
+                      fontWeight: "bold",
+                      color: "#fff",
+                      fontFamily: "'Montserrat', sans-serif",
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1,
+                    }}>
                       {p.price.toLocaleString()}
                     </span>
-                    <span style={{ fontSize: "16px", color: "#5BAD52", marginLeft: "4px" }}>万円</span>
+                    <span style={{ fontSize: "18px", color: "rgba(255,255,255,0.8)", marginLeft: "6px" }}>万円</span>
                   </p>
+                  {p.price_negotiable && (
+                    <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: "8px 0 0" }}>※価格相談可</p>
+                  )}
                 </div>
               )}
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+
+              {/* CTAボタン */}
+              <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
                 <Link
                   href={`/contact?type=visit&property_id=${p.id}&propertyNo=${p.property_no ?? ""}`}
-                  style={{ display: "block", textAlign: "center", padding: "14px", backgroundColor: "#5BAD52", color: "#fff", borderRadius: "8px", textDecoration: "none", fontWeight: "bold", fontSize: "14px" }}
+                  style={{
+                    display: "block", textAlign: "center", padding: "15px",
+                    backgroundColor: "#5BAD52", color: "#fff",
+                    borderRadius: "8px", textDecoration: "none",
+                    fontWeight: "bold", fontSize: "15px",
+                    boxShadow: "0 2px 8px rgba(91,173,82,0.3)",
+                  }}
                 >
                   🏠 来店・内覧予約
                 </Link>
                 <Link
                   href={`/contact?type=document&property_id=${p.id}&propertyNo=${p.property_no ?? ""}`}
-                  style={{ display: "block", textAlign: "center", padding: "13px", backgroundColor: "#fff", color: "#5BAD52", borderRadius: "8px", textDecoration: "none", fontWeight: "bold", fontSize: "14px", border: "1.5px solid #5BAD52" }}
+                  style={{
+                    display: "block", textAlign: "center", padding: "14px",
+                    backgroundColor: "#fff", color: "#5BAD52",
+                    borderRadius: "8px", textDecoration: "none",
+                    fontWeight: "bold", fontSize: "14px",
+                    border: "1.5px solid #5BAD52",
+                  }}
                 >
                   📄 資料請求
                 </Link>
                 <Link
                   href={`/contact?type=property&property_id=${p.id}`}
-                  style={{ display: "block", textAlign: "center", padding: "12px", backgroundColor: "#fff", color: "#888", borderRadius: "8px", textDecoration: "none", fontSize: "13px", border: "1px solid #e0e0e0" }}
+                  style={{
+                    display: "block", textAlign: "center", padding: "12px",
+                    backgroundColor: "#fff", color: "#888",
+                    borderRadius: "8px", textDecoration: "none",
+                    fontSize: "13px", border: "1px solid #e0e0e0",
+                  }}
                 >
                   ✉️ メールで問い合わせ
                 </Link>
