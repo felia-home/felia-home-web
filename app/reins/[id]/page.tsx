@@ -7,6 +7,14 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 
+function cleanBuiltYear(text: string | null | undefined): string | null {
+  if (!text) return null;
+  const normalized = text.replace(/\xa0/g, " ").trim();
+  if (/^\d+$/.test(normalized)) return null;
+  const result = normalized.replace(/(\d+)$/, "$1月").trim();
+  return result || null;
+}
+
 interface ReinsProperty {
   id: string;
   source_type: string;
@@ -95,7 +103,7 @@ export default function ReinsDetailPage() {
     { label: "土地面積", value: property.area_land_m2 ? `${property.area_land_m2}㎡` : null },
     { label: "建物面積", value: property.area_build_m2 ? `${property.area_build_m2}㎡` : null },
     { label: "専有面積", value: property.area_exclusive_m2 ? `${property.area_exclusive_m2}㎡` : null },
-    { label: "築年月", value: property.built_year_text ? property.built_year_text.replace(/(\d+)$/, "$1月") : null },
+    { label: "築年月", value: cleanBuiltYear(property.built_year_text) },
     { label: "最寄駅", value: property.station_name ? `${property.station_line ?? ""} ${property.station_name}駅 徒歩${property.walk_minutes ?? "?"}分` : null },
     { label: "用途地域", value: property.use_zone ?? null },
     { label: "取引態様", value: property.transaction_type ?? null },

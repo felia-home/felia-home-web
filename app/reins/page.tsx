@@ -68,6 +68,14 @@ function PropertyPlaceholder({ type }: { type: string }) {
   );
 }
 
+function cleanBuiltYear(text: string | null | undefined): string | null {
+  if (!text) return null;
+  const normalized = text.replace(/\xa0/g, " ").trim();
+  if (/^\d+$/.test(normalized)) return null;
+  const result = normalized.replace(/(\d+)$/, "$1月").trim();
+  return result || null;
+}
+
 const AREAS = [
   "千代田区","中央区","港区","新宿区","文京区","台東区",
   "品川区","目黒区","大田区","世田谷区","渋谷区","中野区",
@@ -377,9 +385,9 @@ function ReinsCard({ property }: { property: ReinsProperty }) {
             {property.area_m2 && (
               <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📐 {property.area_m2}㎡</p>
             )}
-            {property.built_year_text && (
+            {cleanBuiltYear(property.built_year_text) && (
               <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                📅 {property.built_year_text.replace(/(\d+)$/, "$1月")}
+                📅 {cleanBuiltYear(property.built_year_text)}
               </p>
             )}
           </div>

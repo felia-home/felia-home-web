@@ -46,6 +46,14 @@ interface ReinsProperty {
 
 type Property = NormalProperty | ReinsProperty;
 
+function cleanBuiltYear(text: string | null | undefined): string | null {
+  if (!text) return null;
+  const normalized = text.replace(/\xa0/g, " ").trim();
+  if (/^\d+$/.test(normalized)) return null;
+  const result = normalized.replace(/(\d+)$/, "$1月").trim();
+  return result || null;
+}
+
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
   MANSION: "マンション", USED_MANSION: "中古マンション",
@@ -410,8 +418,8 @@ function ReinsCard({ property }: { property: ReinsProperty }) {
             )}
             {property.rooms && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚪 {property.rooms}</p>}
             {area && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📐 {area}㎡</p>}
-            {property.built_year_text && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📅 {property.built_year_text.replace(/(\d+)$/, "$1月")}</p>
+            {cleanBuiltYear(property.built_year_text) && (
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📅 {cleanBuiltYear(property.built_year_text)}</p>
             )}
           </div>
 
