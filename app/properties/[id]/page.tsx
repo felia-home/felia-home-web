@@ -111,6 +111,16 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   const typeLabel = PROPERTY_TYPE_MAP[p.property_type ?? ""] ?? "";
   const location = [p.city, p.town].filter(Boolean).join("");
   const sellingPoints: string[] = p.selling_points ?? [];
+
+  // 沿線・駅情報を配列化（最大3件、駅名があるものだけ）
+  const stations = [1, 2, 3]
+    .map((i) => ({
+      line: p[`station_line${i}`] ?? null,
+      name: p[`station_name${i}`] ?? null,
+      walk: p[`station_walk${i}`] ?? null,
+    }))
+    .filter((s) => s.name);
+
   const equipments = Object.entries(EQUIPMENT_LABELS)
     .filter(([key]) => p[key] === true)
     .map(([, label]) => label);
@@ -122,7 +132,9 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     { label: "物件種別", value: typeLabel },
     { label: "販売価格", value: p.price != null ? `${p.price.toLocaleString()}万円` : null },
     { label: "所在地", value: location || null },
-    { label: "交通", value: p.station_name1 ? `${p.station_line1 ?? ""} ${p.station_name1}駅 徒歩${p.station_walk1}分` : null },
+    { label: "交通", value: stations.length > 0
+      ? stations.map((s) => `${s.line ? s.line + " " : ""}${s.name}駅 徒歩${s.walk}分`).join(" / ")
+      : null },
     { label: "間取り", value: p.rooms ?? null },
     { label: "土地面積", value: p.area_land_m2 ? `${p.area_land_m2}㎡` : null },
     { label: "建物面積", value: p.area_build_m2 ? `${p.area_build_m2}㎡` : null },
@@ -425,6 +437,33 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                   {p.price_negotiable && (
                     <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: "8px 0 0" }}>※価格相談可</p>
                   )}
+                </div>
+              )}
+
+              {/* 沿線・駅情報 */}
+              {stations.length > 0 && (
+                <div style={{
+                  padding: "14px 16px",
+                  borderTop: "1px solid rgba(255,255,255,0.1)",
+                  backgroundColor: "#1a4a24",
+                }}>
+                  {stations.map((s, i) => (
+                    <div key={i} style={{
+                      display: "flex", alignItems: "center", gap: "8px",
+                      padding: i > 0 ? "6px 0 0" : "0",
+                    }}>
+                      <span style={{ fontSize: "14px" }}>🚃</span>
+                      <div>
+                        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.9)", margin: 0, fontWeight: "500" }}>
+                          {s.line && <span style={{ color: "rgba(255,255,255,0.6)", marginRight: "4px", fontSize: "11px" }}>{s.line}</span>}
+                          {s.name}駅
+                        </p>
+                        <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
+                          徒歩{s.walk}分
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
