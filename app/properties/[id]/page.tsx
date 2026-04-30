@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const property = await getPropertyById(params.id).catch(() => null);
   if (!property) return { title: "物件詳細 | フェリアホーム" };
   const p = property as any;
-  const title = p.title ?? `${p.city ?? ""}${p.town ?? ""}` || "物件詳細";
+  const title = p.title ?? (`${p.city ?? ""}${p.town ?? ""}` || "物件詳細");
   return {
     title: `${title} | フェリアホーム`,
     description: p.description_hp ?? p.catch_copy ?? undefined,
