@@ -11,6 +11,7 @@ import LoanSimulator from "@/components/property/LoanSimulator";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 import { AgentCard } from "@/components/property/AgentCard";
 import { AreaColumnAccordion } from "@/components/property/AreaColumnAccordion";
+import { FavoriteButton } from "@/components/ui/FavoriteButton";
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
@@ -207,9 +208,12 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               </span>
             )}
           </div>
-          <h1 style={{ fontSize: "clamp(18px, 3vw, 26px)", fontWeight: "bold", color: "#1a1a1a", margin: "0 0 6px", lineHeight: 1.4 }}>
-            {displayTitle}
-          </h1>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", margin: "0 0 6px" }}>
+            <h1 style={{ fontSize: "clamp(18px, 3vw, 26px)", fontWeight: "bold", color: "#1a1a1a", margin: 0, lineHeight: 1.4, flex: 1 }}>
+              {displayTitle}
+            </h1>
+            <FavoriteButton propertyId={p.id} size="lg" />
+          </div>
           {p.catch_copy && (
             <p style={{ fontSize: "14px", color: "#5BAD52", margin: 0, fontStyle: "italic" }}>
               {p.catch_copy}

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { PropertyImage } from "@/components/ui/PropertyImage";
+import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import Link from "next/link";
 
 const PROPERTY_TYPES = [
@@ -688,6 +689,9 @@ function PropertyCard({ property }: { property: Property }) {
                 現地販売会
               </span>
             )}
+          </div>
+          <div style={{ position: "absolute", top: "10px", right: "10px", zIndex: 2 }}>
+            <FavoriteButton propertyId={property.id} size="sm" />
           </div>
         </div>
 

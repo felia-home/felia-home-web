@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { PropertyImage } from "@/components/ui/PropertyImage";
+import { FavoriteButton } from "@/components/ui/FavoriteButton";
 
 interface NormalProperty {
   id: string;
@@ -320,6 +321,9 @@ function NormalCard({ property }: { property: NormalProperty }) {
               <span style={{ backgroundColor: "#5BAD52", color: "#fff", fontSize: "10px", padding: "3px 10px", borderRadius: "20px", fontWeight: "bold" }}>{typeLabel}</span>
             </div>
           )}
+          <div style={{ position: "absolute", top: "10px", right: "10px", zIndex: 2 }}>
+            <FavoriteButton propertyId={property.id} size="sm" />
+          </div>
         </div>
         <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
           {/* タイトル固定高さ（なければ空白で高さ確保） */}
