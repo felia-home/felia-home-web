@@ -141,7 +141,10 @@
 }
 
 /* 物件詳細ページ */
-@media (max-width: 900px) {
+.property-detail-grid {
+  grid-template-columns: 1fr 360px;
+}
+@media (max-width: 1023px) {
   .property-detail-grid {
     grid-template-columns: 1fr !important;
   }

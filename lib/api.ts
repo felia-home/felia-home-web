@@ -327,6 +327,9 @@ export interface Property {
   station_name1?: string | null;
   station_walk1?: number | null;
   is_open_house?: boolean;
+  tour_url?: string | null;
+  lat?: number | null;
+  lng?: number | null;
 }
 
 export interface OpenHouse {
