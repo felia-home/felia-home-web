@@ -51,7 +51,38 @@ export async function getPropertiesByLine(line: string) {
 export async function getPropertyById(id: string): Promise<Property | null> {
   try {
     const res = await fetchFromAdmin<{ property: Property }>(`/api/properties/${id}`);
-    return (res as any).property ?? res ?? null;
+    const property = (res as any).property ?? res ?? null;
+    if (!property) return null;
+
+    // 詳細APIで画像が空の場合、一覧APIから補完
+    if (!property.images || property.images.length === 0) {
+      try {
+        const listRes = await fetchFromAdmin<{ properties: Property[] }>(
+          `/api/properties?id=${id}&limit=1&published_hp=true`
+        );
+        const listProps = (listRes as any).properties ?? [];
+        const matched = listProps.find((p: any) => p.id === id);
+        if (matched?.images?.length > 0) {
+          property.images = matched.images;
+        }
+      } catch {}
+
+      // 一覧APIで取得できない場合、published_hp=falseでも試みる
+      if (!property.images || property.images.length === 0) {
+        try {
+          const listRes2 = await fetchFromAdmin<{ properties: Property[] }>(
+            `/api/properties?limit=100`
+          );
+          const listProps2 = (listRes2 as any).properties ?? [];
+          const matched2 = listProps2.find((p: any) => p.id === id);
+          if (matched2?.images?.length > 0) {
+            property.images = matched2.images;
+          }
+        } catch {}
+      }
+    }
+
+    return property;
   } catch {
     return null;
   }
