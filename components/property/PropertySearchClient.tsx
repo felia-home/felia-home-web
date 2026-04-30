@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import Link from "next/link";
@@ -79,8 +80,18 @@ interface Property {
   is_open_house: boolean;
 }
 
+function buildReinsTitle(p: any): string {
+  const location = [p.area, p.town ?? p.address].filter(Boolean).join(" ");
+  const type = p.property_type ?? "";
+  const price = p.price != null ? ` ${p.price.toLocaleString()}万円` : "";
+  return [location, type, price].filter(Boolean).join(" ");
+}
+
 export default function PropertySearchClient() {
-  const [properties, setProperties] = useState<Property[]>([]);
+  const session = useSession();
+  const isLoggedIn = session?.status === "authenticated";
+
+  const [properties, setProperties] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -169,8 +180,30 @@ export default function PropertySearchClient() {
     try {
       const res = await fetch(`/api/properties/search?${params.toString()}`);
       const data = await res.json();
-      setProperties(data.properties ?? []);
-      setTotal(data.total ?? 0);
+      const normalProps = (data.properties ?? []).map((p: any) => ({ ...p, _type: "normal" }));
+
+      // REINS物件取得（ログイン時のみ）
+      let reinsProps: any[] = [];
+      if (isLoggedIn) {
+        try {
+          const reinsParams = new URLSearchParams();
+          if (selectedArea) reinsParams.set("area", selectedArea);
+          if (selectedLine) reinsParams.set("q", selectedLine);
+          if (pr.max) reinsParams.set("price_max", pr.max);
+          reinsParams.set("limit", "9999");
+          const reinsRes = await fetch(`/api/reins?${reinsParams.toString()}`);
+          const reinsData = await reinsRes.json();
+          reinsProps = (reinsData.properties ?? []).map((p: any) => ({
+            ...p,
+            _type: "reins",
+            _title: buildReinsTitle(p),
+          }));
+        } catch {}
+      }
+
+      const allProps = [...normalProps, ...reinsProps];
+      setProperties(allProps);
+      setTotal((data.total ?? normalProps.length) + reinsProps.length);
       setTotalPages(data.total_pages ?? 0);
     } catch {
       setProperties([]);
@@ -179,7 +212,7 @@ export default function PropertySearchClient() {
     } finally {
       setLoading(false);
     }
-  }, [keyword, selectedType, selectedPriceRange, selectedArea, selectedLine, conditions]);
+  }, [keyword, selectedType, selectedPriceRange, selectedArea, selectedLine, conditions, isLoggedIn]);
 
   // 初回
   useEffect(() => { doSearch(1); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -560,9 +593,11 @@ export default function PropertySearchClient() {
         {!loading && properties.length > 0 && (
           <>
             <div className="properties-search-grid">
-              {properties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
+              {properties.map((property: any) =>
+                property._type === "reins"
+                  ? <ReinsSearchCard key={`reins-${property.id}`} property={property} />
+                  : <PropertyCard key={property.id} property={property} />
+              )}
             </div>
 
             {/* ページネーション */}
@@ -751,6 +786,103 @@ function PropertyCard({ property }: { property: Property }) {
             ) : (
               <p style={{ fontSize: "14px", color: "#888", margin: 0 }}>応相談</p>
             )}
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function ReinsSearchCard({ property }: { property: any }) {
+  const [hovered, setHovered] = useState(false);
+  const area = property.area_build_m2 ?? property.area_m2 ?? property.area_land_m2;
+
+  return (
+    <Link
+      href={`/reins/${property.id}`}
+      style={{ textDecoration: "none", color: "inherit", display: "block", height: "100%" }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div style={{
+        backgroundColor: "#fff",
+        borderRadius: "12px",
+        overflow: "hidden",
+        border: "1px solid #e8e8e8",
+        boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.12)" : "0 2px 8px rgba(0,0,0,0.06)",
+        transform: hovered ? "translateY(-3px)" : "translateY(0)",
+        transition: "all 0.2s ease",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}>
+        {/* 画像エリア */}
+        <div style={{ position: "relative", aspectRatio: "4/3", flexShrink: 0 }}>
+          <PropertyImage src={null} alt={property._title} seed={property.id} sizes="33vw" />
+          <div style={{ position: "absolute", top: "10px", left: "10px" }}>
+            <span style={{
+              backgroundColor: "#2d4a6a", color: "#fff",
+              fontSize: "10px", padding: "3px 8px",
+              borderRadius: "3px", fontWeight: "bold",
+              fontFamily: "'Montserrat', sans-serif",
+            }}>
+              REINS
+            </span>
+          </div>
+          {property.property_type && (
+            <div style={{ position: "absolute", top: "10px", left: "60px" }}>
+              <span style={{
+                backgroundColor: "rgba(255,255,255,0.9)", color: "#333",
+                fontSize: "10px", padding: "3px 8px",
+                borderRadius: "3px", fontWeight: "bold",
+              }}>
+                {property.property_type}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* 情報 */}
+        <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ minHeight: "40px", marginBottom: "10px" }}>
+            <p style={{
+              fontSize: "13px", fontWeight: "bold", color: "#333",
+              margin: 0, lineHeight: 1.5,
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}>
+              {property._title}
+            </p>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1, marginBottom: "10px" }}>
+            {property.station_name && (
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
+                🚃 {property.station_line} {property.station_name}駅 徒歩{property.walk_minutes}分
+              </p>
+            )}
+            {property.rooms && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚪 {property.rooms}</p>}
+            {area && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📐 {area}㎡</p>}
+            {property.built_year_text && (() => {
+              const t = String(property.built_year_text).replace(/\xa0/g, " ").trim();
+              if (/^\d+$/.test(t)) return null;
+              return (
+                <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
+                  📅 {t.replace(/(\d+)$/, "$1月")}
+                </p>
+              );
+            })()}
+          </div>
+          <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px", marginTop: "auto" }}>
+            {property.price != null ? (
+              <p style={{ margin: 0 }}>
+                <span style={{ fontSize: "20px", fontWeight: "bold", color: "#2d4a6a" }}>
+                  {property.price.toLocaleString()}
+                </span>
+                <span style={{ fontSize: "12px", color: "#2d4a6a", marginLeft: "2px" }}>万円</span>
+              </p>
+            ) : <p style={{ fontSize: "14px", color: "#888", margin: 0 }}>応相談</p>}
           </div>
         </div>
       </div>
