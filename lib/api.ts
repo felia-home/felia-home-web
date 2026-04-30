@@ -54,33 +54,14 @@ export async function getPropertyById(id: string): Promise<Property | null> {
     const property = (res as any).property ?? res ?? null;
     if (!property) return null;
 
-    // 詳細APIで画像が空の場合、一覧APIから補完
-    if (!property.images || property.images.length === 0) {
-      try {
-        const listRes = await fetchFromAdmin<{ properties: Property[] }>(
-          `/api/properties?id=${id}&limit=1&published_hp=true`
-        );
-        const listProps = (listRes as any).properties ?? [];
-        const matched = listProps.find((p: any) => p.id === id);
-        if (matched?.images?.length > 0) {
-          property.images = matched.images;
-        }
-      } catch {}
-
-      // 一覧APIで取得できない場合、published_hp=falseでも試みる
-      if (!property.images || property.images.length === 0) {
-        try {
-          const listRes2 = await fetchFromAdmin<{ properties: Property[] }>(
-            `/api/properties?limit=100`
-          );
-          const listProps2 = (listRes2 as any).properties ?? [];
-          const matched2 = listProps2.find((p: any) => p.id === id);
-          if (matched2?.images?.length > 0) {
-            property.images = matched2.images;
-          }
-        } catch {}
+    // 全画像を /images エンドポイントから取得（caption・order含む）
+    try {
+      const imgRes = await fetchFromAdmin<{ images: any[] }>(`/api/properties/${id}/images`);
+      const images = (imgRes as any).images ?? [];
+      if (images.length > 0) {
+        property.images = images.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
       }
-    }
+    } catch {}
 
     return property;
   } catch {
@@ -527,6 +508,8 @@ export interface PropertyImage {
   url: string;
   filename: string;
   order?: number;
+  caption?: string | null;
+  is_main?: boolean;
 }
 
 export interface StaffDetail {

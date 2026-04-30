@@ -56,9 +56,32 @@ export default function PropertyGallery({
             padding: "4px 10px",
             borderRadius: "4px",
             fontSize: "12px",
+            zIndex: 2,
           }}>
             {selectedIndex + 1} / {images.length}
           </div>
+
+          {/* キャプション */}
+          {images[selectedIndex].caption && (
+            <div style={{
+              position: "absolute",
+              bottom: 0, left: 0, right: 0,
+              padding: "20px 16px 12px",
+              background: "linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%)",
+              zIndex: 2,
+              pointerEvents: "none",
+            }}>
+              <p style={{
+                fontSize: "13px",
+                color: "#fff",
+                margin: 0,
+                textShadow: "0 1px 4px rgba(0,0,0,0.5)",
+                lineHeight: 1.5,
+              }}>
+                {images[selectedIndex].caption}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* 前後ボタン */}
