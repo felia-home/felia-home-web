@@ -547,25 +547,36 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               {/* 沿線・駅情報 */}
               {stations.length > 0 && (
                 <div style={{
-                  padding: "14px 16px",
+                  padding: "12px 16px",
                   borderTop: "1px solid rgba(255,255,255,0.1)",
                   backgroundColor: "#1a4a24",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
                 }}>
                   {stations.map((s, i) => (
                     <div key={i} style={{
-                      display: "flex", alignItems: "center", gap: "8px",
-                      padding: i > 0 ? "6px 0 0" : "0",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      fontSize: "12px",
+                      color: "rgba(255,255,255,0.85)",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                     }}>
-                      <span style={{ fontSize: "14px" }}>🚃</span>
-                      <div>
-                        <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.9)", margin: 0, fontWeight: "500" }}>
-                          {s.line && <span style={{ color: "rgba(255,255,255,0.6)", marginRight: "4px", fontSize: "11px" }}>{s.line}</span>}
-                          {s.name}駅
-                        </p>
-                        <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: 0 }}>
+                      <span style={{ fontSize: "13px", flexShrink: 0 }}>🚃</span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {s.line && (
+                          <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "11px", marginRight: "4px" }}>
+                            {s.line}
+                          </span>
+                        )}
+                        <span style={{ fontWeight: "500" }}>{s.name}駅</span>
+                        <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "11px", marginLeft: "6px" }}>
                           徒歩{s.walk}分
-                        </p>
-                      </div>
+                        </span>
+                      </span>
                     </div>
                   ))}
                 </div>
