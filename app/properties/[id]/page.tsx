@@ -149,12 +149,22 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     }))
     .filter((s) => s.name);
 
-  const equipments = Object.entries(EQUIPMENT_LABELS)
+  const equipmentLabels = Object.entries(EQUIPMENT_LABELS)
     .filter(([key]) => p[key] === true)
     .map(([, label]) => label);
 
+  const featuresList: string[] = p.features ?? [];
+
+  const equipments = [...equipmentLabels, ...featuresList];
+
   const displayTitle = p.title
     ?? (location ? `${location}${p.price ? ` ${p.price.toLocaleString()}万円` : ""}` : "物件詳細");
+
+  // 物件種別による面積表示分岐
+  const propType = p.property_type ?? "";
+  const isMansion = ["MANSION", "NEW_MANSION", "USED_MANSION"].includes(propType);
+  const isHouse = ["USED_HOUSE", "NEW_HOUSE"].includes(propType);
+  const isLand = propType === "LAND";
 
   const specs = [
     { label: "物件種別", value: typeLabel },
@@ -164,10 +174,30 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       ? stations.map((s) => `${s.line ? s.line + " " : ""}${s.name}駅 徒歩${s.walk}分`).join(" / ")
       : null },
     { label: "間取り", value: p.rooms ?? null },
-    { label: "土地面積", value: p.area_land_m2 ? `${p.area_land_m2}㎡` : null },
-    { label: "建物面積", value: p.area_build_m2 ? `${p.area_build_m2}㎡` : null },
-    { label: "専有面積", value: p.area_exclusive_m2 ? `${p.area_exclusive_m2}㎡` : null },
-    { label: "築年", value: p.building_year ? `${p.building_year}年` : null },
+    ...(isMansion ? [
+      { label: "専有面積", value: p.area_exclusive_m2 ? `${p.area_exclusive_m2}㎡` : null },
+      { label: "建物面積", value: p.area_build_m2 ? `${p.area_build_m2}㎡` : null },
+    ] : []),
+    ...(isHouse ? [
+      { label: "建物面積", value: p.area_build_m2 ? `${p.area_build_m2}㎡` : null },
+      { label: "土地面積", value: p.area_land_m2 ? `${p.area_land_m2}㎡` : null },
+    ] : []),
+    ...(isLand ? [
+      { label: "土地面積", value: (p.area_land_m2 ?? p.area_m2) ? `${p.area_land_m2 ?? p.area_m2}㎡` : null },
+    ] : []),
+    ...(!isMansion && !isHouse && !isLand ? [
+      { label: "土地面積", value: p.area_land_m2 ? `${p.area_land_m2}㎡` : null },
+      { label: "建物面積", value: p.area_build_m2 ? `${p.area_build_m2}㎡` : null },
+    ] : []),
+    {
+      label: "築年月",
+      value: (() => {
+        const year = p.building_year;
+        const month = p.building_month;
+        if (!year) return null;
+        return month ? `${year}年${month}月` : `${year}年`;
+      })(),
+    },
     { label: "構造", value: p.structure ?? null },
     { label: "階数", value: p.floors_total ? `${p.floors_total}階建` : null },
     { label: "取引態様", value: p.transaction_type ?? null },
