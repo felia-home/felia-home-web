@@ -143,10 +143,10 @@ function typeLabel(p: PrivateProperty): string {
   return "物件";
 }
 
-function typeColors(p: PrivateProperty): { bg: string; badge: string; line: string } {
-  if (p.is_mansion) return { bg: "#2a1a3a", badge: "#c4a8d4", line: "#9b6bb5" };
-  if (p.is_house)   return { bg: "#1a2a3a", badge: "#8ab4d4", line: "#4a90b8" };
-  return                   { bg: "#1a3a2a", badge: "#C9A84C", line: "#C9A84C" };
+function typeColors(p: PrivateProperty): { bg: string; badge: string; line: string; button: string } {
+  if (p.is_mansion) return { bg: "#1a2a4a", badge: "rgba(0,0,0,0.4)", line: "#9b6bb5", button: "#5B7FA6" };
+  if (p.is_land)    return { bg: "#1a4a24", badge: "rgba(0,0,0,0.4)", line: "#C9A84C", button: "#C9A84C" };
+  return                   { bg: "#1a3a4a", badge: "rgba(0,0,0,0.4)", line: "#4a90b8", button: "#4A7A8A" };
 }
 
 function getCardBgImage(p: PrivateProperty): string {
@@ -682,34 +682,22 @@ function PrivateCard({
       onMouseLeave={() => setHovered(false)}
       style={{
         backgroundColor: "#fff",
-        borderRadius: "8px",
+        borderRadius: "12px",
         overflow: "hidden",
-        border: "1px solid #e0dbd4",
-        display: "flex",
-        flexDirection: "column",
-        boxShadow: hovered ? "0 12px 32px rgba(0,0,0,0.12)" : "0 2px 8px rgba(0,0,0,0.06)",
+        boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.12)" : "0 2px 12px rgba(0,0,0,0.08)",
         transform: hovered ? "translateY(-3px)" : "translateY(0)",
         transition: "all 0.25s ease",
-        position: "relative",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      {/* 左縦ライン */}
-      <div style={{
-        position: "absolute",
-        top: 0, left: 0, bottom: 0,
-        width: "4px",
-        backgroundColor: colors.line,
-        zIndex: 1,
-      }} />
-
-      {/* カードヘッダー（背景画像付き） */}
+      {/* ① 画像エリア（高さ200px） */}
       <div style={{
         position: "relative",
-        height: "140px",
+        height: "200px",
         overflow: "hidden",
         backgroundColor: colors.bg,
       }}>
-        {/* 背景画像 */}
         <Image
           src={getCardBgImage(property)}
           alt=""
@@ -717,103 +705,71 @@ function PrivateCard({
           style={{ objectFit: "cover", objectPosition: "center" }}
           sizes="(max-width: 768px) 100vw, 33vw"
         />
-        {/* 暗めオーバーレイ */}
+        {/* グラデーションオーバーレイ */}
         <div style={{
           position: "absolute", inset: 0,
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.55) 100%)",
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 100%)",
         }} />
-        {/* テキスト */}
+        {/* 上部：種別バッジ + 物件番号 */}
         <div style={{
-          position: "absolute", inset: 0,
-          padding: "14px 16px 14px 24px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
+          position: "absolute", top: "14px", left: "14px", right: "14px",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
-          {/* 上部：種別バッジ + 物件番号 */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{
-              border: `1px solid ${colors.badge}`,
-              backgroundColor: "rgba(0,0,0,0.35)",
-              color: colors.badge,
-              fontSize: "10px",
-              padding: "3px 10px",
-              borderRadius: "2px",
-              letterSpacing: "0.15em",
-              fontFamily: "'Montserrat', sans-serif",
-              fontWeight: "600",
-            }}>
-              {type.toUpperCase()}
-            </span>
-            {property.property_no && (
-              <span style={{
-                fontSize: "10px",
-                color: "rgba(255,255,255,0.7)",
-                fontFamily: "'Montserrat', sans-serif",
-                letterSpacing: "0.05em",
-                textShadow: "0 1px 4px rgba(0,0,0,0.5)",
-              }}>
-                No.{property.property_no}
-              </span>
-            )}
-          </div>
-          {/* 下部：所在地 */}
-          <h3 style={{
-            fontFamily: "'Noto Serif JP', serif",
-            fontSize: "18px",
-            fontWeight: "600",
+          <span style={{
+            backgroundColor: colors.badge,
             color: "#fff",
-            margin: 0,
-            lineHeight: 1.4,
-            letterSpacing: "0.02em",
-            textShadow: "0 1px 4px rgba(0,0,0,0.5)",
+            fontSize: "11px", padding: "4px 12px",
+            borderRadius: "4px", fontWeight: "bold",
+            letterSpacing: "0.05em",
+          }}>
+            {type}
+          </span>
+          {property.property_no && (
+            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.75)", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>
+              No.{property.property_no}
+            </span>
+          )}
+        </div>
+        {/* 下部：エリア名 */}
+        <div style={{
+          position: "absolute", bottom: "14px", left: "16px", right: "16px",
+        }}>
+          <p style={{
+            fontSize: "22px", fontWeight: "bold",
+            color: "#fff", margin: 0,
+            fontFamily: "'Noto Serif JP', serif",
+            textShadow: "0 2px 8px rgba(0,0,0,0.4)",
+            lineHeight: 1.3,
           }}>
             {location || "所在地非公開"}
-          </h3>
+          </p>
         </div>
       </div>
 
-      {/* ボディ */}
-      <div style={{
-        padding: "20px 20px 20px 24px",
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: "#faf8f5",
-      }}>
+      {/* ② 情報エリア */}
+      <div style={{ padding: "18px 18px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
 
-        {/* 価格 */}
-        <div style={{
-          marginBottom: "16px",
-          paddingBottom: "14px",
-          borderBottom: "1px solid #e8e2da",
-        }}>
-          <p style={{ fontSize: "11px", color: "#aaa", margin: "0 0 4px", letterSpacing: "0.08em" }}>
-            販売価格
-          </p>
+        {/* 販売価格 */}
+        <div style={{ marginBottom: "12px" }}>
+          <p style={{ fontSize: "10px", color: "#aaa", margin: "0 0 4px", letterSpacing: "0.05em" }}>販売価格</p>
           {(() => {
             const result = formatPriceJP(property);
             if ("freeText" in result) {
               return (
                 <p style={{
-                  margin: 0, lineHeight: 1.3,
-                  fontSize: "20px",
-                  fontWeight: "bold",
-                  color: "#1a1a1a",
-                  letterSpacing: "-0.01em",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
+                  fontSize: "20px", fontWeight: "bold",
+                  color: "#222", margin: 0, lineHeight: 1.2,
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                 }}>
                   {result.freeText}
                 </p>
               );
             }
             return (
-              <p style={{ margin: 0, lineHeight: 1.3, display: "flex", alignItems: "baseline", gap: "2px", flexWrap: "nowrap" }}>
+              <p style={{ margin: 0, lineHeight: 1.2, display: "flex", alignItems: "baseline", gap: "2px", flexWrap: "nowrap" }}>
                 <span style={{
                   fontSize: "22px", fontWeight: "bold",
-                  color: "#1a1a1a", letterSpacing: "-0.01em",
+                  color: "#222", letterSpacing: "-0.01em",
                   fontFamily: "'Montserrat', sans-serif",
                 }}>
                   {result.num}
@@ -826,71 +782,59 @@ function PrivateCard({
           })()}
         </div>
 
-        {/* スペック */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "18px", flex: 1 }}>
+        {/* 物件番号（右寄せ小） */}
+        {property.property_no && (
+          <p style={{ fontSize: "10px", color: "#bbb", textAlign: "right", margin: "0 0 10px" }}>
+            No.{property.property_no}
+          </p>
+        )}
+
+        {/* 詳細テーブル */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "6px", marginBottom: "16px" }}>
           {property.area_land_m2 && (
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "11px", color: "#999", letterSpacing: "0.03em" }}>土地面積</span>
-              <span style={{ fontSize: "13px", color: "#444", fontWeight: "500" }}>{property.area_land_m2}㎡</span>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+              <span style={{ color: "#888" }}>土地面積</span>
+              <span style={{ color: "#333", fontWeight: "500" }}>{property.area_land_m2}㎡</span>
             </div>
           )}
           {property.area_build_m2 && (
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "11px", color: "#999", letterSpacing: "0.03em" }}>建物面積</span>
-              <span style={{ fontSize: "13px", color: "#444", fontWeight: "500" }}>{property.area_build_m2}㎡</span>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+              <span style={{ color: "#888" }}>建物面積</span>
+              <span style={{ color: "#333", fontWeight: "500" }}>{property.area_build_m2}㎡</span>
             </div>
           )}
           {property.transaction_type && (
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "11px", color: "#999", letterSpacing: "0.03em" }}>取引態様</span>
-              <span style={{ fontSize: "11px", color: "#666" }}>{property.transaction_type}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+              <span style={{ color: "#888" }}>取引態様</span>
+              <span style={{ color: "#333", fontWeight: "500" }}>{property.transaction_type}</span>
             </div>
           )}
           {dateLabel && (
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "11px", color: "#999", letterSpacing: "0.03em" }}>情報日付</span>
-              <span style={{ fontSize: "11px", color: "#999", fontFamily: "'Montserrat', sans-serif" }}>{dateLabel}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
+              <span style={{ color: "#888" }}>情報日付</span>
+              <span style={{ color: "#333", fontWeight: "500" }}>{dateLabel}</span>
             </div>
           )}
         </div>
 
         {/* 資料請求ボタン */}
-        {isRequested ? (
-          <div style={{
-            textAlign: "center",
-            padding: "12px",
-            backgroundColor: "#f0ece6",
-            borderRadius: "4px",
-            fontSize: "12px",
-            color: "#aaa",
-            border: "1px solid #e0dbd4",
+        <button
+          onClick={isRequested ? undefined : onRequest}
+          disabled={isRequested}
+          style={{
+            display: "block", width: "100%",
+            padding: "13px",
+            backgroundColor: isRequested ? "#aaa" : colors.button,
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            fontSize: "13px", fontWeight: "bold",
+            cursor: isRequested ? "not-allowed" : "pointer",
             letterSpacing: "0.05em",
-          }}>
-            ✓ 資料請求済み
-          </div>
-        ) : (
-          <button
-            onClick={onRequest}
-            style={{
-              display: "block",
-              width: "100%",
-              textAlign: "center",
-              padding: "13px",
-              backgroundColor: colors.line,
-              color: colors.bg === "#2a1a3a" ? "#fff" : "#0d2218",
-              border: "none",
-              borderRadius: "4px",
-              fontWeight: "bold",
-              fontSize: "13px",
-              letterSpacing: "0.08em",
-              cursor: "pointer",
-              transition: "opacity 0.15s ease",
-              opacity: hovered ? 0.9 : 1,
-            }}
-          >
-            資料請求する
-          </button>
-        )}
+          }}
+        >
+          {isRequested ? "✓ 資料請求済み" : "資料を請求する"}
+        </button>
       </div>
     </div>
   );
