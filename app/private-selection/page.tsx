@@ -149,6 +149,12 @@ function typeColors(p: PrivateProperty): { bg: string; badge: string; line: stri
   return                   { bg: "#1a3a2a", badge: "#C9A84C", line: "#C9A84C" };
 }
 
+function getCardBgImage(p: PrivateProperty): string {
+  if (p.is_mansion) return "/images/private-selection/cardM.png";
+  if (p.is_land)    return "/images/private-selection/cardT.png";
+  return                   "/images/private-selection/cardK.png";
+}
+
 const TYPE_FILTER_BG: Record<string, string> = {
   "": "#0d2218",
   "土地": "#1a3a2a",
@@ -696,65 +702,75 @@ function PrivateCard({
         zIndex: 1,
       }} />
 
-      {/* ヘッダー */}
+      {/* カードヘッダー（背景画像付き） */}
       <div style={{
-        backgroundColor: colors.bg,
-        padding: "20px 20px 20px 24px",
         position: "relative",
+        height: "140px",
         overflow: "hidden",
+        backgroundColor: colors.bg,
       }}>
-        {/* 装飾円 */}
+        {/* 背景画像 */}
+        <Image
+          src={getCardBgImage(property)}
+          alt=""
+          fill
+          style={{ objectFit: "cover", objectPosition: "center" }}
+          sizes="(max-width: 768px) 100vw, 33vw"
+        />
+        {/* 暗めオーバーレイ */}
         <div style={{
-          position: "absolute",
-          top: "-30px", right: "-30px",
-          width: "100px", height: "100px",
-          borderRadius: "50%",
-          backgroundColor: "rgba(255,255,255,0.04)",
+          position: "absolute", inset: 0,
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.55) 100%)",
         }} />
-
-        {/* 上段：種別バッジ + 物件番号 */}
+        {/* テキスト */}
         <div style={{
+          position: "absolute", inset: 0,
+          padding: "14px 16px 14px 24px",
           display: "flex",
+          flexDirection: "column",
           justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "12px",
         }}>
-          <span style={{
-            border: `1px solid ${colors.badge}`,
-            color: colors.badge,
-            fontSize: "10px",
-            padding: "3px 10px",
-            borderRadius: "2px",
-            letterSpacing: "0.15em",
-            fontFamily: "'Montserrat', sans-serif",
-            fontWeight: "600",
-          }}>
-            {type.toUpperCase()}
-          </span>
-          {property.property_no && (
+          {/* 上部：種別バッジ + 物件番号 */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{
+              border: `1px solid ${colors.badge}`,
+              backgroundColor: "rgba(0,0,0,0.35)",
+              color: colors.badge,
               fontSize: "10px",
-              color: "rgba(255,255,255,0.3)",
+              padding: "3px 10px",
+              borderRadius: "2px",
+              letterSpacing: "0.15em",
               fontFamily: "'Montserrat', sans-serif",
-              letterSpacing: "0.05em",
+              fontWeight: "600",
             }}>
-              No.{property.property_no}
+              {type.toUpperCase()}
             </span>
-          )}
+            {property.property_no && (
+              <span style={{
+                fontSize: "10px",
+                color: "rgba(255,255,255,0.7)",
+                fontFamily: "'Montserrat', sans-serif",
+                letterSpacing: "0.05em",
+                textShadow: "0 1px 4px rgba(0,0,0,0.5)",
+              }}>
+                No.{property.property_no}
+              </span>
+            )}
+          </div>
+          {/* 下部：所在地 */}
+          <h3 style={{
+            fontFamily: "'Noto Serif JP', serif",
+            fontSize: "18px",
+            fontWeight: "600",
+            color: "#fff",
+            margin: 0,
+            lineHeight: 1.4,
+            letterSpacing: "0.02em",
+            textShadow: "0 1px 4px rgba(0,0,0,0.5)",
+          }}>
+            {location || "所在地非公開"}
+          </h3>
         </div>
-
-        {/* 所在地 */}
-        <h3 style={{
-          fontFamily: "'Noto Serif JP', serif",
-          fontSize: "17px",
-          fontWeight: "600",
-          color: "#fff",
-          margin: 0,
-          lineHeight: 1.4,
-          letterSpacing: "0.02em",
-        }}>
-          {location || "所在地非公開"}
-        </h3>
       </div>
 
       {/* ボディ */}
