@@ -9,6 +9,10 @@ const PLACEHOLDERS = [
   "/images/no-image/placeholder-2.jpg",
   "/images/no-image/placeholder-3.jpg",
   "/images/no-image/placeholder-4.jpg",
+  "/images/no-image/placeholder-5.jpg",
+  "/images/no-image/placeholder-6.jpg",
+  "/images/no-image/placeholder-7.jpg",
+  "/images/no-image/placeholder-8.jpg",
 ];
 
 interface PropertyImageProps {
