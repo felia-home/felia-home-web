@@ -143,10 +143,28 @@ function typeLabel(p: PrivateProperty): string {
   return "物件";
 }
 
-function typeColors(p: PrivateProperty): { bg: string; badge: string; line: string; button: string } {
-  if (p.is_mansion) return { bg: "#1a2a4a", badge: "rgba(0,0,0,0.4)", line: "#9b6bb5", button: "#5B7FA6" };
-  if (p.is_land)    return { bg: "#1a4a24", badge: "rgba(0,0,0,0.4)", line: "#C9A84C", button: "#C9A84C" };
-  return                   { bg: "#1a3a4a", badge: "rgba(0,0,0,0.4)", line: "#4a90b8", button: "#4A7A8A" };
+function typeColors(p: PrivateProperty): { bg: string; badge: string; line: string; button: string; overlay: string } {
+  if (p.is_mansion) return {
+    bg: "#2a1a4a",
+    badge: "rgba(0,0,0,0.4)",
+    line: "#9b6bb5",
+    button: "#7B5EA6",
+    overlay: "linear-gradient(to bottom, rgba(60,20,100,0.4) 0%, rgba(60,20,100,0.75) 100%)",
+  };
+  if (p.is_land) return {
+    bg: "#0d2e1a",
+    badge: "rgba(0,0,0,0.4)",
+    line: "#C9A84C",
+    button: "#C9A84C",
+    overlay: "linear-gradient(to bottom, rgba(5,40,20,0.4) 0%, rgba(5,40,20,0.75) 100%)",
+  };
+  return {
+    bg: "#1a2a4a",
+    badge: "rgba(0,0,0,0.4)",
+    line: "#4a90b8",
+    button: "#2A5A8A",
+    overlay: "linear-gradient(to bottom, rgba(10,40,90,0.4) 0%, rgba(10,40,90,0.75) 100%)",
+  };
 }
 
 function getCardBgImage(p: PrivateProperty): string {
@@ -705,10 +723,10 @@ function PrivateCard({
           style={{ objectFit: "cover", objectPosition: "center" }}
           sizes="(max-width: 768px) 100vw, 33vw"
         />
-        {/* グラデーションオーバーレイ */}
+        {/* グラデーションオーバーレイ（種別色） */}
         <div style={{
           position: "absolute", inset: 0,
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 100%)",
+          background: colors.overlay,
         }} />
         {/* 上部：種別バッジ + 物件番号 */}
         <div style={{
