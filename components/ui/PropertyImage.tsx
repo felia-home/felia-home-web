@@ -21,6 +21,7 @@ interface PropertyImageProps {
   sizes?: string;
   quality?: number;
   seed?: string;
+  style?: React.CSSProperties;
 }
 
 export function PropertyImage({
@@ -29,6 +30,7 @@ export function PropertyImage({
   sizes = "33vw",
   quality = 80,
   seed,
+  style,
 }: PropertyImageProps) {
   const placeholderSrc = useMemo(() => {
     if (seed) {
@@ -46,7 +48,7 @@ export function PropertyImage({
       alt={alt}
       fill
       quality={quality}
-      style={{ objectFit: "cover", objectPosition: "center" }}
+      style={{ objectFit: "cover", objectPosition: "center", ...style }}
       sizes={sizes}
     />
   );

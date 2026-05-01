@@ -239,8 +239,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           {images.length > 0 ? (
             <PropertyGallery images={images} title={displayTitle} />
           ) : (
-            <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden" }}>
-              <PropertyImage src={null} alt={displayTitle} seed={p.id} sizes="100vw" />
+            <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#000" }}>
+              <PropertyImage src={null} alt={displayTitle} seed={p.id} sizes="100vw" style={{ objectFit: "contain" }} />
             </div>
           )}
         </div>

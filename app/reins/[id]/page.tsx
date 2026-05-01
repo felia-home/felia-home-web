@@ -130,8 +130,8 @@ export default function ReinsDetailPage() {
       {/* 画像 */}
       <div style={{ backgroundColor: "#fff" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden" }}>
-            <PropertyImage src={null} alt={displayTitle} seed={property.id} sizes="100vw" />
+          <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#111" }}>
+            <PropertyImage src={null} alt={displayTitle} seed={property.id} sizes="100vw" style={{ objectFit: "contain" }} />
           </div>
         </div>
       </div>

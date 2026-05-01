@@ -36,14 +36,14 @@ export default function PropertyGallery({
       <div style={{ position: "relative", borderRadius: "12px", overflow: "hidden" }}>
         <div
           onClick={() => setModalOpen(true)}
-          style={{ position: "relative", width: "100%", aspectRatio: "16/9", cursor: "zoom-in", backgroundColor: "#f0f0f0" }}
+          style={{ position: "relative", width: "100%", aspectRatio: "16/9", cursor: "zoom-in", backgroundColor: "#111" }}
         >
           <Image
             src={images[selectedIndex].url}
             alt={`${title} - 画像${selectedIndex + 1}`}
             fill
             quality={90}
-            style={{ objectFit: "cover" }}
+            style={{ objectFit: "contain" }}
             sizes="(max-width: 1200px) 100vw, 800px"
             priority
           />
