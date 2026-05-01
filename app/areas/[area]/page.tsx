@@ -1,5 +1,4 @@
 // app/areas/[area]/page.tsx
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -60,8 +59,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function AreaPage({ params }: PageProps) {
   const areaName = decodeURIComponent(params.area);
   const content = getAreaContent(areaName);
-
-  if (!areaContents[areaName]) notFound();
 
   // admin APIのエリア画像URL取得
   let adminImageUrl: string | null = null;
