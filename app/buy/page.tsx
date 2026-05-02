@@ -142,7 +142,7 @@ export default function BuyPage() {
 
       {/* パンくず */}
       <div style={{ backgroundColor: "#F8F8F8", padding: "8px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <nav style={{ fontSize: "12px", color: "#999", display: "flex", alignItems: "center", gap: "4px" }}>
             <Link href="/" style={{ color: "#999", textDecoration: "none" }}>TOP</Link>
             <ChevronRight size={12} />
@@ -152,7 +152,7 @@ export default function BuyPage() {
       </div>
 
       {/* タイトル */}
-      <div className="container-content" style={{ padding: "24px 0 0" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 24px 0" }}>
         <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", fontFamily: "'Noto Serif JP', serif" }}>
           不動産購入について
         </h1>
@@ -172,7 +172,7 @@ export default function BuyPage() {
 
       {/* ── 購入の流れ ──────────────────────────────── */}
       <section style={{ padding: "64px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "8px", fontFamily: "'Noto Serif JP', serif" }}>
             購入の流れ
           </h2>
@@ -187,15 +187,18 @@ export default function BuyPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
             {STEPS.map((step, idx) => (
               <div key={step.num}>
-                <div style={{
-                  backgroundColor: "white",
-                  borderRadius: "8px",
-                  border: "1px solid #E5E5E5",
-                  padding: "20px 24px",
-                  display: "grid",
-                  gap: "20px",
-                  alignItems: "start",
-                }} className="grid-cols-1 tb:grid-cols-[160px_1fr]">
+                <div
+                  className="buy-step-grid"
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: "8px",
+                    border: "1px solid #E5E5E5",
+                    padding: "20px 24px",
+                    display: "grid",
+                    gap: "20px",
+                    alignItems: "start",
+                  }}
+                >
                   {/* 写真 */}
                   <div style={{ position: "relative", width: "100%", maxWidth: "160px", aspectRatio: "4/3", borderRadius: "6px", overflow: "hidden" }}>
                     <Image
@@ -234,7 +237,7 @@ export default function BuyPage() {
 
       {/* ── 住宅取得時の諸費用4つのポイント ─────────── */}
       <section style={{ padding: "64px 0", backgroundColor: "#5a8a6a" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "white", marginBottom: "8px", fontFamily: "'Noto Serif JP', serif" }}>
             住宅取得時の諸費用4つのポイント
           </h2>
@@ -242,8 +245,11 @@ export default function BuyPage() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
             {POINTS.map((point) => (
-              <div key={point.num} style={{ display: "grid", gap: "24px", alignItems: "start" }}
-                className="grid-cols-1 tb:grid-cols-[180px_1fr]">
+              <div
+                key={point.num}
+                className="buy-point-grid"
+                style={{ display: "grid", gap: "24px", alignItems: "start" }}
+              >
                 {/* 写真 */}
                 <div style={{ position: "relative", width: "100%", maxWidth: "180px", aspectRatio: "4/3", borderRadius: "8px", overflow: "hidden" }}>
                   <Image
@@ -283,7 +289,7 @@ export default function BuyPage() {
 
       {/* ── 諸費用一覧テーブル ──────────────────────── */}
       <section style={{ padding: "64px 0", backgroundColor: "#5a8a6a" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <div style={{ backgroundColor: "white", borderRadius: "8px", padding: "24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
               <h3 style={{ fontSize: "16px", fontWeight: "bold", color: "#1a1a1a" }}>住宅取得時にかかる主な諸費用一覧</h3>
@@ -322,7 +328,7 @@ export default function BuyPage() {
 
       {/* ── オンライン不動産見学サービス ───────────── */}
       <section style={{ padding: "64px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "8px", fontFamily: "'Noto Serif JP', serif" }}>
             オンライン不動産見学サービス
           </h2>
@@ -333,8 +339,10 @@ export default function BuyPage() {
             現地に直接行かなくても、ご自宅やwi-fi環境のある場所から本物件見学を行えるサービスです。外出するのが難しい、空いた短い時間を利用して見学したい、動画を見ながら質疑応答したい等、お客様のニーズに合わせて物件を見ることができます。
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "32px" }}
-            className="grid-cols-2 tb:grid-cols-4">
+          <div
+            className="buy-online-grid"
+            style={{ display: "grid", gap: "16px", marginBottom: "32px" }}
+          >
             {ONLINE_STEPS.map((s) => (
               <div key={s.num} style={{ border: "1px solid #E5E5E5", borderRadius: "8px", overflow: "hidden", width: "100%" }}>
                 <div style={{ backgroundColor: "#F0F5F0", padding: "8px 12px" }}>

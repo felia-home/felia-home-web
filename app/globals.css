@@ -278,3 +278,31 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Buy page grids */
+.buy-step-grid {
+  grid-template-columns: 160px 1fr;
+}
+@media (max-width: 767px) {
+  .buy-step-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.buy-point-grid {
+  grid-template-columns: 180px 1fr;
+}
+@media (max-width: 767px) {
+  .buy-point-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.buy-online-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+@media (max-width: 767px) {
+  .buy-online-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
