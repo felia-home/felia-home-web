@@ -30,7 +30,7 @@ export default async function NewsPage() {
 
       {/* パンくず */}
       <div style={{ backgroundColor: "#F8F8F8", padding: "8px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <nav style={{ fontSize: "12px", color: "#999", display: "flex", alignItems: "center", gap: "4px" }}>
             <Link href="/" style={{ color: "#999", textDecoration: "none" }}>TOP</Link>
             <ChevronRight size={12} />
