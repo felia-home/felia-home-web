@@ -41,7 +41,7 @@ export default async function AboutPage() {
 
       {/* パンくず */}
       <div style={{ backgroundColor: "#F8F8F8", padding: "8px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <nav style={{ fontSize: "12px", color: "#999", display: "flex", alignItems: "center", gap: "4px" }}>
             <Link href="/" style={{ color: "#999", textDecoration: "none" }}>TOP</Link>
             <ChevronRight size={12} />
@@ -51,7 +51,7 @@ export default async function AboutPage() {
       </div>
 
       {/* タイトル */}
-      <div className="container-content" style={{ padding: "24px 0 0" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 24px 0" }}>
         <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", fontFamily: "'Noto Serif JP', serif" }}>
           フェリアホームについて
         </h1>
@@ -71,18 +71,17 @@ export default async function AboutPage() {
 
       {/* ── フェリアホームが選ばれる理由 ─────────── */}
       <section style={{ padding: "64px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(16px, 2vw, 20px)", color: "#888", marginBottom: "48px", textAlign: "center", letterSpacing: "0.2em" }}>
             フェリアホームが選ばれる理由
           </h2>
           <div style={{ display: "grid", gap: "48px" }}>
             {reasons.map((r) => (
-              <div key={r.num} style={{
-                display: "grid",
-                gridTemplateColumns: "200px 1fr",
-                gap: "48px",
-                alignItems: "start",
-              }} className="grid-cols-1 tb:grid-cols-[200px_1fr]">
+              <div
+                key={r.num}
+                className="about-reason-grid"
+                style={{ display: "grid", gap: "48px", alignItems: "start" }}
+              >
                 <div>
                   <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "48px", color: "#E5E5E5", fontWeight: "bold", lineHeight: 1, marginBottom: "8px" }}>
                     {r.num}
@@ -112,7 +111,7 @@ export default async function AboutPage() {
 
       {/* ── ごあいさつ ──────────────────────────── */}
       <section style={{ padding: "64px 0" }}>
-        <div className="container-content" style={{ maxWidth: "760px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "760px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 28px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "40px", fontFamily: "'Noto Serif JP', serif", letterSpacing: "0.2em" }}>
             ごあいさつ
           </h2>
@@ -146,9 +145,11 @@ export default async function AboutPage() {
 
       {/* ── 会社概要 ─────────────────────────────── */}
       <section style={{ padding: "64px 0", backgroundColor: "#F8F8F8" }}>
-        <div className="container-content">
-          <div style={{ display: "grid", gap: "40px", alignItems: "start" }}
-            className="grid-cols-1 tb:grid-cols-2">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+          <div
+            className="about-2col-grid"
+            style={{ display: "grid", gap: "40px", alignItems: "start" }}
+          >
             <div>
               <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "28px", fontStyle: "italic", color: "#1a1a1a", marginBottom: "4px" }}>
                 Company
@@ -244,13 +245,15 @@ function AccessSection({
 
   return (
     <section style={{ padding: "64px 0", backgroundColor: gray ? "#F8F8F8" : "#ffffff" }}>
-      <div className="container-content">
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "28px", fontStyle: "italic", color: "#1a1a1a", marginBottom: "4px" }}>
           Access
         </p>
         <p style={{ fontSize: "13px", color: "#888", marginBottom: "32px" }}>アクセス</p>
-        <div style={{ display: "grid", gap: "40px", alignItems: "start" }}
-          className="grid-cols-1 tb:grid-cols-2">
+        <div
+          className="about-2col-grid"
+          style={{ display: "grid", gap: "40px", alignItems: "start" }}
+        >
           {/* 左: テキスト */}
           <div>
             <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "#1a1a1a", marginBottom: "16px", fontFamily: "'Noto Serif JP', serif" }}>
