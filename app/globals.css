@@ -307,6 +307,14 @@
   }
 }
 
+/* Company page grids */
+.company-2col-grid { grid-template-columns: 1fr 1fr; }
+.company-3col-grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1023px) {
+  .company-2col-grid { grid-template-columns: 1fr !important; }
+  .company-3col-grid { grid-template-columns: 1fr !important; }
+}
+
 /* ProfileEditForm grids */
 .profile-grid-2col { grid-template-columns: 1fr 1fr; }
 .profile-grid-3col { grid-template-columns: 1fr 1fr 1fr; }
