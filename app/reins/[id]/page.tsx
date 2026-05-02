@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { PropertyImage } from "@/components/ui/PropertyImage";
+import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import LoanSimulator from "@/components/property/LoanSimulator";
 
 function buildReinsTitle(p: any): string {
@@ -123,6 +124,7 @@ export default function ReinsDetailPage() {
             <h1 style={{ fontSize: "clamp(18px, 3vw, 26px)", fontWeight: "bold", color: "#1a1a1a", margin: 0, lineHeight: 1.4, flex: 1 }}>
               {displayTitle}
             </h1>
+            <FavoriteButton propertyId={property.id} size="lg" />
           </div>
         </div>
       </div>

@@ -211,7 +211,6 @@ export async function getFreeBanners(): Promise<Banner[]> {
       "/api/hp/banners",
       { next: { revalidate: 60 } }
     );
-    console.log("FreeBanner API response:", JSON.stringify(res).substring(0, 200));
     return res.banners ?? [];
   } catch {
     return [];

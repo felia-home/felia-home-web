@@ -22,8 +22,6 @@ function formatDate(dateStr: string | null | undefined): string {
 export default async function NewsPage() {
   const allNews = await getAllNews();
 
-  console.log("allNews:", JSON.stringify(allNews.slice(0, 3)));
-
   const propertyNews = allNews.filter((n) => n.news_type === "property");
   const informationNews = allNews.filter((n) => n.news_type === "information");
 
