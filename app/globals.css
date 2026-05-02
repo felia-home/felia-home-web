@@ -306,3 +306,17 @@
     grid-template-columns: repeat(2, 1fr) !important;
   }
 }
+
+/* ProfileEditForm grids */
+.profile-grid-2col { grid-template-columns: 1fr 1fr; }
+.profile-grid-3col { grid-template-columns: 1fr 1fr 1fr; }
+.profile-check-2col { grid-template-columns: 1fr 1fr; }
+.profile-check-3col { grid-template-columns: 1fr 1fr 1fr; }
+.profile-check-4col { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+@media (max-width: 767px) {
+  .profile-grid-2col { grid-template-columns: 1fr !important; }
+  .profile-grid-3col { grid-template-columns: 1fr !important; }
+  .profile-check-3col { grid-template-columns: 1fr 1fr !important; }
+  .profile-check-4col { grid-template-columns: 1fr 1fr !important; }
+}
