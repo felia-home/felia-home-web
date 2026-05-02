@@ -307,6 +307,16 @@
   }
 }
 
+/* Valuation page */
+.valuation-type-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 480px) {
+  .valuation-type-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 /* Company page grids */
 .company-2col-grid { grid-template-columns: 1fr 1fr; }
 .company-3col-grid { grid-template-columns: repeat(3, 1fr); }

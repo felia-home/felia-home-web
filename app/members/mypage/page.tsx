@@ -16,7 +16,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-export const metadata = { title: "マイページ" };
+export const metadata = { title: "マイページ | フェリアホーム" };
 
 export default async function MypagePage() {
   const session = await getServerSession(authOptions);
@@ -24,9 +24,9 @@ export default async function MypagePage() {
 
   const memberId = (session.user as any).id;
 
-  let profile = null;
+  let profile: any = null;
   let inquiries: any[] = [];
-  let profileData = null;
+  let profileData: any = null;
 
   try {
     [profile, inquiries, profileData] = await Promise.all([
@@ -36,7 +36,6 @@ export default async function MypagePage() {
     ]);
   } catch {}
 
-  // 購入希望条件の入力状況チェック
   const hasProfile = !!(
     profileData &&
     (profileData.desired_areas?.length ||
@@ -48,7 +47,7 @@ export default async function MypagePage() {
     {
       icon: Lock,
       label: "プライベートセレクション",
-      sub: "会員限定・非公開物件一覧",
+      sub: "会員限定の非公開物件",
       href: "/private-selection",
       accent: true,
     },
@@ -63,7 +62,7 @@ export default async function MypagePage() {
     {
       icon: FileText,
       label: "問い合わせ履歴",
-      sub: `${inquiries.length}件の履歴`,
+      sub: `${inquiries.length}件の問い合わせ`,
       href: "/members/inquiries",
       accent: false,
       alert: false,
@@ -71,7 +70,7 @@ export default async function MypagePage() {
     {
       icon: Settings,
       label: "購入希望条件の変更",
-      sub: hasProfile ? "条件が登録されています" : "条件を登録してください",
+      sub: hasProfile ? "条件を編集する" : "条件を登録してください",
       href: "/members/profile",
       accent: false,
       alert: !hasProfile,
@@ -79,102 +78,92 @@ export default async function MypagePage() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F8F8F8" }}>
+    <main style={{ backgroundColor: "#f8f8f8", minHeight: "100vh" }}>
 
-      {/* ページヘッダー */}
-      <div className="bg-white border-b" style={{ borderColor: "#E5E5E5" }}>
-        <div className="container-content py-8">
-          <h1 className="text-2xl font-bold text-gray-800">マイページ</h1>
+      {/* ヘッダー */}
+      <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #E5E5E5", padding: "32px 24px" }}>
+        <div style={{ maxWidth: "640px", margin: "0 auto" }}>
+          <h1 style={{ fontSize: "24px", fontWeight: "bold", color: "#333", margin: 0 }}>マイページ</h1>
         </div>
       </div>
 
-      <div className="container-content py-8">
-        <div className="max-w-2xl mx-auto space-y-4">
+      <div style={{ maxWidth: "640px", margin: "0 auto", padding: "24px 24px 80px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
           {/* プロフィールカード */}
-          <div
-            className="bg-white rounded-xl border p-6"
-            style={{ borderColor: "#E5E5E5" }}
-          >
-            <div className="flex items-center gap-4">
-              <div
-                className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: "#EBF7EA" }}
-              >
+          <div style={{ backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #E5E5E5", padding: "24px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <div style={{
+                width: "56px", height: "56px", borderRadius: "50%",
+                backgroundColor: "#EBF7EA",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
+              }}>
                 <User size={24} style={{ color: "#5BAD52" }} />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-gray-800 text-lg">
-                  {profile?.name || session.user?.name} 様
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontWeight: "bold", color: "#333", fontSize: "18px", margin: "0 0 2px" }}>
+                  {profile?.name || "会員"} 様
                 </p>
-                <p className="text-sm text-gray-500 truncate">
-                  {profile?.email || session.user?.email}
+                <p style={{ fontSize: "13px", color: "#888", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {profile?.email || (session.user as any)?.email}
                 </p>
                 {profile?.phone && (
-                  <p className="text-sm text-gray-500">{profile.phone}</p>
+                  <p style={{ fontSize: "13px", color: "#888", margin: "2px 0 0" }}>{profile.phone}</p>
                 )}
               </div>
             </div>
 
             {/* 購入希望条件サマリー */}
             {profileData && hasProfile && (
-              <div
-                className="mt-4 pt-4 border-t"
-                style={{ borderColor: "#F0F0F0" }}
-              >
-                <p className="text-xs font-bold text-gray-400 tracking-widest mb-2">
-                  購入希望条件（登録済み）
+              <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid #f0f0f0" }}>
+                <p style={{ fontSize: "11px", fontWeight: "bold", color: "#aaa", letterSpacing: "0.1em", marginBottom: "8px" }}>
+                  購入希望条件
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {profileData.desired_areas?.slice(0, 3).map((area) => (
-                    <span
-                      key={area}
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: "#EBF7EA", color: "#5BAD52" }}
-                    >
-                      <MapPin size={9} className="inline mr-0.5" />
-                      {area}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  {profileData.desired_areas?.slice(0, 3).map((area: string) => (
+                    <span key={area} style={{
+                      fontSize: "11px", padding: "3px 10px", borderRadius: "20px",
+                      backgroundColor: "#EBF7EA", color: "#2d7a3a",
+                      display: "flex", alignItems: "center", gap: "4px",
+                    }}>
+                      <MapPin size={9} />{area}
                     </span>
                   ))}
                   {profileData.budget_max && (
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: "#EBF7EA", color: "#5BAD52" }}
-                    >
-                      <Wallet size={9} className="inline mr-0.5" />
-                      〜{profileData.budget_max != null ? profileData.budget_max.toLocaleString() : "未設定"}万円
+                    <span style={{
+                      fontSize: "11px", padding: "3px 10px", borderRadius: "20px",
+                      backgroundColor: "#EBF7EA", color: "#2d7a3a",
+                      display: "flex", alignItems: "center", gap: "4px",
+                    }}>
+                      <Wallet size={9} />〜{profileData.budget_max.toLocaleString()}万円
                     </span>
                   )}
                   {profileData.purchase_timing && (
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: "#EBF7EA", color: "#5BAD52" }}
-                    >
-                      <Calendar size={9} className="inline mr-0.5" />
-                      {profileData.purchase_timing}
+                    <span style={{
+                      fontSize: "11px", padding: "3px 10px", borderRadius: "20px",
+                      backgroundColor: "#EBF7EA", color: "#2d7a3a",
+                      display: "flex", alignItems: "center", gap: "4px",
+                    }}>
+                      <Calendar size={9} />{profileData.purchase_timing}
                     </span>
                   )}
                 </div>
               </div>
             )}
 
-            {/* 条件未登録の場合 */}
+            {/* 条件未登録警告 */}
             {!hasProfile && (
-              <div
-                className="mt-4 pt-4 border-t"
-                style={{ borderColor: "#F0F0F0" }}
-              >
-                <div
-                  className="flex items-center gap-2 p-3 rounded-lg"
-                  style={{ backgroundColor: "#FFF9EC", border: "1px solid #F59E0B" }}
-                >
-                  <AlertCircle size={14} style={{ color: "#F59E0B" }} className="flex-shrink-0" />
-                  <p className="text-xs" style={{ color: "#92400E" }}>
-                    購入希望条件が未登録です。登録するとより精度の高い物件提案が受けられます。
-                    <Link
-                      href="/members/profile"
-                      className="ml-1 font-bold underline"
-                    >
+              <div style={{ marginTop: "16px", paddingTop: "16px", borderTop: "1px solid #f0f0f0" }}>
+                <div style={{
+                  display: "flex", alignItems: "center", gap: "8px",
+                  padding: "10px 14px", borderRadius: "8px",
+                  backgroundColor: "#fffbeb", border: "1px solid #f59e0b",
+                }}>
+                  <AlertCircle size={14} style={{ color: "#f59e0b", flexShrink: 0 }} />
+                  <p style={{ fontSize: "12px", color: "#92400e", margin: 0 }}>
+                    購入希望条件が未登録です。
+                    <Link href="/members/profile" style={{ marginLeft: "4px", fontWeight: "bold", color: "#92400e" }}>
                       今すぐ登録 →
                     </Link>
                   </p>
@@ -186,96 +175,78 @@ export default async function MypagePage() {
           {/* メニュー */}
           {menuItems.map(({ icon: Icon, label, sub, href, accent, alert }) => (
             <Link
-              key={href}
-              href={href}
-              className="bg-white rounded-xl border flex items-center justify-between p-5
-                         hover:shadow-sm transition-all group"
+              key={href} href={href}
               style={{
-                borderColor: accent ? "rgba(201,168,76,0.3)" : "#E5E5E5",
-                backgroundColor: accent ? "#0D2818" : "white",
+                backgroundColor: accent ? "#0D2818" : "#fff",
+                borderRadius: "12px",
+                border: `1px solid ${accent ? "rgba(201,168,76,0.3)" : "#E5E5E5"}`,
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "18px 20px", textDecoration: "none",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
               }}
             >
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center"
-                  style={{
-                    backgroundColor: accent
-                      ? "rgba(201,168,76,0.15)"
-                      : "#EBF7EA",
-                  }}
-                >
-                  <Icon
-                    size={18}
-                    style={{ color: accent ? "#C9A84C" : "#5BAD52" }}
-                  />
+              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                <div style={{
+                  width: "40px", height: "40px", borderRadius: "10px",
+                  backgroundColor: accent ? "rgba(201,168,76,0.15)" : "#f0f0f0",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <Icon size={18} style={{ color: accent ? "#C9A84C" : "#5BAD52" }} />
                 </div>
                 <div>
-                  <p
-                    className="font-medium"
-                    style={{ color: accent ? "#F5F0E8" : "#374151" }}
-                  >
+                  <p style={{ fontSize: "14px", fontWeight: "bold", color: accent ? "#fff" : "#333", margin: "0 0 2px" }}>
                     {label}
                   </p>
-                  <p
-                    className="text-xs mt-0.5"
-                    style={{
-                      color: accent
-                        ? "rgba(245,240,232,0.5)"
-                        : alert
-                        ? "#F59E0B"
-                        : "#9CA3AF",
-                    }}
-                  >
-                    {alert && <AlertCircle size={10} className="inline mr-1" />}
+                  <p style={{ fontSize: "12px", color: accent ? "rgba(255,255,255,0.6)" : "#888", margin: 0, display: "flex", alignItems: "center", gap: "4px" }}>
+                    {alert && <AlertCircle size={10} style={{ color: "#f59e0b" }} />}
                     {sub}
                   </p>
                 </div>
               </div>
-              <ChevronRight
-                size={18}
-                style={{ color: accent ? "rgba(201,168,76,0.5)" : "#D1D5DB" }}
-              />
+              <ChevronRight size={18} style={{ color: accent ? "rgba(255,255,255,0.4)" : "#ccc", flexShrink: 0 }} />
             </Link>
           ))}
 
           {/* 担当者情報 */}
-          <div
-            className="bg-white rounded-xl border p-5"
-            style={{ borderColor: "#E5E5E5" }}
-          >
-            <p className="text-xs font-bold text-gray-400 tracking-widest mb-3">
+          <div style={{ backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #E5E5E5", padding: "20px" }}>
+            <p style={{ fontSize: "11px", fontWeight: "bold", color: "#aaa", letterSpacing: "0.1em", marginBottom: "12px" }}>
               担当者
             </p>
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: "#EBF7EA" }}
-              >
-                <User size={16} style={{ color: "#5BAD52" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div style={{
+                width: "40px", height: "40px", borderRadius: "50%",
+                backgroundColor: "#f0f0f0",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
+              }}>
+                <User size={16} style={{ color: "#aaa" }} />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-700">
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: "14px", fontWeight: "500", color: "#333", margin: "0 0 2px" }}>
                   フェリアホーム 担当者
                 </p>
-                <p className="text-xs text-gray-400">
+                <p style={{ fontSize: "12px", color: "#888", margin: 0 }}>
                   担当者よりご連絡いたします
                 </p>
               </div>
               <a
-                href="tel:03XXXXXXXX"
-                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium"
-                style={{ backgroundColor: "#EBF7EA", color: "#5BAD52" }}
+                href="tel:0359818601"
+                style={{
+                  display: "flex", alignItems: "center", gap: "6px",
+                  padding: "8px 14px", borderRadius: "8px",
+                  backgroundColor: "#EBF7EA", color: "#5BAD52",
+                  textDecoration: "none", fontSize: "12px", fontWeight: "bold",
+                  flexShrink: 0,
+                }}
               >
-                <Phone size={12} />
-                電話する
+                <Phone size={12} />電話する
               </a>
             </div>
           </div>
 
-          {/* ログアウト */}
           <LogoutButton />
         </div>
       </div>
-    </div>
+    </main>
   );
 }
