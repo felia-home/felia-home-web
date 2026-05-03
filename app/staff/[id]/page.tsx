@@ -21,7 +21,7 @@ export default async function StaffDetailPage({ params }: { params: { id: string
     <div style={{ backgroundColor: "#ffffff" }}>
       {/* パンくず */}
       <div style={{ backgroundColor: "#F8F8F8", padding: "8px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <nav style={{ fontSize: "12px", color: "#999", display: "flex", alignItems: "center", gap: "4px" }}>
             <Link href="/" style={{ color: "#999", textDecoration: "none" }}>TOP</Link>
             <ChevronRight size={12} />
@@ -32,7 +32,7 @@ export default async function StaffDetailPage({ params }: { params: { id: string
         </div>
       </div>
 
-      <div className="container-content" style={{ padding: "32px 0 64px", maxWidth: "900px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "32px 24px 64px" }}>
         {/* ヘッダー */}
         <div style={{ marginBottom: "32px" }}>
           <p style={{ fontSize: "12px", color: "#888", marginBottom: "4px" }}>

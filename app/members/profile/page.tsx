@@ -2,42 +2,47 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { getMemberProfileData } from "@/lib/api";
 import { ProfileEditForm } from "@/components/members/ProfileEditForm";
-import { ChevronLeft } from "lucide-react";
 
-export const metadata = { title: "購入希望条件の変更" };
+export const metadata = { title: "購入希望条件の変更 | フェリアホーム" };
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) redirect("/members/login");
-
   const memberId = (session.user as any).id;
-  const profileData = await getMemberProfileData(memberId);
+
+  let profileData = null;
+  try {
+    profileData = await getMemberProfileData(memberId);
+  } catch {}
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F8F8F8" }}>
-      <div className="bg-white border-b py-6" style={{ borderColor: "#E5E5E5" }}>
-        <div className="container-content">
+    <main style={{ backgroundColor: "#f8f8f8", minHeight: "100vh" }}>
+      {/* ヘッダー */}
+      <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #E5E5E5", padding: "20px 24px" }}>
+        <div style={{ maxWidth: "640px", margin: "0 auto" }}>
           <Link
             href="/members/mypage"
-            className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 mb-2"
+            style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "13px", color: "#888", textDecoration: "none", marginBottom: "8px" }}
           >
             <ChevronLeft size={14} /> マイページ
           </Link>
-          <h1 className="text-xl font-bold text-gray-800">購入希望条件の変更</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            ご希望に合った物件をご提案するために使用します
+          <h1 style={{ fontSize: "20px", fontWeight: "bold", color: "#333", margin: "0 0 4px" }}>
+            購入希望条件の変更
+          </h1>
+          <p style={{ fontSize: "13px", color: "#888", margin: 0 }}>
+            希望する条件を登録・更新してください
           </p>
         </div>
       </div>
 
-      <div className="container-content py-8">
-        <div className="max-w-2xl mx-auto">
-          <ProfileEditForm initialData={profileData} />
-        </div>
+      {/* フォーム */}
+      <div style={{ maxWidth: "640px", margin: "0 auto", padding: "24px 24px 80px" }}>
+        <ProfileEditForm initialData={profileData} />
       </div>
-    </div>
+    </main>
   );
 }

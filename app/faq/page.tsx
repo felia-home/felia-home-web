@@ -68,7 +68,7 @@ export default function FaqPage() {
 
       {/* パンくず */}
       <div style={{ backgroundColor: "#F8F8F8", padding: "8px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <nav style={{ fontSize: "12px", color: "#999", display: "flex", alignItems: "center", gap: "4px" }}>
             <Link href="/" style={{ color: "#999", textDecoration: "none" }}>TOP</Link>
             <ChevronRight size={12} />
@@ -79,7 +79,7 @@ export default function FaqPage() {
 
       {/* ヘッダー */}
       <div style={{ backgroundColor: "#F0F5F0", padding: "48px 0 40px" }}>
-        <div className="container-content" style={{ textAlign: "center" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           <div style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             width: "56px", height: "56px", borderRadius: "50%",
@@ -104,14 +104,14 @@ export default function FaqPage() {
 
       {/* FAQ本文 */}
       <section style={{ padding: "56px 0 80px" }}>
-        <div className="container-content" style={{ maxWidth: "800px", margin: "0 auto" }}>
+        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 24px" }}>
           <FaqAccordion groups={FAQ_GROUPS} />
         </div>
       </section>
 
       {/* CTA */}
       <section style={{ padding: "48px 0", backgroundColor: "#F0F5F0" }}>
-        <div className="container-content" style={{ textAlign: "center" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           <p style={{ fontSize: "15px", fontWeight: "bold", color: "#1a1a1a", marginBottom: "8px" }}>
             解決しない場合はお気軽にご相談ください
           </p>

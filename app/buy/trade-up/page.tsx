@@ -127,7 +127,7 @@ export default function TradeUpPage() {
 
       {/* パンくず */}
       <div style={{ backgroundColor: "#F8F8F8", padding: "8px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <nav style={{ fontSize: "12px", color: "#999", display: "flex", alignItems: "center", gap: "4px" }}>
             <Link href="/" style={{ color: "#999", textDecoration: "none" }}>TOP</Link>
             <ChevronRight size={12} />
@@ -137,7 +137,7 @@ export default function TradeUpPage() {
       </div>
 
       {/* タイトル */}
-      <div className="container-content" style={{ padding: "24px 0 0" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 24px 0" }}>
         <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", fontFamily: "'Noto Serif JP', serif" }}>
           物件の買い替えをお考えの方へ
         </h1>
@@ -157,7 +157,7 @@ export default function TradeUpPage() {
 
       {/* 今が買い替えのチャンス */}
       <section style={{ padding: "56px 0 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <p style={{ fontSize: "13px", color: "#5BAD52", fontWeight: "bold", marginBottom: "6px" }}>
             買い替えのメリット多数アリ！
           </p>
@@ -169,8 +169,7 @@ export default function TradeUpPage() {
           <h3 style={{ fontSize: "18px", fontWeight: "bold", color: "#1a1a1a", marginBottom: "20px" }}>
             現在の不動産市場
           </h3>
-          <div style={{ display: "grid", gap: "24px", marginBottom: "56px" }}
-            className="grid-cols-1 tb:grid-cols-[220px_1fr]">
+          <div className="tradeup-img-grid" style={{ display: "grid", gap: "24px", marginBottom: "56px", alignItems: "start" }}>
             <div style={{ position: "relative", width: "100%", maxWidth: "220px", aspectRatio: "4/3", borderRadius: "8px", overflow: "hidden" }}>
               <Image src="/images/buy/trade-up/img01.jpg" alt="不動産市場" fill style={{ objectFit: "cover" }} sizes="220px" />
             </div>
@@ -183,8 +182,7 @@ export default function TradeUpPage() {
           <h3 style={{ fontSize: "20px", fontWeight: "bold", color: "#1a1a1a", marginBottom: "24px", fontFamily: "'Noto Serif JP', serif" }}>
             5つのメリット
           </h3>
-          <div style={{ display: "grid", gap: "16px", marginBottom: "16px" }}
-            className="grid-cols-1 tb:grid-cols-3">
+          <div className="tradeup-merit-grid" style={{ display: "grid", gap: "16px", marginBottom: "16px" }}>
             {merits.slice(0, 3).map((m) => (
               <div key={m.title} style={{ backgroundColor: "#F0F5F0", borderRadius: "8px", padding: "20px" }}>
                 <p style={{ fontWeight: "bold", fontSize: "15px", color: "#2d5a2d", marginBottom: "4px" }}>{m.title}</p>
@@ -193,8 +191,7 @@ export default function TradeUpPage() {
               </div>
             ))}
           </div>
-          <div style={{ display: "grid", gap: "16px", marginBottom: "56px" }}
-            className="grid-cols-1 tb:grid-cols-3">
+          <div className="tradeup-merit-grid" style={{ display: "grid", gap: "16px", marginBottom: "56px" }}>
             {merits.slice(3, 5).map((m) => (
               <div key={m.title} style={{ backgroundColor: "#F0F5F0", borderRadius: "8px", padding: "20px" }}>
                 <p style={{ fontWeight: "bold", fontSize: "15px", color: "#2d5a2d", marginBottom: "4px" }}>{m.title}</p>
@@ -211,7 +208,7 @@ export default function TradeUpPage() {
 
       {/* 弊社のお客様実例 */}
       <section style={{ padding: "56px 0", backgroundColor: "#F8F8F8" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "48px", fontFamily: "'Noto Serif JP', serif" }}>
             弊社のお客様実例
           </h2>
@@ -231,8 +228,7 @@ export default function TradeUpPage() {
               </p>
               <div style={{ backgroundColor: "white", borderRadius: "8px", padding: "20px", marginBottom: "24px", border: "1px solid #E5E5E5" }}>
                 {/* 上段：物件情報 + 矢印 + 売却結果 の3カラム */}
-                <div style={{ display: "grid", gridTemplateColumns: "180px 1fr 60px 1fr", gap: "16px", alignItems: "center" }}
-                  className="grid-cols-1 tb:grid-cols-[180px_1fr_60px_1fr]">
+                <div className="tradeup-case-grid" style={{ display: "grid", gap: "16px", alignItems: "center" }}>
 
                   {/* 物件写真 */}
                   <div style={{ position: "relative", width: "180px", aspectRatio: "4/3", borderRadius: "6px", overflow: "hidden" }}>
@@ -277,8 +273,7 @@ export default function TradeUpPage() {
               <p style={{ fontSize: "13px", fontWeight: "bold", color: "#666", textAlign: "center", marginBottom: "8px" }}>2．購入物件</p>
               <p style={{ fontSize: "14px", fontWeight: "bold", color: "#333", textAlign: "center", marginBottom: "16px" }}>{c.buy.title}</p>
               <div style={{ backgroundColor: "white", borderRadius: "8px", padding: "20px", marginBottom: "24px", border: "1px solid #E5E5E5" }}>
-                <div style={{ display: "grid", gap: "16px" }}
-                  className="grid-cols-1 tb:grid-cols-[1fr_180px]">
+                <div className="tradeup-buy-grid" style={{ display: "grid", gap: "16px", alignItems: "start" }}>
                   <div>
                     <p style={{ fontWeight: "bold", fontSize: "15px", color: "#333" }}>価格 {c.buy.price}万円</p>
                     <p style={{ fontSize: "12px", color: "#666", margin: "4px 0" }}>土地面積 {c.buy.area}㎡</p>
@@ -326,7 +321,7 @@ export default function TradeUpPage() {
 
       {/* CTA */}
       <section style={{ padding: "56px 0" }}>
-        <div className="container-content" style={{ maxWidth: "640px", margin: "0 auto", textAlign: "center" }}>
+        <div style={{ maxWidth: "640px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           <h2 style={{ fontSize: "clamp(15px, 2vw, 20px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "16px", fontFamily: "'Noto Serif JP', serif" }}>
             現在のご自宅からの買い替えにメリットがあるのか、まずはお気軽にご相談を！
           </h2>

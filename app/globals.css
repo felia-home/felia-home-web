@@ -317,6 +317,33 @@
   }
 }
 
+/* Sell page grids */
+.sell-step-grid { grid-template-columns: 160px 1fr; }
+.sell-2col-grid { grid-template-columns: 1fr 1fr; }
+.sell-point-grid { grid-template-columns: 200px 1fr; }
+@media (max-width: 767px) {
+  .sell-step-grid, .sell-2col-grid, .sell-point-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Buy trade-up page grids */
+.tradeup-img-grid { grid-template-columns: 220px 1fr; }
+.tradeup-merit-grid { grid-template-columns: repeat(3, 1fr); }
+.tradeup-case-grid { grid-template-columns: 180px 1fr 60px 1fr; }
+.tradeup-buy-grid { grid-template-columns: 1fr 180px; }
+@media (max-width: 767px) {
+  .tradeup-img-grid, .tradeup-merit-grid, .tradeup-case-grid, .tradeup-buy-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Staff page grid */
+.staff-grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 767px) {
+  .staff-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
 /* Company page grids */
 .company-2col-grid { grid-template-columns: 1fr 1fr; }
 .company-3col-grid { grid-template-columns: repeat(3, 1fr); }

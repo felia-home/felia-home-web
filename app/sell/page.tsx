@@ -184,7 +184,7 @@ export default function SellPage() {
 
       {/* パンくず */}
       <div style={{ backgroundColor: "#F8F8F8", padding: "8px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <nav style={{ fontSize: "12px", color: "#999", display: "flex", alignItems: "center", gap: "4px" }}>
             <Link href="/" style={{ color: "#999", textDecoration: "none" }}>TOP</Link>
             <ChevronRight size={12} />
@@ -194,7 +194,7 @@ export default function SellPage() {
       </div>
 
       {/* タイトル */}
-      <div className="container-content" style={{ padding: "24px 0 20px" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 24px 20px" }}>
         <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", fontFamily: "'Noto Serif JP', serif", margin: 0 }}>
           不動産売却について
         </h1>
@@ -217,7 +217,7 @@ export default function SellPage() {
 
       {/* ── 7つの強み ────────────────────────────── */}
       <section id="strengths" style={{ padding: "64px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "48px", fontFamily: "'Noto Serif JP', serif" }}>
             フェリアホームの不動産売却　7つの強み
           </h2>
@@ -252,7 +252,7 @@ export default function SellPage() {
 
       {/* ── 不動産売却の流れ ──────────────────────── */}
       <section id="flow" style={{ padding: "64px 0", backgroundColor: "#F8F8F8" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 22px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "40px", fontFamily: "'Noto Serif JP', serif" }}>
             不動産売却の流れ
           </h2>
@@ -266,8 +266,7 @@ export default function SellPage() {
                 padding: "24px",
                 boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
               }}>
-                <div style={{ display: "grid", gap: "20px" }}
-                  className="grid-cols-1 tb:grid-cols-[160px_1fr]">
+                <div className="sell-step-grid" style={{ display: "grid", gap: "20px", alignItems: "start" }}>
                   <div style={{ position: "relative", width: "100%", maxWidth: "160px", aspectRatio: "4/3", borderRadius: "8px", overflow: "hidden" }}>
                     <Image
                       src={`/images/sell/${item.imageFile}.jpg`}
@@ -309,7 +308,7 @@ export default function SellPage() {
 
       {/* ── 「仲介」と「買取」の違い ──────────────── */}
       <section id="difference" style={{ padding: "64px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "12px", fontFamily: "'Noto Serif JP', serif" }}>
             「仲介」と「買取」の違い
           </h2>
@@ -321,8 +320,7 @@ export default function SellPage() {
           </p>
 
           {/* 図解 */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "32px" }}
-            className="grid-cols-1 tb:grid-cols-2">
+          <div className="sell-2col-grid" style={{ display: "grid", gap: "16px", marginBottom: "32px" }}>
             <div style={{ border: "2px solid #5BAD52", borderRadius: "8px", padding: "24px" }}>
               <h3 style={{ color: "#5BAD52", fontWeight: "bold", marginBottom: "12px", textAlign: "center" }}>仲介の場合</h3>
               <div style={{ fontSize: "12px", color: "#666", textAlign: "center", lineHeight: 2 }}>
@@ -374,7 +372,7 @@ export default function SellPage() {
 
       {/* ── よくある質問 ──────────────────────────── */}
       <section id="faq" style={{ padding: "64px 0", backgroundColor: "#2d4a4a" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 22px)", fontWeight: "bold", color: "white", marginBottom: "32px", fontFamily: "'Noto Serif JP', serif" }}>
             よくある質問
           </h2>
@@ -384,7 +382,7 @@ export default function SellPage() {
 
       {/* ── 不動産売却時の諸費用 ──────────────────── */}
       <section id="costs" style={{ padding: "64px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "12px", fontFamily: "'Noto Serif JP', serif" }}>
             不動産売却時の諸費用
           </h2>
@@ -416,7 +414,7 @@ export default function SellPage() {
 
       {/* ── 少しでも高く売るポイント ──────────────── */}
       <section id="points" style={{ padding: "64px 0", backgroundColor: "#5a8a6a" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "white", marginBottom: "8px", fontFamily: "'Noto Serif JP', serif" }}>
             少しでも高く売るポイント
           </h2>
@@ -429,8 +427,7 @@ export default function SellPage() {
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "36px" }}>
             {points.map((point) => (
-              <div key={point.num} style={{ display: "grid", gap: "24px", alignItems: "start" }}
-                className="grid-cols-1 tb:grid-cols-[200px_1fr]">
+              <div key={point.num} className="sell-point-grid" style={{ display: "grid", gap: "24px", alignItems: "start" }}>
                 <div style={{ position: "relative", width: "100%", maxWidth: "200px", aspectRatio: "4/3", borderRadius: "8px", overflow: "hidden" }}>
                   <Image
                     src={`/images/sell/${point.imageFile}.jpg`}
@@ -459,7 +456,7 @@ export default function SellPage() {
 
       {/* ── 売却実績リンク ───────────────────────── */}
       <section style={{ padding: "48px 0", backgroundColor: "#F8F8F8" }}>
-        <div className="container-content" style={{ textAlign: "center" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 24px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "8px", fontFamily: "'Noto Serif JP', serif" }}>
             売却実績
           </h2>
@@ -483,7 +480,7 @@ export default function SellPage() {
 
       {/* ── 売却査定CTA ──────────────────────────── */}
       <section id="assessment" style={{ padding: "64px 0" }}>
-        <div className="container-content" style={{ textAlign: "center" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 26px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "12px", fontFamily: "'Noto Serif JP', serif" }}>
             売却査定
           </h2>

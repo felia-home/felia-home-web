@@ -39,7 +39,7 @@ export default async function StaffPage() {
     <div style={{ backgroundColor: "#ffffff" }}>
       {/* パンくず */}
       <div style={{ backgroundColor: "#F8F8F8", padding: "8px 0" }}>
-        <div className="container-content">
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
           <nav style={{ fontSize: "12px", color: "#999", display: "flex", alignItems: "center", gap: "4px" }}>
             <Link href="/" style={{ color: "#999", textDecoration: "none" }}>TOP</Link>
             <ChevronRight size={12} />
@@ -48,7 +48,7 @@ export default async function StaffPage() {
         </div>
       </div>
 
-      <div className="container-content" style={{ padding: "32px 0 64px" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 24px 64px" }}>
         <h1 style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "48px", fontFamily: "'Noto Serif JP', serif" }}>
           スタッフ紹介
         </h1>
@@ -64,15 +64,14 @@ export default async function StaffPage() {
             </div>
 
             {/* グリッド */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "32px" }}
-              className="grid-cols-2 tb:grid-cols-3">
+            <div className="staff-grid" style={{ display: "grid", gap: "32px" }}>
               {members.map((staff) => (
                 <Link
                   key={staff.id}
                   href={`/staff/${staff.id}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
-                  <div className="group">
+                  <div>
                     {/* 写真 */}
                     <div style={{
                       position: "relative", width: "100%", aspectRatio: "16/9",
@@ -84,9 +83,8 @@ export default async function StaffPage() {
                           src={staff.photo_url}
                           alt={staff.name}
                           fill
-                          style={{ objectFit: "cover", objectPosition: "center", transition: "transform 0.4s ease" }}
+                          style={{ objectFit: "cover", objectPosition: "center" }}
                           sizes="(max-width: 768px) 50vw, 33vw"
-                          className="group-hover:scale-105"
                         />
                       ) : (
                         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
