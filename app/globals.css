@@ -456,3 +456,45 @@
 @media (min-width: 768px) {
   .accordion-recruit-wrap { display: none; }
 }
+
+/* PropertyCard */
+.property-card {
+  display: block;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e8e8e8;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease;
+}
+.property-card:hover {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+.property-card-img-wrap {
+  position: relative;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+.property-card-img {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.property-card:hover .property-card-img {
+  transform: scale(1.05);
+}
+.property-card-info { padding: 12px; }
+.property-card-info--large { padding: 12px; }
+@media (min-width: 768px) {
+  .property-card-info--large { padding: 20px; }
+}
+.property-card-price { font-size: 20px; }
+.property-card-price--large { font-size: 20px; }
+@media (min-width: 768px) {
+  .property-card-price--large { font-size: 28px; }
+}
+.property-card-title { font-size: 13px; }
+.property-card-title--large { font-size: 14px; }
+@media (min-width: 768px) {
+  .property-card-title--large { font-size: 17px; }
+}
