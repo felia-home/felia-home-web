@@ -498,3 +498,147 @@
 @media (min-width: 768px) {
   .property-card-title--large { font-size: 17px; }
 }
+
+/* FeatureSection */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 767px) {
+  .feature-grid { grid-template-columns: 1fr !important; }
+}
+.feature-card {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.feature-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  transition: background-color 0.2s ease;
+}
+.feature-card:hover .feature-overlay {
+  background-color: rgba(0, 0, 0, 0.55);
+}
+
+/* FeaturedSlider */
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 767px) {
+  .featured-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+}
+.slider-pagination-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  cursor: pointer;
+  color: #555;
+  transition: border-color 0.15s ease;
+}
+.slider-pagination-btn:hover:not(:disabled) {
+  border-color: #5BAD52;
+  color: #5BAD52;
+}
+.slider-pagination-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.slider-dot {
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+/* Banner sections */
+.banner-section {
+  position: relative;
+  overflow: hidden;
+  padding: 56px 0;
+}
+@media (min-width: 768px) {
+  .banner-section { padding: 80px 0; }
+}
+.banner-flex-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+@media (min-width: 768px) {
+  .banner-flex-row {
+    flex-direction: row;
+  }
+}
+.banner-text-center {
+  text-align: center;
+}
+@media (min-width: 768px) {
+  .banner-text-center { text-align: left; }
+}
+.banner-justify-center {
+  justify-content: center;
+}
+@media (min-width: 768px) {
+  .banner-justify-center { justify-content: flex-start; }
+}
+.cta-button-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cta-button-hover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+.cta-text-hover {
+  color: rgba(255,255,255,0.6);
+  transition: color 0.15s ease;
+  text-decoration: none;
+}
+.cta-text-hover:hover {
+  color: #fff;
+}
+
+/* RecommendSection */
+.area-card {
+  display: block;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+}
+.area-card-img {
+  transition: transform 0.4s ease;
+  object-fit: cover;
+}
+.area-card:hover .area-card-img {
+  transform: scale(1.05);
+}
+.area-card-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  transition: background-color 0.2s ease;
+}
+.area-card:hover .area-card-overlay {
+  background-color: rgba(0, 0, 0, 0.55);
+}
+.area-card-hover-line {
+  width: 0;
+  height: 2px;
+  background-color: #5BAD52;
+  transition: width 0.3s ease;
+}
+.area-card:hover .area-card-hover-line {
+  width: 100%;
+}

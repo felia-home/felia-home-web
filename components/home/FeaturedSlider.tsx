@@ -19,7 +19,7 @@ export function FeaturedSlider({ properties }: FeaturedSliderProps) {
   return (
     <div>
       {/* カードグリッド */}
-      <div className="grid grid-cols-1 tb:grid-cols-2 gap-4 tb:gap-6">
+      <div className="featured-grid">
         {current.map((p) => (
           <PropertyCard key={p.id} property={p} size="large" />
         ))}
@@ -27,29 +27,40 @@ export function FeaturedSlider({ properties }: FeaturedSliderProps) {
 
       {/* ページネーション（2件以上ある場合のみ表示） */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-4 mt-6">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "16px",
+            marginTop: "24px",
+          }}
+        >
           <button
+            type="button"
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="w-10 h-10 rounded-full border flex items-center justify-center
-                       disabled:opacity-30 hover:border-felia-green transition-colors"
-            style={{ borderColor: "#E5E5E5" }}
+            className="slider-pagination-btn"
             aria-label="前へ"
           >
-            <ChevronLeft size={18} className="text-gray-600" />
+            <ChevronLeft size={18} />
           </button>
 
           {/* ドット */}
-          <div className="flex gap-2">
+          <div style={{ display: "flex", gap: "8px" }}>
             {Array.from({ length: totalPages }).map((_, i) => (
               <button
                 key={i}
+                type="button"
                 onClick={() => setPage(i)}
-                className="rounded-full transition-all duration-300"
+                className="slider-dot"
                 style={{
                   width: i === page ? "24px" : "8px",
                   height: "8px",
                   backgroundColor: i === page ? "#5BAD52" : "#D1D5DB",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: 0,
                 }}
                 aria-label={`${i + 1}ページ目`}
               />
@@ -57,14 +68,13 @@ export function FeaturedSlider({ properties }: FeaturedSliderProps) {
           </div>
 
           <button
+            type="button"
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page === totalPages - 1}
-            className="w-10 h-10 rounded-full border flex items-center justify-center
-                       disabled:opacity-30 hover:border-felia-green transition-colors"
-            style={{ borderColor: "#E5E5E5" }}
+            className="slider-pagination-btn"
             aria-label="次へ"
           >
-            <ChevronRight size={18} className="text-gray-600" />
+            <ChevronRight size={18} />
           </button>
         </div>
       )}

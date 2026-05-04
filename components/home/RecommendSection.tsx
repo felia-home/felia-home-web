@@ -24,7 +24,7 @@ export async function RecommendSection({ heading, subheading }: RecommendSection
 
   return (
     <section style={{ padding: "64px 0", backgroundColor: "#ffffff" }}>
-      <div className="container-content">
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <SectionTitle en={heading ?? "Recommend"} ja={subheading ?? "エリア別おすすめ物件"} />
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {groups.map((group, gi) => (
@@ -74,15 +74,8 @@ function AreaCard({ area }: { area: AreaSetting }) {
   return (
     <Link
       href={href}
-      style={{
-        position: "relative",
-        display: "block",
-        overflow: "hidden",
-        borderRadius: "8px",
-        paddingBottom: "70%",
-        textDecoration: "none",
-      }}
-      className="group"
+      className="area-card"
+      style={{ paddingBottom: "70%" }}
     >
       <div style={{ position: "absolute", inset: 0 }}>
         {/* 背景：画像 or グラデーション */}
@@ -91,24 +84,15 @@ function AreaCard({ area }: { area: AreaSetting }) {
             src={area.image_url}
             alt={`${area.area_name}のイメージ`}
             fill
-            style={{ objectFit: "cover", transition: "transform 0.5s ease" }}
+            className="area-card-img"
             sizes="(max-width: 768px) 50vw, 25vw"
-            className="group-hover:scale-105"
           />
         ) : (
           <div style={{ position: "absolute", inset: 0, background: gradient }} />
         )}
 
-        {/* 通常オーバーレイ */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.3)",
-            transition: "background-color 0.3s ease",
-          }}
-          className="group-hover:bg-black/50"
-        />
+        {/* オーバーレイ */}
+        <div className="area-card-overlay" />
 
         {/* 区名テキスト */}
         <div
@@ -119,66 +103,35 @@ function AreaCard({ area }: { area: AreaSetting }) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            transition: "opacity 0.3s ease",
           }}
-          className="group-hover:opacity-0"
         >
-          <span style={{
-            color: "white",
-            fontWeight: "bold",
-            fontSize: "clamp(13px, 2vw, 18px)",
-            textShadow: "0 2px 4px rgba(0,0,0,0.5)",
-            letterSpacing: "0.1em",
-          }}>
+          <span
+            style={{
+              color: "white",
+              fontWeight: "bold",
+              fontSize: "clamp(13px, 2vw, 18px)",
+              textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+              letterSpacing: "0.1em",
+            }}
+          >
             {area.area_name}
           </span>
-          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "11px", marginTop: "4px", letterSpacing: "0.1em" }}>
+          <span
+            style={{
+              color: "rgba(255,255,255,0.7)",
+              fontSize: "11px",
+              marginTop: "4px",
+              letterSpacing: "0.1em",
+            }}
+          >
             view more
           </span>
         </div>
 
-        {/* ホバー時テキスト */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-end",
-            padding: "12px",
-            opacity: 0,
-            transition: "opacity 0.3s ease",
-          }}
-          className="group-hover:opacity-100"
-        >
-          <p style={{ color: "white", fontWeight: "bold", fontSize: "13px", marginBottom: "4px" }}>
-            {area.area_name}
-          </p>
-          <p style={{
-            color: "rgba(255,255,255,0.8)",
-            fontSize: "11px",
-            lineHeight: 1.5,
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}>
-            {content.catchCopy}
-          </p>
-        </div>
-
         {/* グリーンライン */}
         <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            height: "3px",
-            backgroundColor: "#5BAD52",
-            width: "0%",
-            transition: "width 0.5s ease",
-          }}
-          className="group-hover:w-full"
+          className="area-card-hover-line"
+          style={{ position: "absolute", bottom: 0, left: 0 }}
         />
       </div>
     </Link>

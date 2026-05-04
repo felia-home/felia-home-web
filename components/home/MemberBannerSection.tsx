@@ -11,44 +11,103 @@ const benefits = [
 export function MemberBannerSection() {
   return (
     <section
-      className="relative overflow-hidden py-14 tb:py-20"
+      className="banner-section"
       style={{
         background: "linear-gradient(135deg, #1a3a1a 0%, #2d5a2d 40%, #5BAD52 100%)",
       }}
     >
       {/* 背景装飾（円形） */}
       <div
-        className="absolute -top-20 -right-20 w-80 h-80 rounded-full opacity-10"
-        style={{ backgroundColor: "#ffffff" }}
+        style={{
+          position: "absolute",
+          top: "-80px",
+          right: "-80px",
+          width: "320px",
+          height: "320px",
+          borderRadius: "50%",
+          backgroundColor: "rgba(255,255,255,0.1)",
+          pointerEvents: "none",
+        }}
       />
       <div
-        className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full opacity-10"
-        style={{ backgroundColor: "#ffffff" }}
+        style={{
+          position: "absolute",
+          bottom: "-64px",
+          left: "-64px",
+          width: "256px",
+          height: "256px",
+          borderRadius: "50%",
+          backgroundColor: "rgba(255,255,255,0.1)",
+          pointerEvents: "none",
+        }}
       />
 
-      <div className="container-content relative z-10">
-        <div className="flex flex-col tb:flex-row items-center justify-between gap-8">
-
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "0 24px",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
+        <div className="banner-flex-row">
           {/* 左: テキスト */}
-          <div className="text-center tb:text-left">
-            <p className="text-white/70 text-sm tracking-widest mb-2">
+          <div className="banner-text-center">
+            <p
+              style={{
+                color: "rgba(255,255,255,0.7)",
+                fontSize: "14px",
+                letterSpacing: "0.15em",
+                marginBottom: "8px",
+                margin: "0 0 8px",
+              }}
+            >
               MEMBER REGISTRATION
             </p>
             <h2
-              className="text-white font-bold leading-tight mb-4"
-              style={{ fontSize: "clamp(22px, 3vw, 36px)" }}
+              style={{
+                color: "#fff",
+                fontWeight: "bold",
+                lineHeight: 1.2,
+                marginBottom: "16px",
+                fontSize: "clamp(22px, 3vw, 36px)",
+              }}
             >
               会員登録で、もっと便利に。<br />
-              <span className="text-white/85 font-normal" style={{ fontSize: "clamp(15px, 2vw, 22px)" }}>
+              <span
+                style={{
+                  color: "rgba(255,255,255,0.85)",
+                  fontWeight: "normal",
+                  fontSize: "clamp(15px, 2vw, 22px)",
+                }}
+              >
                 未公開物件も見られます。
               </span>
             </h2>
 
             {/* 特典リスト */}
-            <div className="flex flex-wrap justify-center tb:justify-start gap-4 mb-6">
+            <div
+              className="banner-justify-center"
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "16px",
+                marginBottom: "24px",
+              }}
+            >
               {benefits.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-1.5 text-white/80 text-sm">
-                  <Icon size={14} className="flex-shrink-0" />
+                <div
+                  key={label}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "14px",
+                    color: "rgba(255,255,255,0.8)",
+                  }}
+                >
+                  <Icon size={14} style={{ flexShrink: 0 }} />
                   <span>{label}</span>
                 </div>
               ))}
@@ -56,11 +115,27 @@ export function MemberBannerSection() {
           </div>
 
           {/* 右: CTA */}
-          <div className="flex flex-col items-center gap-3 flex-shrink-0">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "12px",
+              flexShrink: 0,
+            }}
+          >
             <Link
               href="/members/register"
-              className="flex items-center gap-2 px-8 py-4 rounded-lg font-bold text-base transition-all duration-200 hover:scale-105 hover:shadow-lg"
+              className="cta-button-hover"
               style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "16px 32px",
+                borderRadius: "8px",
+                fontWeight: "bold",
+                fontSize: "16px",
+                textDecoration: "none",
                 backgroundColor: "#ffffff",
                 color: "#5BAD52",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
@@ -71,12 +146,12 @@ export function MemberBannerSection() {
             </Link>
             <Link
               href="/members/login"
-              className="text-white/60 text-sm hover:text-white transition-colors"
+              className="cta-text-hover"
+              style={{ fontSize: "14px" }}
             >
               すでに会員の方はログイン →
             </Link>
           </div>
-
         </div>
       </div>
     </section>
