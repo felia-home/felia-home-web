@@ -58,10 +58,10 @@ interface AccordionMenuProps {
 
 export function AccordionMenu({ isOpen, onClose }: AccordionMenuProps) {
   const [openItems, setOpenItems] = useState<string[]>([]);
+  const [closeHover, setCloseHover] = useState(false);
   const session = useSession();
   const isLoggedIn = session?.status === "authenticated";
 
-  // メニューが開いた時にスクロールを禁止
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -88,72 +88,130 @@ export function AccordionMenu({ isOpen, onClose }: AccordionMenuProps) {
     <>
       {/* オーバーレイ */}
       <div
-        className="fixed inset-0 z-50 bg-black/40"
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 50,
+          backgroundColor: "rgba(0,0,0,0.4)",
+        }}
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* ドロワー本体 */}
       <div
-        className="fixed top-0 right-0 z-50 h-full w-full tb:w-[420px] bg-white shadow-2xl overflow-y-auto"
-        style={{ animation: "slideInRight 0.25s ease-out" }}
+        className="accordion-drawer"
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          zIndex: 50,
+          height: "100%",
+          backgroundColor: "#fff",
+          boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",
+          overflowY: "auto",
+          animation: "slideInRight 0.25s ease-out",
+        }}
       >
         {/* ヘッダー */}
         <div
-          className="flex items-center justify-between px-6 py-4 border-b sticky top-0 bg-white z-10"
-          style={{ borderColor: "#E5E5E5" }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "16px 24px",
+            borderBottom: "1px solid #E5E5E5",
+            position: "sticky",
+            top: 0,
+            backgroundColor: "#fff",
+            zIndex: 10,
+          }}
         >
           <span
-            className="font-montserrat font-bold text-lg tracking-wider"
-            style={{ color: "#5BAD52" }}
+            style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: 700,
+              fontSize: "18px",
+              letterSpacing: "0.05em",
+              color: "#5BAD52",
+            }}
           >
             MENU
           </span>
           <button
             onClick={onClose}
-            className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+            onMouseEnter={() => setCloseHover(true)}
+            onMouseLeave={() => setCloseHover(false)}
+            style={{
+              padding: "6px",
+              borderRadius: "4px",
+              border: "none",
+              backgroundColor: closeHover ? "#f3f4f6" : "transparent",
+              cursor: "pointer",
+              transition: "background-color 0.2s",
+            }}
             aria-label="メニューを閉じる"
           >
-            <X size={22} className="text-gray-600" />
+            <X size={22} style={{ color: "#666" }} />
           </button>
         </div>
 
         {/* メニューリスト */}
-        <nav className="py-2">
+        <nav style={{ padding: "8px 0" }}>
           {menuItems.map((item) => (
             <div key={item.label}>
               {item.children ? (
                 <>
                   <button
                     onClick={() => toggleItem(item.label)}
-                    className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors text-left"
+                    className="accordion-menu-item"
                   >
-                    <span className="font-medium text-gray-700 text-[15px]">
+                    <span
+                      style={{
+                        fontWeight: 500,
+                        color: "#444",
+                        fontSize: "15px",
+                      }}
+                    >
                       {item.label}
                     </span>
                     {openItems.includes(item.label) ? (
-                      <ChevronUp size={18} className="text-gray-400 flex-shrink-0" />
+                      <ChevronUp
+                        size={18}
+                        style={{ color: "#999", flexShrink: 0 }}
+                      />
                     ) : (
-                      <ChevronDown size={18} className="text-gray-400 flex-shrink-0" />
+                      <ChevronDown
+                        size={18}
+                        style={{ color: "#999", flexShrink: 0 }}
+                      />
                     )}
                   </button>
 
                   {/* サブメニュー */}
                   {openItems.includes(item.label) && (
                     <div
-                      className="border-l-2 ml-6 mb-1"
-                      style={{ borderColor: "#5BAD52" }}
+                      style={{
+                        borderLeft: "2px solid #5BAD52",
+                        marginLeft: "24px",
+                        marginBottom: "4px",
+                      }}
                     >
                       {item.children.map((child) => (
                         <Link
                           key={child.href}
                           href={child.href}
                           onClick={onClose}
-                          className="flex items-center gap-2 px-4 py-3 text-sm text-gray-600 hover:text-felia-green hover:bg-green-50 transition-colors"
+                          className="accordion-submenu-link"
                         >
                           <span
-                            className="w-1 h-1 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: "#5BAD52" }}
+                            style={{
+                              width: "4px",
+                              height: "4px",
+                              borderRadius: "50%",
+                              flexShrink: 0,
+                              backgroundColor: "#5BAD52",
+                            }}
                           />
                           {child.label}
                         </Link>
@@ -165,50 +223,93 @@ export function AccordionMenu({ isOpen, onClose }: AccordionMenuProps) {
                 <Link
                   href={item.href!}
                   onClick={onClose}
-                  className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+                  className="accordion-menu-item"
+                  style={{ textDecoration: "none" }}
                 >
-                  <span className="font-medium text-gray-700 text-[15px]">
+                  <span
+                    style={{
+                      fontWeight: 500,
+                      color: "#444",
+                      fontSize: "15px",
+                    }}
+                  >
                     {item.label}
                   </span>
-                  <span className="text-gray-300 text-sm">›</span>
+                  <span style={{ color: "#ccc", fontSize: "14px" }}>›</span>
                 </Link>
               )}
 
               {/* セパレーター */}
               <div
-                className="mx-6 border-b"
-                style={{ borderColor: "#F0F0F0" }}
+                style={{
+                  margin: "0 24px",
+                  borderBottom: "1px solid #F0F0F0",
+                }}
               />
             </div>
           ))}
         </nav>
 
         {/* 下部CTA */}
-        <div className="px-6 py-6 space-y-3">
+        <div
+          style={{
+            padding: "24px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+          }}
+        >
           <Link
             href="/lp/register"
             onClick={onClose}
-            className="flex items-center justify-center w-full py-3 rounded text-white font-medium text-sm transition-colors"
-            style={{ backgroundColor: "#5BAD52" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+              padding: "12px",
+              borderRadius: "4px",
+              backgroundColor: "#5BAD52",
+              color: "#fff",
+              fontWeight: 500,
+              fontSize: "14px",
+              textDecoration: "none",
+            }}
           >
             無料会員登録
           </Link>
           <Link
             href="/sell/valuation"
             onClick={onClose}
-            className="flex items-center justify-center w-full py-3 rounded border font-medium text-sm transition-colors text-gray-700 hover:border-felia-green hover:text-felia-green"
-            style={{ borderColor: "#E5E5E5" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+              padding: "12px",
+              borderRadius: "4px",
+              border: "1px solid #E5E5E5",
+              fontWeight: 500,
+              fontSize: "14px",
+              color: "#444",
+              textDecoration: "none",
+              backgroundColor: "#fff",
+            }}
           >
             無料売却査定
           </Link>
         </div>
 
         {/* 採用情報リンク（SPのみ） */}
-        <div className="px-6 pb-8 tb:hidden">
+        <div className="accordion-recruit-wrap">
           <Link
             href="/recruit"
             onClick={onClose}
-            className="text-sm text-gray-500 hover:text-gray-700"
+            style={{
+              fontSize: "14px",
+              color: "#888",
+              textDecoration: "none",
+            }}
           >
             採用情報
           </Link>
@@ -217,7 +318,10 @@ export function AccordionMenu({ isOpen, onClose }: AccordionMenuProps) {
         {/* ログアウト（ログイン時のみ） */}
         {isLoggedIn && (
           <button
-            onClick={() => { onClose(); signOut({ callbackUrl: "/" }); }}
+            onClick={() => {
+              onClose();
+              signOut({ callbackUrl: "/" });
+            }}
             style={{
               display: "block",
               width: "100%",

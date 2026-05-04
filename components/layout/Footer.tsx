@@ -51,42 +51,85 @@ export function Footer() {
   return (
     <footer style={{ backgroundColor: "#1A1A1A" }}>
       {/* メインフッター */}
-      <div className="container-content py-12 tb:py-16">
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "48px 24px" }}>
 
         {/* ロゴ＋キャッチコピー */}
-        <div className="mb-10 pb-8 border-b" style={{ borderColor: "#333" }}>
-          <Link href="/" className="inline-flex items-center gap-1 mb-3">
+        <div
+          style={{
+            marginBottom: "40px",
+            paddingBottom: "32px",
+            borderBottom: "1px solid #333",
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              marginBottom: "12px",
+              textDecoration: "none",
+            }}
+          >
             <span
-              className="font-montserrat font-bold text-2xl tracking-wider"
-              style={{ color: "#5BAD52" }}
+              style={{
+                fontFamily: "'Montserrat', sans-serif",
+                fontWeight: 700,
+                fontSize: "24px",
+                letterSpacing: "0.05em",
+                color: "#5BAD52",
+              }}
             >
               Felia
             </span>
-            <span className="font-bold text-2xl text-white tracking-wide">
+            <span
+              style={{
+                fontWeight: 700,
+                fontSize: "24px",
+                color: "#fff",
+                letterSpacing: "0.05em",
+              }}
+            >
               Home
             </span>
           </Link>
-          <p className="text-sm text-gray-400 mt-1">
+          <p style={{ fontSize: "14px", color: "#999", marginTop: "4px" }}>
             東京の不動産売買は、フェリアホームへ
           </p>
         </div>
 
         {/* リンクグループ */}
-        <div className="grid grid-cols-2 tb:grid-cols-4 gap-8 tb:gap-6">
+        <div className="footer-grid">
           {footerLinks.map((group) => (
             <div key={group.group}>
               <h3
-                className="text-sm font-bold mb-4 pb-2 border-b"
-                style={{ color: "#5BAD52", borderColor: "#333" }}
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  marginBottom: "16px",
+                  paddingBottom: "8px",
+                  borderBottom: "1px solid #333",
+                  color: "#5BAD52",
+                }}
               >
                 {group.group}
               </h3>
-              <ul className="space-y-2.5">
+              <ul
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  listStyle: "none",
+                  padding: 0,
+                  margin: 0,
+                }}
+              >
                 {group.links.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-xs text-gray-400 hover:text-white transition-colors leading-relaxed"
+                      className="footer-link"
+                      style={{ fontSize: "12px", lineHeight: 1.6 }}
                     >
                       {link.label}
                     </Link>
@@ -98,17 +141,23 @@ export function Footer() {
         </div>
 
         {/* 会員登録CTA */}
-        <div
-          className="mt-10 pt-8 border-t flex flex-col tb:flex-row items-center gap-4"
-          style={{ borderColor: "#333" }}
-        >
-          <p className="text-sm text-gray-400">
+        <div className="footer-cta">
+          <p style={{ fontSize: "14px", color: "#999", margin: 0 }}>
             会員登録で未公開物件・お気に入り保存が利用できます
           </p>
           <Link
             href="/members/register"
-            className="flex-shrink-0 px-6 py-2.5 rounded text-white text-sm font-medium transition-colors"
-            style={{ backgroundColor: "#5BAD52" }}
+            style={{
+              flexShrink: 0,
+              padding: "10px 24px",
+              borderRadius: "4px",
+              backgroundColor: "#5BAD52",
+              color: "#fff",
+              fontSize: "14px",
+              fontWeight: 500,
+              textDecoration: "none",
+              textAlign: "center",
+            }}
           >
             無料会員登録はこちら
           </Link>
@@ -116,31 +165,45 @@ export function Footer() {
       </div>
 
       {/* ボトムバー */}
-      <div className="border-t py-5" style={{ borderColor: "#2A2A2A" }}>
-        <div className="container-content flex flex-col tb:flex-row items-center justify-between gap-3">
+      <div style={{ borderTop: "1px solid #2A2A2A", padding: "20px 0" }}>
+        <div
+          className="footer-bottom"
+          style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}
+        >
           {/* ボトムリンク */}
-          <div className="flex flex-wrap items-center gap-4 justify-center tb:justify-start">
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: "16px",
+            }}
+          >
             {bottomLinks.map((link, i) => (
-              <span key={link.href} className="flex items-center gap-4">
+              <span
+                key={link.href}
+                style={{ display: "flex", alignItems: "center", gap: "16px" }}
+              >
                 <Link
                   href={link.href}
-                  className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                  className="footer-bottom-link"
+                  style={{ fontSize: "12px" }}
                 >
                   {link.label}
                 </Link>
                 {i < bottomLinks.length - 1 && (
-                  <span className="text-gray-700">|</span>
+                  <span style={{ color: "#444" }}>|</span>
                 )}
               </span>
             ))}
           </div>
 
           {/* コピーライト */}
-          <div className="text-center tb:text-right">
-            <p className="text-xs text-gray-600">
+          <div>
+            <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
               東京都知事（X）第XXXXX号
             </p>
-            <p className="text-xs text-gray-600 mt-0.5">
+            <p style={{ fontSize: "12px", color: "#666", marginTop: "2px" }}>
               © 2025 株式会社フェリアホーム. All Rights Reserved.
             </p>
           </div>
