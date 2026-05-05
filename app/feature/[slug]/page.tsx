@@ -79,35 +79,119 @@ export default async function FeaturePage({ params }: { params: { slug: string }
   const { properties, total } = await getAreaProperties(area.name);
 
   return (
-    <div className="pt-20 pb-20 bg-[#fafaf8] min-h-screen">
+    <main
+      style={{
+        backgroundColor: "#fafaf8",
+        minHeight: "100vh",
+        paddingTop: "80px",
+        paddingBottom: "80px",
+      }}
+    >
       {/* エリアヒーロー */}
-      <div className="relative h-64 bg-[#1a3a2a] mb-12 overflow-hidden">
+      <div
+        style={{
+          position: "relative",
+          height: "256px",
+          backgroundColor: "#1a3a2a",
+          marginBottom: "48px",
+          overflow: "hidden",
+        }}
+      >
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-40"
-          style={{ backgroundImage: `url('/images/areas/${params.slug}.jpg')` }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `url('/images/areas/${params.slug}.jpg')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.4,
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a3a2a]/80" />
-        <div className="relative h-full flex flex-col justify-end container-xl pb-8">
-          <nav className="text-xs text-white/60 flex items-center gap-2 mb-3">
-            <Link href="/" className="hover:text-white">ホーム</Link>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to bottom, transparent, rgba(26,58,42,0.8))",
+          }}
+        />
+        <div
+          className="container-xl"
+          style={{
+            position: "relative",
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-end",
+            paddingBottom: "32px",
+          }}
+        >
+          <nav
+            style={{
+              fontSize: "12px",
+              color: "rgba(255,255,255,0.6)",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              marginBottom: "12px",
+            }}
+          >
+            <Link href="/" className="crumb-link-white">
+              ホーム
+            </Link>
             <span>/</span>
-            <Link href="/properties" className="hover:text-white">物件検索</Link>
+            <Link href="/properties" className="crumb-link-white">
+              物件検索
+            </Link>
             <span>/</span>
-            <span className="text-white">{area.name}</span>
+            <span style={{ color: "#fff" }}>{area.name}</span>
           </nav>
-          <h1 className="font-serif text-3xl font-bold text-white">{area.name}の物件</h1>
+          <h1
+            style={{
+              fontFamily: "'Noto Serif JP', serif",
+              fontSize: "clamp(22px, 4vw, 36px)",
+              fontWeight: "bold",
+              color: "#fff",
+              margin: 0,
+            }}
+          >
+            {area.name}の物件
+          </h1>
         </div>
       </div>
 
       <div className="container-xl">
         {/* エリア説明 */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm mb-10">
-          <p className="text-sm text-[#706e68] leading-relaxed mb-4">{area.description}</p>
-          <div className="flex flex-wrap gap-2">
+        <div
+          style={{
+            backgroundColor: "#fff",
+            borderRadius: "16px",
+            padding: "32px",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+            marginBottom: "40px",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "14px",
+              color: "#706e68",
+              lineHeight: 1.8,
+              marginBottom: "16px",
+            }}
+          >
+            {area.description}
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
             {area.tags.map((tag) => (
               <span
                 key={tag}
-                className="text-xs bg-[#e8f0eb] text-[#1a3a2a] px-3 py-1 rounded-full"
+                style={{
+                  fontSize: "12px",
+                  backgroundColor: "#e8f0eb",
+                  color: "#1a3a2a",
+                  padding: "4px 12px",
+                  borderRadius: "9999px",
+                }}
               >
                 {tag}
               </span>
@@ -116,42 +200,91 @@ export default async function FeaturePage({ params }: { params: { slug: string }
         </div>
 
         {/* 物件一覧 */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-serif text-xl font-bold text-[#1c1b18]">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "24px",
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: "'Noto Serif JP', serif",
+              fontSize: "20px",
+              fontWeight: "bold",
+              color: "#1c1b18",
+              margin: 0,
+            }}
+          >
             {area.name}の掲載物件
           </h2>
-          <p className="text-sm text-[#706e68]">{total}件</p>
+          <p style={{ fontSize: "14px", color: "#706e68", margin: 0 }}>
+            {total}件
+          </p>
         </div>
 
         {properties.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            <div
+              className="grid-3col-resp"
+              style={{ gap: "24px", marginBottom: "40px" }}
+            >
               {properties.map((p) => (
                 <PropertyCard key={p.id} property={p} />
               ))}
             </div>
-            <div className="text-center">
+            <div style={{ textAlign: "center" }}>
               <Link
                 href={`/properties?area=${encodeURIComponent(area.name)}`}
-                className="inline-block border border-[#1a3a2a] text-[#1a3a2a] px-8 py-3 rounded-full text-sm hover:bg-[#1a3a2a] hover:text-white transition-colors"
+                className="btn-darkgreen-outline"
+                style={{
+                  display: "inline-block",
+                  border: "1px solid #1a3a2a",
+                  color: "#1a3a2a",
+                  padding: "12px 32px",
+                  borderRadius: "9999px",
+                  fontSize: "14px",
+                  textDecoration: "none",
+                }}
               >
                 {area.name}の物件をすべて見る
               </Link>
             </div>
           </>
         ) : (
-          <div className="text-center py-16 text-[#706e68]">
-            <p className="text-lg mb-2">現在掲載中の物件はありません</p>
-            <p className="text-sm mb-6">新着情報はお問合せにてお気軽にご確認ください</p>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "64px 0",
+              color: "#706e68",
+            }}
+          >
+            <p style={{ fontSize: "18px", marginBottom: "8px" }}>
+              現在掲載中の物件はありません
+            </p>
+            <p style={{ fontSize: "14px", marginBottom: "24px" }}>
+              新着情報はお問合せにてお気軽にご確認ください
+            </p>
             <Link
               href="/contact"
-              className="inline-block bg-[#c9a96e] text-white px-8 py-3 rounded-full text-sm font-bold hover:bg-[#b8935a] transition-colors"
+              className="btn-gold-fill"
+              style={{
+                display: "inline-block",
+                backgroundColor: "#c9a96e",
+                color: "#fff",
+                padding: "12px 32px",
+                borderRadius: "9999px",
+                fontSize: "14px",
+                fontWeight: "bold",
+                textDecoration: "none",
+              }}
             >
               お問合せはこちら
             </Link>
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

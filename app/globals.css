@@ -76,6 +76,44 @@
   }
 }
 
+/* container-xl */
+.container-xl {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+@media (min-width: 768px) { .container-xl { padding: 0 24px; } }
+@media (min-width: 1024px) { .container-xl { padding: 0 32px; } }
+
+/* Luxury theme hover effects */
+.btn-gold-fill { transition: background-color 0.15s ease; }
+.btn-gold-fill:hover { background-color: #b8935a !important; }
+.btn-darkgreen-outline { transition: background-color 0.15s ease, color 0.15s ease; }
+.btn-darkgreen-outline:hover { background-color: #1a3a2a !important; color: #fff !important; }
+.btn-white-outline { transition: background-color 0.15s ease; }
+.btn-white-outline:hover { background-color: rgba(255,255,255,0.1) !important; }
+.crumb-link-white { color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.15s ease; }
+.crumb-link-white:hover { color: #fff; }
+
+/* service page */
+.service-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+@media (min-width: 768px) {
+  .service-card-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.service-cta-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+}
+@media (min-width: 640px) {
+  .service-cta-btns { flex-direction: row; }
+}
+
 /* Responsive grid utilities */
 .grid-2col-resp {
   display: grid;
