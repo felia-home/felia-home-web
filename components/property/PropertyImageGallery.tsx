@@ -3,110 +3,238 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
+import { ChevronLeft, ChevronRight, ZoomIn, X } from "lucide-react";
 
-interface PropertyImageGalleryProps {
-  images: string[];
-  name: string;
+interface GalleryImage {
+  url: string;
+  caption?: string | null;
 }
 
-export function PropertyImageGallery({ images, name }: PropertyImageGalleryProps) {
+interface Props {
+  images: GalleryImage[];
+}
+
+export function PropertyImageGallery({ images }: Props) {
   const [current, setCurrent] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [imgErrors, setImgErrors] = useState<Set<number>>(new Set());
+  const [imgErrors, setImgErrors] = useState<Record<number, boolean>>({});
 
-  const validImages = images.filter((_, i) => !imgErrors.has(i));
-  if (validImages.length === 0) {
+  if (!images || images.length === 0) {
     return (
       <div
-        className="w-full rounded-xl flex items-center justify-center"
-        style={{ aspectRatio: "4/3", backgroundColor: "#EBF7EA" }}
+        style={{
+          width: "100%",
+          borderRadius: "12px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f0f0f0",
+          aspectRatio: "16/9",
+        }}
       >
-        <span className="text-gray-400 text-sm">画像なし</span>
+        <span style={{ color: "#aaa", fontSize: "13px" }}>画像なし</span>
       </div>
     );
   }
 
-  const prev = () => setCurrent((c) => (c - 1 + validImages.length) % validImages.length);
-  const next = () => setCurrent((c) => (c + 1) % validImages.length);
+  const prev = () =>
+    setCurrent((i) => (i - 1 + images.length) % images.length);
+  const next = () => setCurrent((i) => (i + 1) % images.length);
 
   return (
     <>
       {/* メイン画像 */}
-      <div className="relative rounded-xl overflow-hidden" style={{ aspectRatio: "4/3" }}>
-        <Image
-          src={validImages[current]}
-          alt={`${name} - 画像${current + 1}`}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 60vw"
-          onError={() => setImgErrors((e) => new Set(e).add(current))}
-          priority
-        />
+      <div
+        style={{
+          position: "relative",
+          borderRadius: "12px",
+          overflow: "hidden",
+          aspectRatio: "16/9",
+        }}
+      >
+        {!imgErrors[current] ? (
+          <Image
+            src={images[current].url}
+            alt={images[current].caption ?? `物件画像 ${current + 1}`}
+            fill
+            style={{ objectFit: "cover" }}
+            sizes="(max-width: 768px) 100vw, 60vw"
+            onError={() =>
+              setImgErrors((e) => ({ ...e, [current]: true }))
+            }
+          />
+        ) : (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#f0f0f0",
+              color: "#aaa",
+              fontSize: "13px",
+            }}
+          >
+            画像を読み込めませんでした
+          </div>
+        )}
 
         {/* ズームボタン */}
         <button
+          type="button"
           onClick={() => setLightboxOpen(true)}
-          className="absolute top-3 right-3 w-9 h-9 rounded-lg bg-black/40 hover:bg-black/60
-                     flex items-center justify-center transition-colors backdrop-blur-sm"
+          className="gallery-zoom-btn"
+          style={{
+            position: "absolute",
+            top: "12px",
+            right: "12px",
+            width: "36px",
+            height: "36px",
+            borderRadius: "8px",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
+          }}
+          aria-label="拡大"
         >
-          <ZoomIn size={16} className="text-white" />
+          <ZoomIn size={16} style={{ color: "#fff" }} />
         </button>
 
-        {/* 枚数表示 */}
-        <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-black/50 backdrop-blur-sm">
-          <span className="text-white text-xs font-medium">
-            {current + 1} / {validImages.length}
-          </span>
-        </div>
+        {/* 枚数バッジ */}
+        {images.length > 1 && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: "12px",
+              right: "12px",
+              padding: "4px 10px",
+              borderRadius: "8px",
+              backgroundColor: "rgba(0,0,0,0.5)",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+            }}
+          >
+            <span
+              style={{
+                color: "#fff",
+                fontSize: "12px",
+                fontWeight: 500,
+              }}
+            >
+              {current + 1} / {images.length}
+            </span>
+          </div>
+        )}
 
-        {/* 矢印（複数枚の場合のみ） */}
-        {validImages.length > 1 && (
+        {/* 前後矢印 */}
+        {images.length > 1 && (
           <>
             <button
+              type="button"
               onClick={prev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full
-                         bg-white/80 hover:bg-white flex items-center justify-center
-                         transition-colors shadow-sm"
+              className="gallery-arrow-btn"
+              style={{
+                position: "absolute",
+                left: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              }}
+              aria-label="前の画像"
             >
-              <ChevronLeft size={18} className="text-gray-700" />
+              <ChevronLeft size={18} style={{ color: "#555" }} />
             </button>
             <button
+              type="button"
               onClick={next}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full
-                         bg-white/80 hover:bg-white flex items-center justify-center
-                         transition-colors shadow-sm"
+              className="gallery-arrow-btn"
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              }}
+              aria-label="次の画像"
             >
-              <ChevronRight size={18} className="text-gray-700" />
+              <ChevronRight size={18} style={{ color: "#555" }} />
             </button>
           </>
         )}
       </div>
 
-      {/* サムネイル */}
-      {validImages.length > 1 && (
-        <div className="flex gap-2 mt-2 overflow-x-auto pb-1">
-          {validImages.map((img, i) => (
+      {/* サムネイル列 */}
+      {images.length > 1 && (
+        <div
+          style={{
+            display: "flex",
+            gap: "8px",
+            marginTop: "8px",
+            overflowX: "auto",
+            paddingBottom: "4px",
+          }}
+        >
+          {images.map((img, i) => (
             <button
               key={i}
+              type="button"
               onClick={() => setCurrent(i)}
-              className="flex-shrink-0 rounded-lg overflow-hidden transition-all"
               style={{
+                flexShrink: 0,
                 width: "72px",
                 height: "54px",
-                border: i === current ? "2px solid #5BAD52" : "2px solid transparent",
-                opacity: i === current ? 1 : 0.6,
+                borderRadius: "8px",
+                overflow: "hidden",
+                border: `2px solid ${i === current ? "#5BAD52" : "transparent"}`,
+                padding: 0,
+                cursor: "pointer",
+                transition: "border-color 0.15s ease",
+                position: "relative",
+                opacity: i === current ? 1 : 0.7,
               }}
+              aria-label={`サムネイル ${i + 1}`}
             >
-              <div className="relative w-full h-full">
+              {!imgErrors[i] ? (
                 <Image
-                  src={img}
-                  alt={`サムネイル${i + 1}`}
+                  src={img.url}
+                  alt={img.caption ?? `サムネイル ${i + 1}`}
                   fill
-                  className="object-cover"
+                  style={{ objectFit: "cover" }}
                   sizes="72px"
+                  onError={() =>
+                    setImgErrors((e) => ({ ...e, [i]: true }))
+                  }
                 />
-              </div>
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "#f0f0f0",
+                  }}
+                />
+              )}
             </button>
           ))}
         </div>
@@ -115,44 +243,117 @@ export function PropertyImageGallery({ images, name }: PropertyImageGalleryProps
       {/* ライトボックス */}
       {lightboxOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
           onClick={() => setLightboxOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 50,
+            backgroundColor: "rgba(0,0,0,0.9)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
+          {/* 閉じるボタン */}
           <button
-            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center
-                       rounded-full bg-white/20 hover:bg-white/40 transition-colors"
+            type="button"
             onClick={() => setLightboxOpen(false)}
+            className="lightbox-btn"
+            style={{
+              position: "absolute",
+              top: "16px",
+              right: "16px",
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10,
+            }}
+            aria-label="閉じる"
           >
-            <X size={20} className="text-white" />
+            <X size={20} style={{ color: "#fff" }} />
           </button>
+
+          {/* 画像 */}
           <div
-            className="relative max-w-[90vw] max-h-[85vh]"
-            style={{ aspectRatio: "4/3", width: "min(90vw, 1200px)" }}
             onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              maxWidth: "90vw",
+              maxHeight: "85vh",
+            }}
           >
             <Image
-              src={validImages[current]}
-              alt={`${name} - 画像${current + 1}`}
-              fill
-              className="object-contain"
-              sizes="90vw"
+              src={images[current].url}
+              alt={images[current].caption ?? `物件画像 ${current + 1}`}
+              width={1200}
+              height={800}
+              style={{
+                objectFit: "contain",
+                maxWidth: "90vw",
+                maxHeight: "85vh",
+                width: "auto",
+                height: "auto",
+              }}
             />
           </div>
-          {validImages.length > 1 && (
+
+          {/* ライトボックス矢印 */}
+          {images.length > 1 && (
             <>
               <button
-                onClick={(e) => { e.stopPropagation(); prev(); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full
-                           bg-white/20 hover:bg-white/40 flex items-center justify-center"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prev();
+                }}
+                className="lightbox-btn"
+                style={{
+                  position: "absolute",
+                  left: "16px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "50%",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                aria-label="前の画像"
               >
-                <ChevronLeft size={22} className="text-white" />
+                <ChevronLeft size={24} style={{ color: "#fff" }} />
               </button>
               <button
-                onClick={(e) => { e.stopPropagation(); next(); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full
-                           bg-white/20 hover:bg-white/40 flex items-center justify-center"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  next();
+                }}
+                className="lightbox-btn"
+                style={{
+                  position: "absolute",
+                  right: "16px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "50%",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                aria-label="次の画像"
               >
-                <ChevronRight size={22} className="text-white" />
+                <ChevronRight size={24} style={{ color: "#fff" }} />
               </button>
             </>
           )}
