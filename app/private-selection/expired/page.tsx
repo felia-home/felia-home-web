@@ -10,41 +10,103 @@ export const metadata = {
 export default function ExpiredPage() {
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ backgroundColor: "#0A1A0F" }}
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 16px",
+        backgroundColor: "#0A1A0F",
+      }}
     >
       <div
-        className="max-w-md w-full text-center p-10 rounded-2xl"
-        style={{ backgroundColor: "#0D2818", border: "1px solid rgba(201,168,76,0.2)" }}
+        style={{
+          maxWidth: "28rem",
+          width: "100%",
+          textAlign: "center",
+          padding: "40px",
+          borderRadius: "16px",
+          backgroundColor: "#0D2818",
+          border: "1px solid rgba(201,168,76,0.2)",
+        }}
       >
         <div
-          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-          style={{ backgroundColor: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)" }}
+          style={{
+            width: "64px",
+            height: "64px",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 20px",
+            backgroundColor: "rgba(201,168,76,0.1)",
+            border: "1px solid rgba(201,168,76,0.3)",
+          }}
         >
           <Clock size={28} style={{ color: "#C9A84C" }} />
         </div>
 
-        <h1 className="font-bold mb-3" style={{ color: "#F5F0E8", fontSize: "20px" }}>
+        <h1
+          style={{
+            fontWeight: "bold",
+            marginBottom: "12px",
+            color: "#F5F0E8",
+            fontSize: "20px",
+          }}
+        >
           URLの有効期限が切れています
         </h1>
-        <p className="text-sm leading-relaxed mb-8" style={{ color: "rgba(245,240,232,0.5)" }}>
+        <p
+          style={{
+            fontSize: "14px",
+            lineHeight: 1.7,
+            marginBottom: "32px",
+            color: "rgba(245,240,232,0.5)",
+          }}
+        >
           ご案内のURLは有効期限（30日間）が過ぎています。
           担当者に新しいURLの発行をご依頼ください。
         </p>
 
-        <div className="space-y-3">
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           <a
             href="tel:03XXXXXXXX"
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-lg font-bold text-sm transition-all hover:scale-[1.02]"
-            style={{ backgroundColor: "#C9A84C", color: "#0A1A0F" }}
+            className="cta-button-hover"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              width: "100%",
+              padding: "14px",
+              borderRadius: "8px",
+              fontWeight: "bold",
+              fontSize: "14px",
+              textDecoration: "none",
+              backgroundColor: "#C9A84C",
+              color: "#0A1A0F",
+              boxSizing: "border-box",
+            }}
           >
             <Phone size={16} />
             担当者に電話する
           </a>
           <Link
             href="/members/register"
-            className="flex items-center justify-center w-full py-3 rounded-lg text-sm border transition-colors"
-            style={{ borderColor: "rgba(201,168,76,0.3)", color: "#C9A84C" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+              padding: "12px",
+              borderRadius: "8px",
+              fontSize: "14px",
+              border: "1px solid rgba(201,168,76,0.3)",
+              color: "#C9A84C",
+              textDecoration: "none",
+              transition: "background-color 0.2s ease",
+              boxSizing: "border-box",
+            }}
           >
             会員登録して閲覧する（無料）
           </Link>

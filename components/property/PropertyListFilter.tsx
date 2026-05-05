@@ -33,7 +33,7 @@ export function PropertyListFilter({ total }: { total: number }) {
       } else {
         params.delete(key);
       }
-      params.delete("page"); // フィルター変更時はページをリセット
+      params.delete("page");
       router.push(`${pathname}?${params.toString()}`);
     },
     [router, pathname, searchParams]
@@ -53,31 +53,67 @@ export function PropertyListFilter({ total }: { total: number }) {
 
   return (
     <div
-      className="bg-white rounded-xl border p-4 tb:p-5 mb-6"
-      style={{ borderColor: "#E5E5E5" }}
+      style={{
+        backgroundColor: "#fff",
+        borderRadius: "12px",
+        border: "1px solid #E5E5E5",
+        padding: "16px",
+        marginBottom: "24px",
+      }}
     >
       {/* ヘッダー行 */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "16px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <SlidersHorizontal size={16} style={{ color: "#5BAD52" }} />
-          <span className="text-sm font-bold text-gray-700">絞り込み</span>
+          <span
+            style={{
+              fontSize: "14px",
+              fontWeight: "bold",
+              color: "#444",
+            }}
+          >
+            絞り込み
+          </span>
           {hasFilter && (
             <span
-              className="text-xs px-2 py-0.5 rounded-full text-white"
-              style={{ backgroundColor: "#5BAD52" }}
+              style={{
+                fontSize: "11px",
+                padding: "2px 8px",
+                borderRadius: "9999px",
+                color: "#fff",
+                backgroundColor: "#5BAD52",
+              }}
             >
               適用中
             </span>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-500">
-            <span className="font-bold text-gray-700">{total}</span> 件
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <span style={{ fontSize: "14px", color: "#888" }}>
+            <span style={{ fontWeight: "bold", color: "#444" }}>{total}</span> 件
           </span>
           {hasFilter && (
             <button
+              type="button"
               onClick={clearAll}
-              className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                fontSize: "12px",
+                color: "#999",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+              }}
             >
               <X size={12} />
               クリア
@@ -87,8 +123,7 @@ export function PropertyListFilter({ total }: { total: number }) {
       </div>
 
       {/* フィルター行 */}
-      <div className="flex flex-wrap gap-3">
-        {/* 現在の絞り込みタグ */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
         {area && (
           <ActiveTag label={area} onRemove={() => updateParam("area", null)} />
         )}
@@ -102,7 +137,6 @@ export function PropertyListFilter({ total }: { total: number }) {
           />
         )}
 
-        {/* 物件種別 */}
         <FilterSelect
           label="物件種別"
           value={type || ""}
@@ -110,7 +144,6 @@ export function PropertyListFilter({ total }: { total: number }) {
           onChange={(v) => updateParam("type", v || null)}
         />
 
-        {/* 価格帯 */}
         <FilterSelect
           label="価格帯"
           value={searchParams.get("priceMax") || ""}
@@ -127,7 +160,6 @@ export function PropertyListFilter({ total }: { total: number }) {
           }}
         />
 
-        {/* 間取り */}
         <FilterSelect
           label="間取り"
           value={searchParams.get("layout") || ""}
@@ -135,8 +167,7 @@ export function PropertyListFilter({ total }: { total: number }) {
           onChange={(v) => updateParam("layout", v || null)}
         />
 
-        {/* ソート（右寄せ） */}
-        <div className="ml-auto">
+        <div style={{ marginLeft: "auto" }}>
           <FilterSelect
             label="並び順"
             value={sort}
@@ -155,11 +186,31 @@ export function PropertyListFilter({ total }: { total: number }) {
 function ActiveTag({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <span
-      className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full"
-      style={{ backgroundColor: "#EBF7EA", color: "#5BAD52" }}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "4px",
+        fontSize: "12px",
+        padding: "4px 10px",
+        borderRadius: "9999px",
+        backgroundColor: "#EBF7EA",
+        color: "#5BAD52",
+      }}
     >
       {label}
-      <button onClick={onRemove} className="hover:opacity-70">
+      <button
+        type="button"
+        onClick={onRemove}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          padding: 0,
+          display: "flex",
+          alignItems: "center",
+          color: "inherit",
+        }}
+      >
         <X size={10} />
       </button>
     </span>
@@ -181,10 +232,17 @@ function FilterSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="text-sm border rounded-lg px-3 py-1.5 text-gray-600 bg-white cursor-pointer
-                 hover:border-felia-green focus:outline-none focus:border-felia-green
-                 transition-colors"
-      style={{ borderColor: value ? "#5BAD52" : "#E5E5E5" }}
+      style={{
+        fontSize: "14px",
+        border: `1px solid ${value ? "#5BAD52" : "#E5E5E5"}`,
+        borderRadius: "8px",
+        padding: "6px 12px",
+        color: "#555",
+        backgroundColor: "#fff",
+        cursor: "pointer",
+        outline: "none",
+        transition: "border-color 0.15s ease",
+      }}
     >
       <option value="">{label}</option>
       {options.map((opt) => (

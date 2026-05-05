@@ -25,7 +25,8 @@
       "Bash(curl -s --max-time 5 -o /dev/null -w \"HTTP %{http_code}, time %{time_total}s\\\\n\" \"http://localhost:3001/api/properties?published_hp=true&limit=1\")",
       "Bash(curl -s --max-time 5 -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"http://localhost:3001/api/properties/cmo12smp3000112xbie5/images\")",
       "Bash(xargs -I{} grep -l \"className=\" {})",
-      "Bash(xargs '-I{}' sh -c 'count=$\\(grep -c \"className=\" \"{}\" 2>/dev/null\\); if [ \"$count\" -gt 0 ]; then echo \"$count {}\"; fi')"
+      "Bash(xargs '-I{}' sh -c 'count=$\\(grep -c \"className=\" \"{}\" 2>/dev/null\\); if [ \"$count\" -gt 0 ]; then echo \"$count {}\"; fi')",
+      "Bash(xargs -I '{}' sh -c 'count=$\\(grep -c \"className=\" \"{}\" 2>/dev/null\\); if [ \"$count\" -gt \"0\" ]; then echo \"$count {}\"; fi')"
     ],
     "additionalDirectories": [
       "c:\\Users\\User\\projects\\felia-home-web\\app\\staff",

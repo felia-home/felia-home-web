@@ -7,24 +7,39 @@ interface SectionTitleProps {
 }
 
 export function SectionTitle({ en, ja, align = "center" }: SectionTitleProps) {
-  const alignClass = align === "center" ? "text-center" : "text-left";
+  const textAlign = align === "center" ? "center" : "left";
 
   return (
-    <div className={`mb-8 tb:mb-12 ${alignClass}`}>
+    <div style={{ marginBottom: "32px", textAlign }}>
       <h2
-        className="font-montserrat font-bold text-3xl tb:text-4xl pc:text-5xl tracking-wider text-felia-green"
-        style={{ fontFamily: "'Montserrat', sans-serif", color: "#5BAD52" }}
+        style={{
+          fontFamily: "'Montserrat', sans-serif",
+          fontWeight: "bold",
+          fontSize: "clamp(28px, 4vw, 48px)",
+          letterSpacing: "0.1em",
+          color: "#5BAD52",
+          margin: 0,
+          lineHeight: 1.1,
+        }}
       >
         {en}
       </h2>
-      <p className="mt-2 text-sm tb:text-base text-gray-500 tracking-widest">
+      <p
+        style={{
+          marginTop: "8px",
+          fontSize: "clamp(13px, 1.4vw, 16px)",
+          color: "#888",
+          letterSpacing: "0.2em",
+        }}
+      >
         {ja}
       </p>
       <div
-        className="mt-3 mx-auto"
         style={{
-          width: align === "center" ? "40px" : "40px",
-          marginLeft: align === "left" ? "0" : "auto",
+          marginTop: "12px",
+          marginLeft: align === "center" ? "auto" : "0",
+          marginRight: align === "center" ? "auto" : "0",
+          width: "40px",
           height: "3px",
           backgroundColor: "#5BAD52",
         }}

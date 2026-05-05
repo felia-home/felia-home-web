@@ -22,7 +22,6 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  // 表示するページ番号の範囲
   const getPageNumbers = () => {
     const range: (number | "...")[] = [];
     if (totalPages <= 7) {
@@ -30,7 +29,11 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
     }
     range.push(1);
     if (currentPage > 3) range.push("...");
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
       range.push(i);
     }
     if (currentPage < totalPages - 2) range.push("...");
@@ -39,49 +42,83 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
   };
 
   return (
-    <div className="flex items-center justify-center gap-1.5 mt-10">
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "6px",
+        marginTop: "40px",
+      }}
+    >
       {/* 前へ */}
       <button
+        type="button"
         onClick={() => goToPage(currentPage - 1)}
         disabled={currentPage === 1}
-        className="w-9 h-9 flex items-center justify-center rounded border disabled:opacity-30
-                   hover:border-felia-green transition-colors"
-        style={{ borderColor: "#E5E5E5" }}
+        className="slider-pagination-btn"
+        style={{ width: "36px", height: "36px", borderRadius: "6px" }}
+        aria-label="前へ"
       >
-        <ChevronLeft size={16} className="text-gray-600" />
+        <ChevronLeft size={16} />
       </button>
 
       {/* ページ番号 */}
-      {getPageNumbers().map((page, i) => (
+      {getPageNumbers().map((page, i) =>
         page === "..." ? (
-          <span key={`ellipsis-${i}`} className="w-9 h-9 flex items-center justify-center text-gray-400 text-sm">
+          <span
+            key={`ellipsis-${i}`}
+            style={{
+              width: "36px",
+              height: "36px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#999",
+              fontSize: "14px",
+            }}
+          >
             ⋯
           </span>
         ) : (
           <button
             key={page}
+            type="button"
             onClick={() => goToPage(page)}
-            className="w-9 h-9 flex items-center justify-center rounded border text-sm font-medium transition-colors"
             style={{
-              borderColor: page === currentPage ? "#5BAD52" : "#E5E5E5",
-              backgroundColor: page === currentPage ? "#5BAD52" : "white",
-              color: page === currentPage ? "white" : "#333",
+              width: "36px",
+              height: "36px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "6px",
+              border:
+                page === currentPage
+                  ? "1.5px solid #5BAD52"
+                  : "1px solid #E5E5E5",
+              backgroundColor: page === currentPage ? "#5BAD52" : "#fff",
+              color: page === currentPage ? "#fff" : "#333",
+              fontSize: "13px",
+              fontWeight: page === currentPage ? "bold" : "normal",
+              cursor: "pointer",
+              transition: "all 0.15s ease",
             }}
           >
             {page}
           </button>
         )
-      ))}
+      )}
 
       {/* 次へ */}
       <button
+        type="button"
         onClick={() => goToPage(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="w-9 h-9 flex items-center justify-center rounded border disabled:opacity-30
-                   hover:border-felia-green transition-colors"
-        style={{ borderColor: "#E5E5E5" }}
+        className="slider-pagination-btn"
+        style={{ width: "36px", height: "36px", borderRadius: "6px" }}
+        aria-label="次へ"
       >
-        <ChevronRight size={16} className="text-gray-600" />
+        <ChevronRight size={16} />
       </button>
     </div>
   );
