@@ -7,10 +7,23 @@ import { LogOut } from "lucide-react";
 export function LogoutButton() {
   return (
     <button
+      type="button"
       onClick={() => signOut({ callbackUrl: "/" })}
-      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border
-                 text-sm text-gray-500 hover:border-red-300 hover:text-red-400 transition-colors bg-white"
-      style={{ borderColor: "#E5E5E5" }}
+      className="logout-btn"
+      style={{
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "8px",
+        padding: "12px",
+        borderRadius: "12px",
+        border: "1px solid #E5E5E5",
+        backgroundColor: "#fff",
+        color: "#888",
+        fontSize: "14px",
+        cursor: "pointer",
+      }}
     >
       <LogOut size={16} />
       ログアウト

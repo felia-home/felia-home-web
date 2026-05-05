@@ -56,7 +56,7 @@ export function SearchSection() {
         <SectionTitle en="Search" ja="物件検索" />
 
         <div
-          className="grid grid-cols-1 tb:grid-cols-2"
+          className="grid-2col-resp"
           style={{ gap: "32px", alignItems: "start" }}
         >
           {/* 左: SVGクリッカブルマップ */}
