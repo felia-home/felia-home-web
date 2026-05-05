@@ -137,11 +137,10 @@ export default async function VoicePage() {
               <p style={{ color: "#999", fontSize: "14px" }}>現在、お客様の声を準備中です。</p>
             </div>
           ) : (
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "24px",
-            }} className="grid-cols-1 tb:grid-cols-2">
+            <div
+              style={{ gap: "24px" }}
+              className="grid-2col-resp"
+            >
               {testimonials.map((t) => (
                 <TestimonialCard key={t.id} t={t} />
               ))}

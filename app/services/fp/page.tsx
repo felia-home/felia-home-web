@@ -40,8 +40,8 @@ export default function FPPage() {
       {/* メインビジュアル */}
       <section style={{ padding: "0 0 64px" }}>
         <div className="container-content">
-          <div style={{ display: "grid", gap: "32px", alignItems: "center" }}
-            className="grid-cols-1 tb:grid-cols-2">
+          <div style={{ gap: "32px", alignItems: "center" }}
+            className="grid-2col-resp">
 
             {/* 左: 画像エリア */}
             <div style={{ position: "relative" }}>
@@ -100,8 +100,8 @@ export default function FPPage() {
       {/* 対応内容 */}
       <section style={{ padding: "0 0 64px" }}>
         <div className="container-content">
-          <div style={{ display: "grid", gap: "32px" }}
-            className="grid-cols-1 tb:grid-cols-[1fr_280px]">
+          <div style={{ gap: "32px" }}
+            className="grid-1280-resp">
             {/* 左: 説明 */}
             <div>
               <h3 style={{ fontSize: "16px", fontWeight: "bold", color: "#1a1a1a", marginBottom: "16px" }}>
@@ -147,8 +147,8 @@ export default function FPPage() {
           <h2 style={{ fontSize: "clamp(18px, 2.5vw, 24px)", fontWeight: "bold", color: "#1a1a1a", marginBottom: "32px", fontFamily: "'Noto Serif JP', serif" }}>
             ファイナンシャルプランナー　相談できること
           </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}
-            className="grid-cols-1 tb:grid-cols-2">
+          <div style={{ gap: "20px" }}
+            className="grid-2col-resp">
             {consultItems.map((item) => (
               <div key={item.title} style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
                 <div style={{

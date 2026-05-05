@@ -41,8 +41,8 @@ export default async function WebFlyersPage() {
             <p>現在、チラシを準備中です。</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}
-            className="grid-cols-1 tb:grid-cols-2 pc:grid-cols-3">
+          <div style={{ gap: "24px" }}
+            className="grid-3col-resp">
             {flyers.map((flyer) => (
               <div key={flyer.id} style={{ border: "1px solid #E5E5E5", borderRadius: "12px", overflow: "hidden", backgroundColor: "white" }}>
                 {/* チラシ表面画像 */}

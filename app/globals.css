@@ -40,10 +40,6 @@
     font-family: 'Montserrat', sans-serif;
   }
 
-  .section-padding {
-    @apply py-12 tb:py-16 pc:py-20;
-  }
-
   .container-content {
     max-width: 1200px;
     margin-left: auto;
@@ -64,20 +60,6 @@
   .border-felia-green {
     border-color: #5BAD52;
   }
-
-  /* ボタン共通 */
-  .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 bg-felia-green text-white font-medium rounded hover:bg-felia-green-dark transition-colors duration-200;
-    background-color: #5BAD52;
-  }
-
-  .btn-primary:hover {
-    background-color: #4A9A41;
-  }
-
-  .btn-outline {
-    @apply inline-flex items-center justify-center px-6 py-3 border-2 border-felia-green text-felia-green font-medium rounded hover:bg-felia-green hover:text-white transition-colors duration-200;
-  }
 }
 
 /* container-content responsive padding */
@@ -92,6 +74,34 @@
     padding-left: 32px;
     padding-right: 32px;
   }
+}
+
+/* Responsive grid utilities */
+.grid-2col-resp {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .grid-2col-resp { grid-template-columns: repeat(2, 1fr); }
+}
+
+.grid-1280-resp {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .grid-1280-resp { grid-template-columns: 1fr 280px; }
+}
+
+.grid-3col-resp {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .grid-3col-resp { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .grid-3col-resp { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* WEBチラシグリッド */
