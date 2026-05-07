@@ -12,6 +12,7 @@ import { PropertyImage } from "@/components/ui/PropertyImage";
 import { AgentCard } from "@/components/property/AgentCard";
 import { AreaColumnAccordion } from "@/components/property/AreaColumnAccordion";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
+import PropertyViewBeacon from "@/components/PropertyViewBeacon";
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
@@ -228,6 +229,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
   return (
     <main style={{ backgroundColor: "#f8f8f8", minHeight: "100vh" }}>
+      {/* 閲覧計測ビーコン（マウント時に1回だけ POST） */}
+      <PropertyViewBeacon propertyId={p.id} />
 
       {/* パンくず */}
       <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e8e8e8", padding: "12px 24px" }}>
