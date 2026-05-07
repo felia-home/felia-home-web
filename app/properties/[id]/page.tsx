@@ -60,7 +60,12 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   const propLat = p.latitude ?? p.lat;
   const propLng = p.longitude ?? p.lng;
 
-  // 近隣物件取得（admin直接呼び出しでサーバー間通信）
+  // 近隣物件取得（同物件種別・同価格帯で絞り込み、フォールバック付き）
+  const targetType: string | null = (property as any).property_type ?? null;
+  const targetPrice: number | null = (property as any).price ?? null;
+  const priceMin30 = targetPrice != null ? Math.floor(targetPrice * 0.7) : null;
+  const priceMax30 = targetPrice != null ? Math.ceil(targetPrice * 1.3) : null;
+
   let nearbyProperties: any[] = [];
   try {
     const nearbyParams = new URLSearchParams();
@@ -70,16 +75,45 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     } else if (p.city) {
       nearbyParams.set("city", p.city);
     }
-    nearbyParams.set("limit", "3");
+    // 候補を多めに取得し、HP 側でも絞り込み（admin が type/price フィルタ未対応でも安全）
+    nearbyParams.set("limit", "20");
     nearbyParams.set("exclude_id", p.id);
     nearbyParams.set("published_hp", "true");
+    if (targetType) nearbyParams.set("type", targetType);
+    if (priceMin30 != null) nearbyParams.set("priceMin", String(priceMin30));
+    if (priceMax30 != null) nearbyParams.set("priceMax", String(priceMax30));
+
     if (nearbyParams.has("lat") || nearbyParams.has("city")) {
       const res = await fetch(
         `${process.env.ADMIN_API_URL}/api/properties/nearby?${nearbyParams}`,
         { cache: "no-store" }
       );
       const data = await res.json();
-      nearbyProperties = data.properties ?? [];
+      const candidates: any[] = (data.properties ?? []).filter(
+        (np: any) => np.id !== p.id
+      );
+
+      const sameType = (np: any) =>
+        !targetType || np.property_type === targetType;
+      const inRange = (np: any, factor: number) => {
+        if (targetPrice == null || np.price == null) return false;
+        const min = targetPrice * (1 - factor);
+        const max = targetPrice * (1 + factor);
+        return np.price >= min && np.price <= max;
+      };
+
+      // Stage 1: 同種別 + ±30%
+      let filtered = candidates.filter((np) => sameType(np) && inRange(np, 0.3));
+      // Stage 2: 同種別 + ±50%
+      if (filtered.length < 2) {
+        filtered = candidates.filter((np) => sameType(np) && inRange(np, 0.5));
+      }
+      // Stage 3: 同種別のみ（価格条件なし）
+      if (filtered.length < 2) {
+        filtered = candidates.filter(sameType);
+      }
+
+      nearbyProperties = filtered.slice(0, 4);
     }
   } catch {}
 
