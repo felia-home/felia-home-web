@@ -255,6 +255,11 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             </h1>
             <FavoriteButton propertyId={p.id} size="lg" />
           </div>
+          {(propType === "MANSION" || propType === "NEW_MANSION") && (p as any).building_name && (
+            <p style={{ fontSize: "15px", color: "#444", margin: "4px 0 8px", fontWeight: 500 }}>
+              {(p as any).building_name}
+            </p>
+          )}
           {p.catch_copy && (
             <p style={{ fontSize: "14px", color: "#5BAD52", margin: 0, fontStyle: "italic" }}>
               {p.catch_copy}

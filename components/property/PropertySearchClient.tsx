@@ -693,6 +693,11 @@ function PropertyCard({ property }: { property: Property }) {
   const typeLabel = PROPERTY_TYPE_MAP[property.property_type] ?? property.property_type;
   const location = [property.city, property.town].filter(Boolean).join("") || "";
   const displayTitle = property.title || buildFallbackTitle(property);
+  const isMansion =
+    property.property_type === "MANSION" ||
+    property.property_type === "NEW_MANSION";
+  const buildingName = (property as any).building_name as string | null | undefined;
+  const showBuildingName = isMansion && !!buildingName;
 
   return (
     <Link
@@ -758,6 +763,16 @@ function PropertyCard({ property }: { property: Property }) {
             }}>
               {displayTitle}
             </p>
+            {showBuildingName && (
+              <p style={{
+                fontSize: "13px",
+                color: "#555",
+                margin: "2px 0 0",
+                fontWeight: 500,
+              }}>
+                {buildingName}
+              </p>
+            )}
           </div>
 
           {/* スペック */}

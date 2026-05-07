@@ -56,6 +56,12 @@ export function PropertyCard({ property, size = "normal" }: Props) {
     PROPERTY_TYPE_LABELS[property.property_type ?? ""] ?? "";
   const location = [property.city, property.town].filter(Boolean).join("");
 
+  const isMansion =
+    property.property_type === "MANSION" ||
+    property.property_type === "NEW_MANSION";
+  const buildingName = (property as any).building_name as string | null | undefined;
+  const showBuildingName = isMansion && !!buildingName;
+
   const isNew = (property as any).is_new ?? false;
   const isFeliaSel = (property as any).is_felia_selection ?? false;
   const isOpenHouse = (property as any).is_open_house ?? false;
@@ -234,6 +240,18 @@ export function PropertyCard({ property, size = "normal" }: Props) {
         >
           {displayTitle}
         </p>
+        {showBuildingName && (
+          <p
+            style={{
+              fontSize: "13px",
+              color: "#555",
+              margin: "2px 0 8px",
+              fontWeight: 500,
+            }}
+          >
+            {buildingName}
+          </p>
+        )}
 
         {/* 詳細情報 */}
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>

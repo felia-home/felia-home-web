@@ -351,6 +351,7 @@ export interface Property {
   tour_url?: string | null;
   lat?: number | null;
   lng?: number | null;
+  building_name?: string | null;
 }
 
 export interface OpenHouse {
@@ -505,6 +506,7 @@ export interface PropertyDetail {
   eq_separate_bath_toilet: boolean;
   eq_counter_kitchen: boolean;
   eq_roof_balcony: boolean;
+  building_name?: string | null;
 }
 
 export interface PropertyImage {
