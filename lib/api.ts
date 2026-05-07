@@ -472,6 +472,7 @@ export interface PropertyDetail {
   building_month: number | null;
   structure: string | null;
   floors_total: number | null;
+  floor_unit: number | null;
   direction: string | null;
   use_zone: string | null;
   bcr: number | null;

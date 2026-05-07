@@ -179,6 +179,14 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     ...(isMansion ? [
       { label: "専有面積", value: p.area_exclusive_m2 ? `${p.area_exclusive_m2}㎡` : null },
       { label: "建物面積", value: p.area_build_m2 ? `${p.area_build_m2}㎡` : null },
+      {
+        label: "所在階",
+        value: p.floor_unit
+          ? p.floors_total
+            ? `${p.floor_unit}階 / ${p.floors_total}階建`
+            : `${p.floor_unit}階`
+          : null,
+      },
     ] : []),
     ...(isHouse ? [
       { label: "建物面積", value: p.area_build_m2 ? `${p.area_build_m2}㎡` : null },
@@ -201,7 +209,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       })(),
     },
     { label: "構造", value: p.structure ?? null },
-    { label: "階数", value: p.floors_total ? `${p.floors_total}階建` : null },
+    { label: "階数", value: !isMansion && p.floors_total ? `${p.floors_total}階建` : null },
     { label: "取引態様", value: p.transaction_type ?? null },
     { label: "土地権利", value: p.land_right ?? null },
     { label: "用途地域", value: p.use_zone ?? null },
