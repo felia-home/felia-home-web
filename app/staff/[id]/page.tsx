@@ -55,7 +55,10 @@ export default async function StaffDetailPage({ params }: { params: { id: string
               src={staff.photo_url}
               alt={staff.name}
               fill
-              style={{ objectFit: "cover", objectPosition: "center top" }}
+              style={{
+                objectFit: "cover",
+                objectPosition: `${staff.photo_focal_x ?? 50}% ${staff.photo_focal_y ?? 50}%`,
+              }}
               priority
               sizes="900px"
             />

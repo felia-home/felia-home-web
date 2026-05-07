@@ -102,7 +102,10 @@ function SaleResultCard({ result }: { result: SaleResult }) {
                   src={result.staff.photo_url}
                   alt={result.staff.name}
                   fill
-                  style={{ objectFit: "cover" }}
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: `${result.staff.photo_focal_x ?? 50}% ${result.staff.photo_focal_y ?? 50}%`,
+                  }}
                   sizes="32px"
                 />
               </div>

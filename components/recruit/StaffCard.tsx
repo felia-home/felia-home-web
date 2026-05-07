@@ -40,7 +40,10 @@ export default function StaffCard({ staff }: { staff: RecruitStaff }) {
               src={staff.photo_url}
               alt={staff.name}
               fill
-              style={{ objectFit: "cover", objectPosition: "center top" }}
+              style={{
+                objectFit: "cover",
+                objectPosition: `${staff.photo_focal_x ?? 50}% ${staff.photo_focal_y ?? 50}%`,
+              }}
               sizes="(max-width: 768px) 50vw, 25vw"
             />
           ) : (

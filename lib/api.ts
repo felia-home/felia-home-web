@@ -233,6 +233,8 @@ export interface SaleResult {
     id: string;
     name: string;
     photo_url: string | null;
+    photo_focal_x?: number | null;
+    photo_focal_y?: number | null;
   } | null;
 }
 
@@ -534,6 +536,8 @@ export interface StaffDetail {
   position: string | null;
   store_name: string | null;
   photo_url: string | null;
+  photo_focal_x?: number | null;
+  photo_focal_y?: number | null;
   bio: string | null;
   catchphrase: string | null;
 }
@@ -581,6 +585,8 @@ export interface RecruitStaff {
   department: string | null;
   store_name: string | null;
   photo_url: string | null;
+  photo_focal_x?: number | null;
+  photo_focal_y?: number | null;
   bio: string | null;
   catchphrase: string | null;
   qualification: string | null;
@@ -863,6 +869,8 @@ export interface StaffMember {
   department?: string | null;
   store_name?: string | null;
   photo_url?: string | null;
+  photo_focal_x?: number | null;
+  photo_focal_y?: number | null;
   bio?: string | null;
   catchphrase?: string | null;
   qualification?: string | null;

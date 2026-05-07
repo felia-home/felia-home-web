@@ -87,7 +87,12 @@ export default function StaffInterviewModal({
                 alt={staff.name}
                 width={90}
                 height={110}
-                style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                style={{
+                  objectFit: "cover",
+                  objectPosition: `${staff.photo_focal_x ?? 50}% ${staff.photo_focal_y ?? 50}%`,
+                  width: "100%",
+                  height: "100%",
+                }}
               />
             ) : (
               <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px" }}>
