@@ -95,7 +95,7 @@ export default async function AreaPage({ params }: PageProps) {
               src={heroImageUrl}
               alt={`${areaName}のイメージ`}
               fill
-              quality={85}
+              quality={100}
               style={{ objectFit: "cover", objectPosition: "center" }}
               sizes="100vw"
               priority
