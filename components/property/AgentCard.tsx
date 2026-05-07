@@ -8,6 +8,8 @@ interface Agent {
   id: string;
   name: string;
   photo_url?: string | null;
+  photo_focal_x?: number | null;
+  photo_focal_y?: number | null;
   position?: string | null;
   bio?: string | null;
   catchphrase?: string | null;
@@ -50,7 +52,10 @@ export function AgentCard({ agent }: { agent: Agent }) {
                   src={agent.photo_url}
                   alt={agent.name}
                   fill
-                  style={{ objectFit: "cover" }}
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: `${agent.photo_focal_x ?? 50}% ${agent.photo_focal_y ?? 50}%`,
+                  }}
                   sizes="72px"
                 />
               ) : (
@@ -163,7 +168,16 @@ export function AgentCard({ agent }: { agent: Agent }) {
                   position: "relative",
                 }}>
                   {agent.photo_url ? (
-                    <Image src={agent.photo_url} alt={agent.name} fill style={{ objectFit: "cover" }} sizes="100px" />
+                    <Image
+                      src={agent.photo_url}
+                      alt={agent.name}
+                      fill
+                      style={{
+                        objectFit: "cover",
+                        objectPosition: `${agent.photo_focal_x ?? 50}% ${agent.photo_focal_y ?? 50}%`,
+                      }}
+                      sizes="100px"
+                    />
                   ) : (
                     <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px" }}>👤</div>
                   )}

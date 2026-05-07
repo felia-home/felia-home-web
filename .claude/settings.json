@@ -27,7 +27,11 @@
       "Bash(xargs -I{} grep -l \"className=\" {})",
       "Bash(xargs '-I{}' sh -c 'count=$\\(grep -c \"className=\" \"{}\" 2>/dev/null\\); if [ \"$count\" -gt 0 ]; then echo \"$count {}\"; fi')",
       "Bash(xargs -I '{}' sh -c 'count=$\\(grep -c \"className=\" \"{}\" 2>/dev/null\\); if [ \"$count\" -gt \"0\" ]; then echo \"$count {}\"; fi')",
-      "Bash(npm uninstall *)"
+      "Bash(npm uninstall *)",
+      "Bash(curl -s --max-time 10 \"http://localhost:3002/api/hp/sale-results\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" --max-time 10 \"http://localhost:3002/api/hp/sale-results\")",
+      "Bash(curl -s --max-time 10 \"http://localhost:3001/api/hp/sale-results\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" --max-time 10 \"http://localhost:3001/api/hp/sale-results\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\User\\projects\\felia-home-web\\app\\staff",
