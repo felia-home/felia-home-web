@@ -87,6 +87,18 @@ function buildReinsTitle(p: any): string {
   return [location, type, price].filter(Boolean).join(" ");
 }
 
+function buildFallbackTitle(p: any): string {
+  const parts: string[] = [];
+  if (p.city) parts.push(p.city);
+  if (p.town) parts.push(p.town);
+  if (p.chome) parts.push(`${p.chome}丁目`);
+  const typeLabel = PROPERTY_TYPE_MAP[p.property_type ?? ""];
+  if (typeLabel) parts.push(typeLabel);
+  if (p.building_name) parts.push(p.building_name);
+  else if (p.block_number) parts.push(p.block_number);
+  return parts.join(" ") || "物件詳細";
+}
+
 export default function PropertySearchClient() {
   const session = useSession();
   const isLoggedIn = session?.status === "authenticated";
@@ -680,6 +692,7 @@ function PropertyCard({ property }: { property: Property }) {
   const mainImage = property.images?.find((i) => i.is_main)?.url ?? property.images?.[0]?.url ?? null;
   const typeLabel = PROPERTY_TYPE_MAP[property.property_type] ?? property.property_type;
   const location = [property.city, property.town].filter(Boolean).join("") || "";
+  const displayTitle = property.title || buildFallbackTitle(property);
 
   return (
     <Link
@@ -704,7 +717,7 @@ function PropertyCard({ property }: { property: Property }) {
         <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
           <PropertyImage
             src={mainImage}
-            alt={property.title ?? "物件"}
+            alt={displayTitle}
             seed={property.id}
             sizes="(max-width: 768px) 100vw, 33vw"
           />
@@ -735,18 +748,16 @@ function PropertyCard({ property }: { property: Property }) {
 
           {/* タイトル：2行固定高さ */}
           <div style={{ minHeight: "40px", marginBottom: "10px" }}>
-            {property.title && (
-              <p style={{
-                fontSize: "13px", fontWeight: "bold", color: "#333",
-                margin: 0, lineHeight: 1.5,
-                overflow: "hidden",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-              }}>
-                {property.title}
-              </p>
-            )}
+            <p style={{
+              fontSize: "13px", fontWeight: "bold", color: "#333",
+              margin: 0, lineHeight: 1.5,
+              overflow: "hidden",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}>
+              {displayTitle}
+            </p>
           </div>
 
           {/* スペック */}

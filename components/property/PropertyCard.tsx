@@ -21,6 +21,19 @@ const PROPERTY_TYPE_LABELS: Record<string, string> = {
   NEW_MANSION: "新築マンション",
 };
 
+function buildFallbackTitle(property: Property): string {
+  const p = property as any;
+  const parts: string[] = [];
+  if (p.city) parts.push(p.city);
+  if (p.town) parts.push(p.town);
+  if (p.chome) parts.push(`${p.chome}丁目`);
+  const typeLabel = PROPERTY_TYPE_LABELS[p.property_type ?? ""];
+  if (typeLabel) parts.push(typeLabel);
+  if (p.building_name) parts.push(p.building_name);
+  else if (p.block_number) parts.push(p.block_number);
+  return parts.join(" ") || "物件詳細";
+}
+
 const BADGE_COLORS: Record<string, string> = {
   new: "#2563EB",
   felia: "#1a4a24",
@@ -36,6 +49,8 @@ export function PropertyCard({ property, size = "normal" }: Props) {
     property.images?.find((img) => img.is_main)?.url ??
     property.images?.[0]?.url ??
     null;
+
+  const displayTitle = property.title || buildFallbackTitle(property);
 
   const typeLabel =
     PROPERTY_TYPE_LABELS[property.property_type ?? ""] ?? "";
@@ -56,7 +71,7 @@ export function PropertyCard({ property, size = "normal" }: Props) {
         {mainImage && !imgError ? (
           <Image
             src={mainImage}
-            alt={property.title ?? "物件"}
+            alt={displayTitle}
             fill
             className="property-card-img"
             sizes={
@@ -204,23 +219,21 @@ export function PropertyCard({ property, size = "normal" }: Props) {
         )}
 
         {/* 物件名 */}
-        {property.title && (
-          <p
-            className={`property-card-title${isLarge ? "--large" : ""}`}
-            style={{
-              fontWeight: "500",
-              color: "#333",
-              lineHeight: 1.4,
-              marginBottom: "8px",
-              overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {property.title}
-          </p>
-        )}
+        <p
+          className={`property-card-title${isLarge ? "--large" : ""}`}
+          style={{
+            fontWeight: "500",
+            color: "#333",
+            lineHeight: 1.4,
+            marginBottom: "8px",
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+          }}
+        >
+          {displayTitle}
+        </p>
 
         {/* 詳細情報 */}
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
