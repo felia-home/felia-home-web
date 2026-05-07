@@ -198,10 +198,23 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   const isHouse = ["USED_HOUSE", "NEW_HOUSE"].includes(propType);
   const isLand = propType === "LAND";
 
-  const displayTitle =
-    isMansion && p.building_name
-      ? p.building_name
-      : [p.city, p.town, p.address].filter(Boolean).join("") || "物件詳細";
+  // タイトル組み立て
+  // - マンション系: building_name を主軸に、building_block があれば半角スペース連結
+  // - 戸建て・土地系: city + town を主軸に、building_block があれば半角スペース連結
+  //   （address は内部用のため引き続き表示しない）
+  const blockSuffix = p.building_block ? ` ${p.building_block}` : "";
+  let displayTitle: string;
+  if (isMansion && p.building_name) {
+    displayTitle = `${p.building_name}${blockSuffix}`;
+  } else if (isMansion) {
+    // マンション系で building_name が無い場合は従来通り住所表示
+    displayTitle = [p.city, p.town, p.address].filter(Boolean).join("") || "物件詳細";
+    if (p.building_block) displayTitle = `${displayTitle}${blockSuffix}`;
+  } else {
+    // 戸建て・土地系: address は出さず city+town に block を付ける
+    const base = [p.city, p.town].filter(Boolean).join("") || "物件詳細";
+    displayTitle = `${base}${blockSuffix}`;
+  }
 
   const specs = [
     { label: "物件番号", value: p.property_number ?? null },
