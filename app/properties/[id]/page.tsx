@@ -169,6 +169,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       : [p.city, p.town, p.address].filter(Boolean).join("") || "物件詳細";
 
   const specs = [
+    { label: "物件番号", value: p.property_number ?? null },
     { label: "物件種別", value: typeLabel },
     { label: "販売価格", value: p.price != null ? `${p.price.toLocaleString()}万円` : null },
     { label: "所在地", value: location || null },

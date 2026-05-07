@@ -447,6 +447,7 @@ export async function getCompanyBranches(): Promise<CompanyBranch[]> {
 
 export interface PropertyDetail {
   id: string;
+  property_number?: string | null;
   property_type: string;
   transaction_type: string | null;
   brokerage_type: string | null;
