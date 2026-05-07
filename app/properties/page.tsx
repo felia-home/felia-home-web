@@ -10,7 +10,6 @@ const PROPERTY_TYPE_MAP: Record<string, string> = {
   USED_HOUSE: "中古戸建",
   NEW_HOUSE: "新築戸建",
   MANSION: "マンション",
-  USED_MANSION: "中古マンション",
   NEW_MANSION: "新築マンション",
   OTHER: "その他",
 };

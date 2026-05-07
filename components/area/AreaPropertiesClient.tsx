@@ -57,7 +57,7 @@ function cleanBuiltYear(text: string | null | undefined): string | null {
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
-  MANSION: "マンション", USED_MANSION: "中古マンション",
+  MANSION: "マンション",
   NEW_MANSION: "新築マンション",
 };
 
@@ -158,7 +158,7 @@ export function AreaPropertiesClient({
       if (p._type === "normal") {
         const pt = p.property_type ?? "";
         if (filterType === "house" && !["USED_HOUSE", "NEW_HOUSE"].includes(pt)) return false;
-        if (filterType === "mansion" && !["MANSION", "USED_MANSION", "NEW_MANSION"].includes(pt)) return false;
+        if (filterType === "mansion" && !["MANSION", "NEW_MANSION"].includes(pt)) return false;
         if (filterType === "land" && pt !== "LAND") return false;
       } else {
         const st = p.source_type;

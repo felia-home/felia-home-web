@@ -58,7 +58,7 @@ const AREAS = [
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
-  MANSION: "マンション", USED_MANSION: "中古マンション",
+  MANSION: "マンション",
   NEW_MANSION: "新築マンション", OTHER: "その他",
 };
 
@@ -68,6 +68,8 @@ interface Property {
   title: string | null;
   city: string | null;
   town: string | null;
+  address: string | null;
+  building_name: string | null;
   price: number | null;
   rooms: string | null;
   area_land_m2: number | null;
@@ -87,17 +89,6 @@ function buildReinsTitle(p: any): string {
   return [location, type, price].filter(Boolean).join(" ");
 }
 
-function buildFallbackTitle(p: any): string {
-  const parts: string[] = [];
-  if (p.city) parts.push(p.city);
-  if (p.town) parts.push(p.town);
-  if (p.chome) parts.push(`${p.chome}丁目`);
-  const typeLabel = PROPERTY_TYPE_MAP[p.property_type ?? ""];
-  if (typeLabel) parts.push(typeLabel);
-  if (p.building_name) parts.push(p.building_name);
-  else if (p.block_number) parts.push(p.block_number);
-  return parts.join(" ") || "物件詳細";
-}
 
 export default function PropertySearchClient() {
   const session = useSession();
@@ -692,12 +683,16 @@ function PropertyCard({ property }: { property: Property }) {
   const mainImage = property.images?.find((i) => i.is_main)?.url ?? property.images?.[0]?.url ?? null;
   const typeLabel = PROPERTY_TYPE_MAP[property.property_type] ?? property.property_type;
   const location = [property.city, property.town].filter(Boolean).join("") || "";
-  const displayTitle = property.title || buildFallbackTitle(property);
   const isMansion =
     property.property_type === "MANSION" ||
     property.property_type === "NEW_MANSION";
-  const buildingName = (property as any).building_name as string | null | undefined;
-  const showBuildingName = isMansion && !!buildingName;
+  const buildingName = property.building_name;
+  const displayTitle =
+    isMansion && buildingName
+      ? buildingName
+      : [property.city, property.town, property.address]
+          .filter(Boolean)
+          .join("") || "物件詳細";
 
   return (
     <Link
@@ -763,16 +758,6 @@ function PropertyCard({ property }: { property: Property }) {
             }}>
               {displayTitle}
             </p>
-            {showBuildingName && (
-              <p style={{
-                fontSize: "13px",
-                color: "#555",
-                margin: "2px 0 0",
-                fontWeight: 500,
-              }}>
-                {buildingName}
-              </p>
-            )}
           </div>
 
           {/* スペック */}

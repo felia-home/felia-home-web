@@ -352,6 +352,10 @@ export interface Property {
   lat?: number | null;
   lng?: number | null;
   building_name?: string | null;
+  area_exclusive_m2?: number | null;
+  building_year?: number | null;
+  building_month?: number | null;
+  features?: string[] | null;
 }
 
 export interface OpenHouse {
@@ -507,6 +511,8 @@ export interface PropertyDetail {
   eq_counter_kitchen: boolean;
   eq_roof_balcony: boolean;
   building_name?: string | null;
+  area_exclusive_m2?: number | null;
+  features?: string[] | null;
 }
 
 export interface PropertyImage {

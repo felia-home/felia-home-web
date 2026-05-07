@@ -15,7 +15,7 @@ import { FavoriteButton } from "@/components/ui/FavoriteButton";
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
-  MANSION: "マンション", USED_MANSION: "中古マンション",
+  MANSION: "マンション",
   NEW_MANSION: "新築マンション",
 };
 
@@ -157,14 +157,16 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
   const equipments = [...equipmentLabels, ...featuresList];
 
-  const displayTitle = p.title
-    ?? (location ? `${location}${p.price ? ` ${p.price.toLocaleString()}万円` : ""}` : "物件詳細");
-
   // 物件種別による面積表示分岐
   const propType = p.property_type ?? "";
-  const isMansion = ["MANSION", "NEW_MANSION", "USED_MANSION"].includes(propType);
+  const isMansion = ["MANSION", "NEW_MANSION"].includes(propType);
   const isHouse = ["USED_HOUSE", "NEW_HOUSE"].includes(propType);
   const isLand = propType === "LAND";
+
+  const displayTitle =
+    isMansion && p.building_name
+      ? p.building_name
+      : [p.city, p.town, p.address].filter(Boolean).join("") || "物件詳細";
 
   const specs = [
     { label: "物件種別", value: typeLabel },
@@ -255,11 +257,6 @@ export default async function PropertyDetailPage({ params }: PageProps) {
             </h1>
             <FavoriteButton propertyId={p.id} size="lg" />
           </div>
-          {(propType === "MANSION" || propType === "NEW_MANSION") && (p as any).building_name && (
-            <p style={{ fontSize: "15px", color: "#444", margin: "4px 0 8px", fontWeight: 500 }}>
-              {(p as any).building_name}
-            </p>
-          )}
           {p.catch_copy && (
             <p style={{ fontSize: "14px", color: "#5BAD52", margin: 0, fontStyle: "italic" }}>
               {p.catch_copy}

@@ -17,22 +17,8 @@ const PROPERTY_TYPE_LABELS: Record<string, string> = {
   USED_HOUSE: "中古戸建",
   NEW_HOUSE: "新築戸建",
   MANSION: "マンション",
-  USED_MANSION: "中古マンション",
   NEW_MANSION: "新築マンション",
 };
-
-function buildFallbackTitle(property: Property): string {
-  const p = property as any;
-  const parts: string[] = [];
-  if (p.city) parts.push(p.city);
-  if (p.town) parts.push(p.town);
-  if (p.chome) parts.push(`${p.chome}丁目`);
-  const typeLabel = PROPERTY_TYPE_LABELS[p.property_type ?? ""];
-  if (typeLabel) parts.push(typeLabel);
-  if (p.building_name) parts.push(p.building_name);
-  else if (p.block_number) parts.push(p.block_number);
-  return parts.join(" ") || "物件詳細";
-}
 
 const BADGE_COLORS: Record<string, string> = {
   new: "#2563EB",
@@ -50,17 +36,21 @@ export function PropertyCard({ property, size = "normal" }: Props) {
     property.images?.[0]?.url ??
     null;
 
-  const displayTitle = property.title || buildFallbackTitle(property);
+  const isMansion =
+    property.property_type === "MANSION" ||
+    property.property_type === "NEW_MANSION";
+  const buildingName = property.building_name;
+
+  const displayTitle =
+    isMansion && buildingName
+      ? buildingName
+      : [property.city, property.town, property.address]
+          .filter(Boolean)
+          .join("") || "物件詳細";
 
   const typeLabel =
     PROPERTY_TYPE_LABELS[property.property_type ?? ""] ?? "";
   const location = [property.city, property.town].filter(Boolean).join("");
-
-  const isMansion =
-    property.property_type === "MANSION" ||
-    property.property_type === "NEW_MANSION";
-  const buildingName = (property as any).building_name as string | null | undefined;
-  const showBuildingName = isMansion && !!buildingName;
 
   const isNew = (property as any).is_new ?? false;
   const isFeliaSel = (property as any).is_felia_selection ?? false;
@@ -240,18 +230,6 @@ export function PropertyCard({ property, size = "normal" }: Props) {
         >
           {displayTitle}
         </p>
-        {showBuildingName && (
-          <p
-            style={{
-              fontSize: "13px",
-              color: "#555",
-              margin: "2px 0 8px",
-              fontWeight: 500,
-            }}
-          >
-            {buildingName}
-          </p>
-        )}
 
         {/* 詳細情報 */}
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
