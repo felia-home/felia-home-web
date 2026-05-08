@@ -364,14 +364,22 @@ export interface OpenHouse {
   id: string;
   title: string | null;
   city: string | null;
+  town?: string | null;
   address: string | null;
   open_house_start: string | null;
   open_house_end: string | null;
+  open_house_comment?: string | null;
   is_open_house: boolean;
   station_name1?: string | null;
   station_walk1?: number | null;
   property_type?: string | null;
   price?: number | null;
+  building_name?: string | null;
+  area_exclusive_m2?: number | null;
+  area_build_m2?: number | null;
+  area_land_m2?: number | null;
+  rooms?: string | null;
+  images?: { url: string }[] | null;
 }
 
 export interface NewsItem {

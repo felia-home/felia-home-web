@@ -1,8 +1,19 @@
 // components/home/OpenHouseAndInfoSection.tsx
 import Link from "next/link";
-import { ArrowRight, MapPin, Info } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Info } from "lucide-react";
 import { getOpenHouses, getInformationNews } from "@/lib/api";
 import type { OpenHouse, NewsItem } from "@/lib/api";
+
+const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+
+const PROPERTY_TYPE_LABEL: Record<string, string> = {
+  LAND: "土地",
+  USED_HOUSE: "中古戸建",
+  NEW_HOUSE: "新築戸建",
+  MANSION: "マンション",
+  NEW_MANSION: "新築マンション",
+};
 
 function formatInfoDate(dateStr: string | null | undefined): string {
   if (!dateStr) return "";
@@ -15,25 +26,41 @@ function formatInfoDate(dateStr: string | null | undefined): string {
   }
 }
 
-function formatYearMonth(dateStr: string | null | undefined): { year: string; month: string } {
-  if (!dateStr) return { year: "—", month: "—" };
+function formatOpenHouseDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
   const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return { year: "—", month: "—" };
-  return { year: String(d.getFullYear()), month: String(d.getMonth() + 1) };
+  if (isNaN(d.getTime())) return "";
+  return `${d.getMonth() + 1}月${d.getDate()}日(${WEEKDAYS[d.getDay()]})`;
 }
 
-function formatDateRange(start: string | null | undefined, end: string | null | undefined): string {
-  const fmt = (dateStr: string | null | undefined) => {
-    if (!dateStr) return "";
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return "";
-    return `${d.getMonth() + 1}/${d.getDate()}`;
-  };
-  const s = fmt(start);
-  const e = fmt(end);
-  if (!s && !e) return "日程未定";
+function formatTime(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "";
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
+function formatTimeRange(start: string | null | undefined, end: string | null | undefined): string {
+  const s = formatTime(start);
+  const e = formatTime(end);
+  if (!s && !e) return "";
   if (!e) return s;
-  return `${s} 〜 ${e}`;
+  if (!s) return e;
+  return `${s}〜${e}`;
+}
+
+function getDisplayArea(oh: OpenHouse): string | null {
+  const type = oh.property_type ?? "";
+  const isMansion = ["MANSION", "NEW_MANSION"].includes(type);
+  const isLand = type === "LAND";
+  const m2 = isMansion
+    ? oh.area_exclusive_m2
+    : isLand
+      ? oh.area_land_m2
+      : oh.area_build_m2;
+  if (m2 == null) return null;
+  const label = isMansion ? "専有面積" : isLand ? "土地面積" : "建物面積";
+  return `${label} ${Number(m2).toFixed(2)}㎡`;
 }
 
 export async function OpenHouseAndInfoSection() {
@@ -132,62 +159,123 @@ export async function OpenHouseAndInfoSection() {
 
 // 現地販売会カード
 function OpenHouseCard({ openHouse }: { openHouse: OpenHouse }) {
-  const { year, month } = formatYearMonth(openHouse.open_house_start);
-  const dateRange = formatDateRange(openHouse.open_house_start, openHouse.open_house_end);
+  const dateStr = formatOpenHouseDate(openHouse.open_house_start);
+  const timeRange = formatTimeRange(openHouse.open_house_start, openHouse.open_house_end);
+  const typeLabel = PROPERTY_TYPE_LABEL[openHouse.property_type ?? ""] ?? "";
+  const isMansion = ["MANSION", "NEW_MANSION"].includes(openHouse.property_type ?? "");
+
+  // タイトル: マンション系は building_name 優先、それ以外は city + town
+  const heading = isMansion && openHouse.building_name
+    ? openHouse.building_name
+    : [openHouse.city, openHouse.town].filter(Boolean).join("");
+
+  // サブタイトル: city + town（heading と重複時は非表示）
+  const subLine = [openHouse.city, openHouse.town].filter(Boolean).join("");
+  const showSubLine = subLine && subLine !== heading;
+
+  const areaText = getDisplayArea(openHouse);
+  const mainImage = openHouse.images?.[0]?.url ?? null;
+
+  // 種別 + 間取り
+  const typeRoomLine = [typeLabel, openHouse.rooms].filter(Boolean).join("　");
 
   return (
     <Link
       href={`/properties/${openHouse.id}`}
       style={{
+        background: "#fff",
+        borderRadius: "12px",
+        overflow: "hidden",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
         display: "flex",
-        gap: "12px",
-        padding: "12px",
-        borderRadius: "8px",
-        border: "1px solid #E5E5E5",
+        flexDirection: "column",
         textDecoration: "none",
         color: "inherit",
       }}
     >
-      {/* 年月ブロック */}
-      <div style={{
-        flexShrink: 0,
-        width: "60px",
-        borderRadius: "4px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "8px 4px",
-        backgroundColor: "#EBF7EA",
-      }}>
-        <span style={{
-          fontFamily: "'Montserrat', sans-serif",
-          fontWeight: "bold",
-          fontSize: "22px",
-          lineHeight: 1,
-          color: "#5BAD52",
-        }}>
-          {year}
-        </span>
-        <span style={{ fontSize: "12px", color: "#666", marginTop: "4px" }}>
-          {month}月
-        </span>
-      </div>
-
-      {/* 物件情報 */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: "13px", fontWeight: "500", color: "#333", margin: "0 0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          {openHouse.title ?? "物件名未設定"}
-        </p>
-        <p style={{ fontSize: "13px", color: "#555", margin: "0 0 4px" }}>
-          {dateRange}
-        </p>
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-          <MapPin size={10} style={{ color: "#5BAD52" }} />
-          <span style={{ fontSize: "11px", color: "#aaa", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {openHouse.city ?? ""}{openHouse.address ?? ""}
-          </span>
+      {/* サムネイル */}
+      {mainImage ? (
+        <div style={{ position: "relative", width: "100%", aspectRatio: "16/10", overflow: "hidden", backgroundColor: "#f0f0f0" }}>
+          <Image
+            src={mainImage}
+            alt={heading || "現地販売会"}
+            fill
+            style={{ objectFit: "cover" }}
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
         </div>
+      ) : (
+        <div style={{ width: "100%", aspectRatio: "16/10", backgroundColor: "#EBF7EA", display: "flex", alignItems: "center", justifyContent: "center", color: "#aaa", fontSize: "12px" }}>
+          画像準備中
+        </div>
+      )}
+
+      <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+        {/* 開催日時 */}
+        {dateStr && (
+          <div>
+            <span style={{
+              background: "#c8a96e",
+              color: "#fff",
+              fontSize: "11px",
+              fontWeight: 700,
+              padding: "4px 10px",
+              borderRadius: "4px",
+              display: "inline-block",
+              marginBottom: "6px",
+              letterSpacing: "0.05em",
+            }}>
+              開催日時
+            </span>
+            <p style={{ fontSize: "14px", fontWeight: 600, color: "#333", margin: 0 }}>
+              {dateStr}{timeRange && ` ${timeRange}`}
+            </p>
+          </div>
+        )}
+
+        {/* 物件情報 */}
+        <div>
+          {typeRoomLine && (
+            <p style={{ fontSize: "12px", color: "#666", margin: "0 0 4px", letterSpacing: "0.05em" }}>
+              {typeRoomLine}
+            </p>
+          )}
+          {heading && (
+            <p style={{ fontSize: "15px", fontWeight: 600, color: "#1a1a1a", margin: "0 0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {heading}
+            </p>
+          )}
+          {showSubLine && (
+            <p style={{ fontSize: "12px", color: "#888", margin: "0 0 4px" }}>
+              {subLine}
+            </p>
+          )}
+          {openHouse.price != null && (
+            <p style={{ fontSize: "20px", fontWeight: 700, color: "#c0392b", margin: "4px 0" }}>
+              {openHouse.price.toLocaleString()}万円
+            </p>
+          )}
+          {areaText && (
+            <p style={{ fontSize: "12px", color: "#666", margin: "2px 0 0" }}>
+              {areaText}
+            </p>
+          )}
+        </div>
+
+        {/* 詳細ボタン */}
+        <span style={{
+          display: "block",
+          textAlign: "center",
+          background: "#1a1a2e",
+          color: "#fff",
+          padding: "10px",
+          borderRadius: "6px",
+          fontSize: "13px",
+          fontWeight: 600,
+          marginTop: "4px",
+        }}>
+          詳細を見る →
+        </span>
       </div>
     </Link>
   );
