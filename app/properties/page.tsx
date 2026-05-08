@@ -8,7 +8,8 @@ import {
 import type { Property } from "@/lib/api";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 
-export const revalidate = 60;
+// searchParams を確実に反映するため毎回サーバ実行（ISR キャッシュ無効化）
+export const dynamic = "force-dynamic";
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地",
