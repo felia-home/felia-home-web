@@ -260,6 +260,20 @@ function OpenHouseCard({ openHouse }: { openHouse: OpenHouse }) {
               {areaText}
             </p>
           )}
+          {openHouse.description_hp && (
+            <p style={{
+              fontSize: "12px",
+              color: "#666",
+              margin: "6px 0 0",
+              lineHeight: 1.6,
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}>
+              {openHouse.description_hp}
+            </p>
+          )}
         </div>
 
         {/* 詳細ボタン */}

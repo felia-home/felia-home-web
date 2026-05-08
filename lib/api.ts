@@ -368,7 +368,7 @@ export interface OpenHouse {
   address: string | null;
   open_house_start: string | null;
   open_house_end: string | null;
-  open_house_comment?: string | null;
+  description_hp?: string | null;
   is_open_house: boolean;
   station_name1?: string | null;
   station_walk1?: number | null;
