@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { getNewProperties } from "@/lib/api";
+import {
+  getNewProperties,
+  getFeaturedProperties,
+  getPropertiesByArea,
+  getPropertiesByLine,
+} from "@/lib/api";
 import type { Property } from "@/lib/api";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 
@@ -14,10 +19,51 @@ const PROPERTY_TYPE_MAP: Record<string, string> = {
   OTHER: "その他",
 };
 
-export default async function PropertiesPage() {
+interface PageProps {
+  searchParams?: {
+    flag?: string;
+    line?: string;
+    area?: string;
+    type?: string;
+  };
+}
+
+export default async function PropertiesPage({ searchParams }: PageProps) {
+  const flag = searchParams?.flag ?? "";
+  const line = searchParams?.line ?? "";
+  const area = searchParams?.area ?? "";
+  const type = searchParams?.type ?? "";
+
+  // 表示モード判定 + フィルタ取得
   let properties: Property[] = [];
+  let pageTitle = "新着物件情報";
+  let pageEn = "NEW ARRIVALS";
+  let pageDesc = "最新の掲載物件をご紹介します";
+
   try {
-    properties = await getNewProperties();
+    if (line) {
+      properties = await getPropertiesByLine(line);
+      pageTitle = `${line}沿線の物件`;
+      pageEn = "BY LINE";
+      pageDesc = `${line}沿線の物件をご紹介します`;
+    } else if (area) {
+      properties = await getPropertiesByArea(area);
+      pageTitle = `${area}の物件`;
+      pageEn = "BY AREA";
+      pageDesc = `${area}エリアの物件をご紹介します`;
+    } else if (flag === "featured") {
+      properties = await getFeaturedProperties();
+      pageTitle = "厳選物件情報";
+      pageEn = "FELIA SELECTION";
+      pageDesc = "フェリアホームが厳選する特別な物件";
+    } else {
+      properties = await getNewProperties();
+    }
+
+    // 物件種別フィルタ（任意）— クライアント側でフィルタ
+    if (type) {
+      properties = properties.filter((p) => p.property_type === type);
+    }
   } catch {
     properties = [];
   }
@@ -30,7 +76,7 @@ export default async function PropertiesPage() {
         <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", gap: "8px", fontSize: "12px", color: "#888" }}>
           <Link href="/" style={{ color: "#888", textDecoration: "none" }}>ホーム</Link>
           <span>›</span>
-          <span style={{ color: "#333" }}>新着物件情報</span>
+          <span style={{ color: "#333" }}>{pageTitle}</span>
         </div>
       </div>
 
@@ -49,7 +95,7 @@ export default async function PropertiesPage() {
             fontFamily: "'Montserrat', sans-serif",
             fontWeight: "600",
           }}>
-            NEW ARRIVALS
+            {pageEn}
           </p>
           <h1 style={{
             fontSize: "clamp(24px, 4vw, 36px)",
@@ -57,10 +103,10 @@ export default async function PropertiesPage() {
             color: "#1a1a1a",
             margin: "0 0 8px",
           }}>
-            新着物件情報
+            {pageTitle}
           </h1>
           <p style={{ fontSize: "14px", color: "#666", margin: "0 0 20px" }}>
-            最新の掲載物件をご紹介します
+            {pageDesc}
           </p>
           <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
             <Link

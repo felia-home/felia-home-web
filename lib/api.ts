@@ -40,12 +40,18 @@ export async function getNewProperties() {
   return res.properties ?? [];
 }
 
-export async function getPropertiesByArea(area: string) {
-  return fetchFromAdmin<Property[]>(`/api/properties?area=${encodeURIComponent(area)}&published_hp=true`);
+export async function getPropertiesByArea(area: string): Promise<Property[]> {
+  const res = await fetchFromAdmin<{ properties: Property[] }>(
+    `/api/properties?area=${encodeURIComponent(area)}&published_hp=true`
+  );
+  return res.properties ?? [];
 }
 
-export async function getPropertiesByLine(line: string) {
-  return fetchFromAdmin<Property[]>(`/api/properties?line=${encodeURIComponent(line)}&published_hp=true`);
+export async function getPropertiesByLine(line: string): Promise<Property[]> {
+  const res = await fetchFromAdmin<{ properties: Property[] }>(
+    `/api/properties?line=${encodeURIComponent(line)}&published_hp=true`
+  );
+  return res.properties ?? [];
 }
 
 export async function getPropertyById(id: string): Promise<Property | null> {
