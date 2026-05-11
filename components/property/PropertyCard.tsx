@@ -6,10 +6,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Train } from "lucide-react";
 import type { Property } from "@/lib/api";
+import { FavoriteButton } from "@/components/ui/FavoriteButton";
 
 interface Props {
   property: Property;
   size?: "normal" | "large";
+  showFavoriteButton?: boolean;
 }
 
 const PROPERTY_TYPE_LABELS: Record<string, string> = {
@@ -27,7 +29,7 @@ const BADGE_COLORS: Record<string, string> = {
   member: "#525252",
 };
 
-export function PropertyCard({ property, size = "normal" }: Props) {
+export function PropertyCard({ property, size = "normal", showFavoriteButton = false }: Props) {
   const [imgError, setImgError] = useState(false);
   const isLarge = size === "large";
 
@@ -166,12 +168,12 @@ export function PropertyCard({ property, size = "normal" }: Props) {
           )}
         </div>
 
-        {/* 右上：物件種別バッジ */}
+        {/* 右上：物件種別バッジ（favorite ボタン有りなら下にずらす） */}
         {typeLabel && (
           <div
             style={{
               position: "absolute",
-              top: "10px",
+              top: showFavoriteButton ? "44px" : "10px",
               right: "10px",
               zIndex: 10,
             }}
@@ -188,6 +190,20 @@ export function PropertyCard({ property, size = "normal" }: Props) {
             >
               {typeLabel}
             </span>
+          </div>
+        )}
+
+        {/* お気に入りボタン（オプション） */}
+        {showFavoriteButton && (
+          <div
+            style={{
+              position: "absolute",
+              top: "8px",
+              right: "8px",
+              zIndex: 11,
+            }}
+          >
+            <FavoriteButton propertyId={property.id} size="sm" />
           </div>
         )}
       </div>

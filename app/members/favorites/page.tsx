@@ -3,8 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import { FavoriteButton } from "@/components/ui/FavoriteButton";
+import { PropertyCard } from "@/components/property/PropertyCard";
 
 export const metadata = { title: "お気に入り物件 | フェリアホーム" };
 
@@ -76,61 +75,12 @@ export default async function FavoritesPage() {
             {favorites.map((fav: any) => {
               const p = fav.property ?? fav;
               if (!p) return null;
-              const mainImage = p.images?.[0]?.url ?? null;
-              const location = [p.city, p.town].filter(Boolean).join("");
               return (
-                <Link
+                <PropertyCard
                   key={fav.id ?? p.id}
-                  href={`/properties/${p.id}`}
-                  style={{ textDecoration: "none", color: "inherit", display: "block" }}
-                >
-                  <div style={{
-                    backgroundColor: "#fff", borderRadius: "12px",
-                    overflow: "hidden", border: "1px solid #e8e8e8",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-                    height: "100%", display: "flex", flexDirection: "column",
-                  }}>
-                    <div style={{ position: "relative", aspectRatio: "4/3", backgroundColor: "#f0f0f0", flexShrink: 0 }}>
-                      {mainImage ? (
-                        <Image src={mainImage} alt={p.title ?? "物件"} fill quality={80}
-                          style={{ objectFit: "cover" }} sizes="33vw" />
-                      ) : (
-                        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px", color: "#bbb" }}>🏠</div>
-                      )}
-                      <div style={{ position: "absolute", top: "10px", right: "10px", zIndex: 2 }}>
-                        <FavoriteButton propertyId={p.id} size="sm" />
-                      </div>
-                    </div>
-                    <div style={{ padding: "14px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
-                      <div style={{ minHeight: "36px", marginBottom: "8px" }}>
-                        {p.title && (
-                          <p style={{
-                            fontSize: "13px", fontWeight: "bold", color: "#333",
-                            margin: 0, lineHeight: 1.4,
-                            overflow: "hidden",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                          }}>
-                            {p.title}
-                          </p>
-                        )}
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1, marginBottom: "10px" }}>
-                        {location && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📍 {location}</p>}
-                        {p.rooms && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚪 {p.rooms}</p>}
-                      </div>
-                      <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px", marginTop: "auto" }}>
-                        {p.price != null ? (
-                          <p style={{ margin: 0 }}>
-                            <span style={{ fontSize: "20px", fontWeight: "bold", color: "#5BAD52" }}>{p.price.toLocaleString()}</span>
-                            <span style={{ fontSize: "12px", color: "#5BAD52", marginLeft: "2px" }}>万円</span>
-                          </p>
-                        ) : <p style={{ fontSize: "14px", color: "#888", margin: 0 }}>応相談</p>}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+                  property={p}
+                  showFavoriteButton
+                />
               );
             })}
           </div>
