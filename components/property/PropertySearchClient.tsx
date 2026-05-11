@@ -190,6 +190,10 @@ export default function PropertySearchClient() {
       return pt === target;
     };
 
+    // 公開フィルタ（admin が published_hp パラメータを無視している場合の保険）
+    // p.published_hp === false の場合のみ除外。undefined/true は通す
+    const isPublished = (p: any) => p.published_hp !== false;
+
     const PAGE_SIZE = 45;
 
     try {
@@ -210,8 +214,9 @@ export default function PropertySearchClient() {
       const data = await res.json();
       const allFromAdmin: any[] = data.properties ?? [];
 
-      // HP 側で property_type 厳密フィルタ
+      // HP 側で published_hp + property_type 厳密フィルタ
       const normalProps = allFromAdmin
+        .filter(isPublished)
         .filter(matchesType)
         .map((item: any) => ({ ...item, _type: "normal" }));
 
