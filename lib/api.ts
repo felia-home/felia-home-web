@@ -65,7 +65,14 @@ export async function getPropertyById(id: string): Promise<Property | null> {
       const imgRes = await fetchFromAdmin<{ images: any[] }>(`/api/properties/${id}/images`);
       const images = (imgRes as any).images ?? [];
       if (images.length > 0) {
-        property.images = images
+        // URL重複の防御（DBにPropertyImageが二重登録されていた場合に備える）
+        const seenUrls = new Set<string>();
+        const unique = images.filter((img: any) => {
+          if (!img?.url || seenUrls.has(img.url)) return false;
+          seenUrls.add(img.url);
+          return true;
+        });
+        property.images = unique
           .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
           .map((img: any) => ({
             ...img,

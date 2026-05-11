@@ -365,11 +365,11 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           {/* 左カラム */}
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
 
-            {/* ④ おすすめポイント */}
-            {sellingPoints.length > 0 && (() => {
+            {/* ④ おすすめポイント（テキスト項目のみ。URLは tour_url で表示するためここでは出さない） */}
+            {(() => {
               const isUrl = (str: string) => /^https?:\/\//i.test(str.trim());
               const textPoints = sellingPoints.filter(p => !isUrl(p));
-              const urlPoints  = sellingPoints.filter(p =>  isUrl(p));
+              if (textPoints.length === 0) return null;
               return (
                 <div style={{ backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #e8e8e8", overflow: "hidden" }}>
                   <div style={{ backgroundColor: "#1a4a24", padding: "14px 20px" }}>
@@ -378,27 +378,14 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                     </h2>
                   </div>
                   <div style={{ padding: "20px" }}>
-                    {textPoints.length > 0 && (
-                      <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "10px" }}>
-                        {textPoints.map((point, i) => (
-                          <li key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-                            <span style={{ color: "#5BAD52", fontWeight: "bold", flexShrink: 0, marginTop: "1px" }}>✓</span>
-                            <span style={{ fontSize: "14px", color: "#333", lineHeight: 1.6 }}>{point}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    {urlPoints.map((point, i) => (
-                      <div key={`url-${i}`} style={{ marginTop: textPoints.length > 0 || i > 0 ? "16px" : 0 }}>
-                        <iframe
-                          src={point.trim()}
-                          style={{ width: "100%", height: 400, border: "none", borderRadius: 8 }}
-                          allowFullScreen
-                          allow="xr-spatial-tracking; gyroscope; accelerometer"
-                          title={`360度ビュー ${i + 1}`}
-                        />
-                      </div>
-                    ))}
+                    <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "10px" }}>
+                      {textPoints.map((point, i) => (
+                        <li key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                          <span style={{ color: "#5BAD52", fontWeight: "bold", flexShrink: 0, marginTop: "1px" }}>✓</span>
+                          <span style={{ fontSize: "14px", color: "#333", lineHeight: 1.6 }}>{point}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               );
