@@ -180,14 +180,17 @@ export default function PropertySearchClient() {
     // 物件種別フィルタ（HP 側で厳密判定）。
     // admin の property_type フィルタが部分一致等で不正確な可能性があるため、
     // admin には property_type を送らず HP 側で確実に絞り込む。
-    const matchesType = (p: { property_type?: string | null }) => {
+    // 防御策: property_type / propertyType の両方を参照し、大文字正規化して比較
+    const matchesType = (p: { property_type?: string | null; propertyType?: string | null }) => {
       if (!selectedType) return true;
-      const pt = p.property_type ?? "";
-      if (selectedType === "MANSION") return pt === "MANSION" || pt === "NEW_MANSION";
-      return pt === selectedType;
+      const raw = (p.property_type ?? p.propertyType ?? "") as string;
+      const pt = raw.toUpperCase();
+      const target = selectedType.toUpperCase();
+      if (target === "MANSION") return pt === "MANSION" || pt === "NEW_MANSION";
+      return pt === target;
     };
 
-    const PAGE_SIZE = 12;
+    const PAGE_SIZE = 45;
 
     try {
       const pr = PRICE_RANGES[selectedPriceRange];
@@ -886,6 +889,17 @@ function ReinsSearchCard({ property }: { property: any }) {
   const [hovered, setHovered] = useState(false);
   const area = property.area_build_m2 ?? property.area_m2 ?? property.area_land_m2;
 
+  // REINS 物件のサムネイル取得（優先順位）
+  // 1) 通常画像 images[0].url
+  // 2) マンション建物外観 mansion_building.exterior_images[0].url
+  // 3) 直接サムネイル thumbnail_url
+  const reinsThumb: string | null =
+    property.images?.[0]?.url ??
+    property.mansion_building?.exterior_images?.[0]?.url ??
+    property.exterior_images?.[0]?.url ??
+    property.thumbnail_url ??
+    null;
+
   return (
     <Link
       href={`/reins/${property.id}`}
@@ -907,7 +921,7 @@ function ReinsSearchCard({ property }: { property: any }) {
       }}>
         {/* 画像エリア */}
         <div style={{ position: "relative", aspectRatio: "4/3", flexShrink: 0 }}>
-          <PropertyImage src={null} alt={property._title} seed={property.id} sizes="33vw" />
+          <PropertyImage src={reinsThumb} alt={property._title} seed={property.id} sizes="33vw" />
           <div style={{ position: "absolute", top: "10px", left: "10px" }}>
             <span style={{
               backgroundColor: "#2d4a6a", color: "#fff",
