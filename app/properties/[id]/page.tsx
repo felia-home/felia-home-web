@@ -13,6 +13,7 @@ import { AgentCard } from "@/components/property/AgentCard";
 import { AreaColumnAccordion } from "@/components/property/AreaColumnAccordion";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import PropertyViewBeacon from "@/components/PropertyViewBeacon";
+import { displayFeatures } from "@/lib/featureLabels";
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
@@ -188,9 +189,27 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     .filter(([key]) => p[key] === true)
     .map(([, label]) => label);
 
-  const featuresList: string[] = p.features ?? [];
+  // features は英語キーで返るので日本語ラベルに変換（未知のキーは破棄）
+  const featuresList: string[] = displayFeatures(p.features ?? []);
 
   const equipments = [...equipmentLabels, ...featuresList];
+
+  // 制限事項
+  const restrictions: string[] = [];
+  if (p.rebuild_possible === "再建築不可") restrictions.push("再建築不可");
+  if (p.setback) {
+    restrictions.push(
+      `セットバックあり${p.setback_area ? `（${p.setback_area}㎡）` : ""}`
+    );
+  }
+  if (p.private_road) {
+    restrictions.push(
+      `私道負担あり${p.private_road_area ? `（${p.private_road_area}㎡）` : ""}`
+    );
+  }
+  if (p.national_land_law) restrictions.push("国土法届出要");
+  if (p.agricultural_law) restrictions.push("農地法許可要");
+  if (p.landscape_law) restrictions.push("景観法適用");
 
   // 物件種別による面積表示分岐
   const propType = p.property_type ?? "";
@@ -581,6 +600,25 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                 ))}
               </div>
             </div>
+
+            {/* ⑧½ 制限事項 */}
+            {restrictions.length > 0 && (
+              <div style={{ backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #e8e8e8", overflow: "hidden" }}>
+                <div style={{ backgroundColor: "#f8f8f8", padding: "14px 20px", borderBottom: "1px solid #e8e8e8" }}>
+                  <h2 style={{ fontSize: "15px", fontWeight: "bold", color: "#333", margin: 0 }}>制限事項</h2>
+                </div>
+                <div style={{ padding: "16px 20px" }}>
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {restrictions.map((r, i) => (
+                      <li key={i} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: "#c0392b", fontWeight: 500 }}>
+                        <span style={{ fontSize: "16px" }}>⚠️</span>
+                        {r}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
 
             {/* ⑨ 設備・特徴 */}
             {equipments.length > 0 && (
