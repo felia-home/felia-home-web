@@ -171,9 +171,20 @@ export default function PropertySearchClient() {
     setSearched(true);
     setCurrentPage(page);
 
+    // 「マンション」選択時は MANSION + NEW_MANSION の両方を対象にする
+    // admin API がカンマ区切りに対応していれば事前絞り込み、未対応でも HP 側で再フィルタする
+    const typeParamValue =
+      selectedType === "MANSION" ? "MANSION,NEW_MANSION" : selectedType;
+    const matchesType = (p: { property_type?: string | null }) => {
+      if (!selectedType) return true;
+      const pt = p.property_type ?? "";
+      if (selectedType === "MANSION") return pt === "MANSION" || pt === "NEW_MANSION";
+      return pt === selectedType;
+    };
+
     const params = new URLSearchParams();
     if (keyword.trim()) params.set("keyword", keyword.trim());
-    if (selectedType) params.set("property_type", selectedType);
+    if (typeParamValue) params.set("property_type", typeParamValue);
     const pr = PRICE_RANGES[selectedPriceRange];
     if (pr.min) params.set("price_min", pr.min);
     if (pr.max) params.set("price_max", pr.max);
@@ -190,7 +201,10 @@ export default function PropertySearchClient() {
     try {
       const res = await fetch(`/api/properties/search?${params.toString()}`);
       const data = await res.json();
-      const normalProps = (data.properties ?? []).map((p: any) => ({ ...p, _type: "normal" }));
+      // HP 側でも正規化フィルタを適用（admin API がパラメータ未対応でも安全）
+      const normalProps = (data.properties ?? [])
+        .filter(matchesType)
+        .map((p: any) => ({ ...p, _type: "normal" }));
 
       // REINS物件取得（ログイン時のみ）
       let reinsProps: any[] = [];
@@ -200,14 +214,17 @@ export default function PropertySearchClient() {
           if (selectedArea) reinsParams.set("area", selectedArea);
           if (selectedLine) reinsParams.set("q", selectedLine);
           if (pr.max) reinsParams.set("price_max", pr.max);
+          if (typeParamValue) reinsParams.set("property_type", typeParamValue);
           reinsParams.set("limit", "9999");
           const reinsRes = await fetch(`/api/reins?${reinsParams.toString()}`);
           const reinsData = await reinsRes.json();
-          reinsProps = (reinsData.properties ?? []).map((p: any) => ({
-            ...p,
-            _type: "reins",
-            _title: buildReinsTitle(p),
-          }));
+          reinsProps = (reinsData.properties ?? [])
+            .filter(matchesType)
+            .map((p: any) => ({
+              ...p,
+              _type: "reins",
+              _title: buildReinsTitle(p),
+            }));
         } catch {}
       }
 
