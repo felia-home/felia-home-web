@@ -177,8 +177,9 @@ export default function PropertySearchClient() {
     setSearched(true);
     setCurrentPage(page);
 
-    // 「マンション」選択時は MANSION + NEW_MANSION の両方を対象にする
-    // admin API はカンマ区切りに非対応のため、単一値で2回リクエストして結合する
+    // 物件種別フィルタ（HP 側で厳密判定）。
+    // admin の property_type フィルタが部分一致等で不正確な可能性があるため、
+    // admin には property_type を送らず HP 側で確実に絞り込む。
     const matchesType = (p: { property_type?: string | null }) => {
       if (!selectedType) return true;
       const pt = p.property_type ?? "";
@@ -186,74 +187,33 @@ export default function PropertySearchClient() {
       return pt === selectedType;
     };
 
-    // 共通パラメータを構築するヘルパー
-    const buildBaseParams = () => {
+    const PAGE_SIZE = 12;
+
+    try {
+      const pr = PRICE_RANGES[selectedPriceRange];
+
+      // 通常物件: 全件取得（admin にはページングさせない）
+      // admin に property_type は送らない（HP 側で厳密フィルタ）
       const p = new URLSearchParams();
       if (keyword.trim()) p.set("keyword", keyword.trim());
-      const pr = PRICE_RANGES[selectedPriceRange];
       if (pr.min) p.set("price_min", pr.min);
       if (pr.max) p.set("price_max", pr.max);
       if (selectedArea) p.set("city", selectedArea);
       if (selectedLine) p.set("station", selectedLine);
-      conditions.forEach((cond) => {
-        p.set(cond, "true");
-      });
-      p.set("page", String(page));
-      p.set("limit", "12");
-      return p;
-    };
+      conditions.forEach((cond) => p.set(cond, "true"));
+      p.set("limit", "9999");
 
-    const fetchNormal = async (typeValue: string) => {
-      const p = buildBaseParams();
-      if (typeValue) p.set("property_type", typeValue);
-      const r = await fetch(`/api/properties/search?${p.toString()}`);
-      return r.json();
-    };
+      const res = await fetch(`/api/properties/search?${p.toString()}`);
+      const data = await res.json();
+      const allFromAdmin: any[] = data.properties ?? [];
 
-    const pr = PRICE_RANGES[selectedPriceRange];
-
-    try {
-      // 通常検索: 「マンション」選択時は MANSION と NEW_MANSION を並列取得して結合
-      let mergedProperties: any[] = [];
-      let mergedTotal = 0;
-      let mergedTotalPages = 0;
-
-      const dedupeById = (arr: any[]) => {
-        const seen = new Set<string>();
-        return arr.filter((p) => {
-          if (!p?.id || seen.has(p.id)) return false;
-          seen.add(p.id);
-          return true;
-        });
-      };
-
-      if (selectedType === "MANSION") {
-        const [d1, d2] = await Promise.all([
-          fetchNormal("MANSION"),
-          fetchNormal("NEW_MANSION"),
-        ]);
-        const props1 = d1.properties ?? [];
-        const props2 = d2.properties ?? [];
-        // admin が部分一致等で重複を返す可能性があるため ID で排除
-        mergedProperties = dedupeById([...props1, ...props2]);
-        // total は重複排除後の件数を採用（admin の合算 total では重複が二重に数えられる）
-        mergedTotal = mergedProperties.length;
-        // ページ数は重複排除後の件数 / limit で再計算
-        mergedTotalPages = Math.ceil(mergedTotal / 12) || 0;
-      } else {
-        const data = await fetchNormal(selectedType);
-        mergedProperties = data.properties ?? [];
-        mergedTotal = data.total ?? mergedProperties.length;
-        mergedTotalPages = data.total_pages ?? 0;
-      }
-
-      // HP 側でも正規化フィルタを適用（admin が全種別を返した場合の保険）
-      const normalProps = mergedProperties
+      // HP 側で property_type 厳密フィルタ
+      const normalProps = allFromAdmin
         .filter(matchesType)
-        .map((p: any) => ({ ...p, _type: "normal" }));
+        .map((item: any) => ({ ...item, _type: "normal" }));
 
       // REINS物件取得（ログイン時のみ）
-      // 注意: REINS は HP の property_type ではなく source_type フィールドを使う
+      // REINS は HP の property_type ではなく source_type フィールドを使う
       //       MANSION/NEW_MANSION → source_type=MANSION
       //       NEW_HOUSE/USED_HOUSE → source_type=HOUSE
       //       LAND → source_type=LAND
@@ -269,15 +229,15 @@ export default function PropertySearchClient() {
                 : "";
 
         try {
-          const p = new URLSearchParams();
-          if (selectedArea) p.set("area", selectedArea);
-          if (selectedLine) p.set("q", selectedLine);
-          if (pr.max) p.set("price_max", pr.max);
-          if (reinsSourceType) p.set("source_type", reinsSourceType);
-          p.set("limit", "9999");
-          const r = await fetch(`/api/reins?${p.toString()}`);
-          const data = await r.json();
-          const reinsCombined: any[] = data.properties ?? [];
+          const rp = new URLSearchParams();
+          if (selectedArea) rp.set("area", selectedArea);
+          if (selectedLine) rp.set("q", selectedLine);
+          if (pr.max) rp.set("price_max", pr.max);
+          if (reinsSourceType) rp.set("source_type", reinsSourceType);
+          rp.set("limit", "9999");
+          const reinsRes = await fetch(`/api/reins?${rp.toString()}`);
+          const reinsData = await reinsRes.json();
+          const reinsCombined: any[] = reinsData.properties ?? [];
 
           // HP 側セーフティーネット: admin が source_type を無視しても確実に絞り込む
           const matchesReinsType = (item: any) => {
@@ -303,25 +263,31 @@ export default function PropertySearchClient() {
       const sortedNormal = isMansionSearch
         ? [
             ...normalProps.filter(
-              (p: any) => p.mansion_building_id || p.building_name
+              (item: any) => item.mansion_building_id || item.building_name
             ),
             ...normalProps.filter(
-              (p: any) => !p.mansion_building_id && !p.building_name
+              (item: any) => !item.mansion_building_id && !item.building_name
             ),
           ]
         : normalProps;
 
       const sortedReins = isMansionSearch
         ? [
-            ...reinsProps.filter((p: any) => p.building_name),
-            ...reinsProps.filter((p: any) => !p.building_name),
+            ...reinsProps.filter((item: any) => item.building_name),
+            ...reinsProps.filter((item: any) => !item.building_name),
           ]
         : reinsProps;
 
-      const allProps = [...sortedNormal, ...sortedReins];
-      setProperties(allProps);
-      setTotal(mergedTotal + reinsProps.length);
-      setTotalPages(mergedTotalPages);
+      const allItems = [...sortedNormal, ...sortedReins];
+
+      // HP 側ページング
+      const totalCount = allItems.length;
+      const totalPagesCount = Math.ceil(totalCount / PAGE_SIZE) || 0;
+      const pageItems = allItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+      setProperties(pageItems);
+      setTotal(totalCount);
+      setTotalPages(totalPagesCount);
     } catch {
       setProperties([]);
       setTotal(0);
