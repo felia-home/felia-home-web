@@ -268,15 +268,28 @@ export default function PropertySearchClient() {
                 : "";
 
         try {
-          const rp = new URLSearchParams();
-          if (selectedArea) rp.set("area", selectedArea);
-          if (selectedLine) rp.set("q", selectedLine);
-          if (pr.max) rp.set("price_max", pr.max);
-          if (reinsSourceType) rp.set("source_type", reinsSourceType);
-          rp.set("limit", "9999");
-          const reinsRes = await fetch(`/api/reins?${rp.toString()}`);
-          const reinsData = await reinsRes.json();
-          const reinsCombined: any[] = reinsData.properties ?? [];
+          // admin /api/hp/reins は内部 limit cap がある可能性が高い（既知の総件数 7,888 件に対し
+          // limit=9999 でも一度に取れない）。ページングで全件取得する。
+          const REINS_BATCH = 1000;
+          const REINS_MAX_PAGES = 10; // 最大 10,000 件まで（安全装置）
+          let reinsCombined: any[] = [];
+          let page = 1;
+          while (page <= REINS_MAX_PAGES) {
+            const rp = new URLSearchParams();
+            if (selectedArea) rp.set("area", selectedArea);
+            if (selectedLine) rp.set("q", selectedLine);
+            if (pr.max) rp.set("price_max", pr.max);
+            if (reinsSourceType) rp.set("source_type", reinsSourceType);
+            rp.set("limit", String(REINS_BATCH));
+            rp.set("page", String(page));
+            const reinsRes = await fetch(`/api/reins?${rp.toString()}`);
+            const reinsData = await reinsRes.json();
+            const batch: any[] = reinsData.properties ?? [];
+            reinsCombined = [...reinsCombined, ...batch];
+            // 終了条件: 取得件数が batch サイズ未満（=最後のページ）
+            if (batch.length < REINS_BATCH) break;
+            page++;
+          }
 
           // HP 側セーフティーネット: source_type と築年月で確実に絞り込む
           // 戸建ては REINS の source_type=HOUSE しか返らないため、
@@ -312,23 +325,22 @@ export default function PropertySearchClient() {
       // 表示順序のソート
       // 共通: 通常物件 → REINS物件
       // マンション選択時: 通常もREINSも、マンション建物紐づきあり → なし の順
+      // ※ REINS には mansion_building_id が無いため building_name 有無で判定する
       const isMansionSearch = selectedType === "MANSION";
+      const hasMansionLink = (item: any) =>
+        !!(item.mansion_building_id || item.building_name);
 
       const sortedNormal = isMansionSearch
         ? [
-            ...normalProps.filter(
-              (item: any) => item.mansion_building_id || item.building_name
-            ),
-            ...normalProps.filter(
-              (item: any) => !item.mansion_building_id && !item.building_name
-            ),
+            ...normalProps.filter(hasMansionLink),
+            ...normalProps.filter((item: any) => !hasMansionLink(item)),
           ]
         : normalProps;
 
       const sortedReins = isMansionSearch
         ? [
-            ...reinsProps.filter((item: any) => item.building_name),
-            ...reinsProps.filter((item: any) => !item.building_name),
+            ...reinsProps.filter(hasMansionLink),
+            ...reinsProps.filter((item: any) => !hasMansionLink(item)),
           ]
         : reinsProps;
 
