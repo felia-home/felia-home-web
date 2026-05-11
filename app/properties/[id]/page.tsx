@@ -196,8 +196,9 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
   // 制限事項
   const restrictions: string[] = [];
-  if (p.rebuild_possible === "再建築不可") restrictions.push("再建築不可");
-  if (p.setback) {
+  if (p.rebuild_allowed === "不可") restrictions.push("再建築不可");
+  if (p.rebuild_allowed === "要確認") restrictions.push("再建築要確認");
+  if (p.setback_required) {
     restrictions.push(
       `セットバックあり${p.setback_area ? `（${p.setback_area}㎡）` : ""}`
     );
@@ -207,9 +208,9 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       `私道負担あり${p.private_road_area ? `（${p.private_road_area}㎡）` : ""}`
     );
   }
-  if (p.national_land_law) restrictions.push("国土法届出要");
-  if (p.agricultural_law) restrictions.push("農地法許可要");
-  if (p.landscape_law) restrictions.push("景観法適用");
+  if (p.national_land_act) restrictions.push("国土法届出要");
+  if (p.agricultural_act) restrictions.push("農地法許可要");
+  if (p.landscape_act) restrictions.push("景観法適用");
 
   // 物件種別による面積表示分岐
   const propType = p.property_type ?? "";

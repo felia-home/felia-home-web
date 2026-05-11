@@ -555,14 +555,14 @@ export interface PropertyDetail {
   building_name?: string | null;
   area_exclusive_m2?: number | null;
   features?: string[] | null;
-  rebuild_possible?: string | null;
-  setback?: boolean | null;
+  rebuild_allowed?: string | null;
+  setback_required?: boolean | null;
   setback_area?: number | null;
   private_road?: boolean | null;
   private_road_area?: number | null;
-  national_land_law?: boolean | null;
-  agricultural_law?: boolean | null;
-  landscape_law?: boolean | null;
+  national_land_act?: boolean | null;
+  agricultural_act?: boolean | null;
+  landscape_act?: boolean | null;
 }
 
 export interface PropertyImage {
