@@ -77,6 +77,12 @@ interface Property {
   station_line1: string | null;
   station_name1: string | null;
   station_walk1: number | null;
+  station_line2: string | null;
+  station_name2: string | null;
+  station_walk2: number | null;
+  station_line3: string | null;
+  station_name3: string | null;
+  station_walk3: number | null;
   building_year: number | null;
   images: { id: string; url: string; is_main: boolean }[];
   is_felia_selection: boolean;

@@ -356,6 +356,12 @@ export interface Property {
   station_line1?: string | null;
   station_name1?: string | null;
   station_walk1?: number | null;
+  station_line2?: string | null;
+  station_name2?: string | null;
+  station_walk2?: number | null;
+  station_line3?: string | null;
+  station_name3?: string | null;
+  station_walk3?: number | null;
   is_open_house?: boolean;
   tour_url?: string | null;
   lat?: number | null;
@@ -380,6 +386,12 @@ export interface OpenHouse {
   station_line1?: string | null;
   station_name1?: string | null;
   station_walk1?: number | null;
+  station_line2?: string | null;
+  station_name2?: string | null;
+  station_walk2?: number | null;
+  station_line3?: string | null;
+  station_name3?: string | null;
+  station_walk3?: number | null;
   property_type?: string | null;
   price?: number | null;
   building_name?: string | null;
@@ -484,6 +496,9 @@ export interface PropertyDetail {
   station_line2: string | null;
   station_name2: string | null;
   station_walk2: number | null;
+  station_line3: string | null;
+  station_name3: string | null;
+  station_walk3: number | null;
   area_land_m2: number | null;
   area_build_m2: number | null;
   rooms: string | null;

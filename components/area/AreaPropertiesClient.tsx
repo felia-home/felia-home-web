@@ -21,6 +21,12 @@ interface NormalProperty {
   station_line1: string | null;
   station_name1: string | null;
   station_walk1: number | null;
+  station_line2: string | null;
+  station_name2: string | null;
+  station_walk2: number | null;
+  station_line3: string | null;
+  station_name3: string | null;
+  station_walk3: number | null;
   images: { url: string; is_main: boolean }[];
   is_felia_selection: boolean;
   is_open_house: boolean;
