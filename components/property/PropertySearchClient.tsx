@@ -102,6 +102,27 @@ function buildReinsTitle(p: any): string {
   return [location, type, price].filter(Boolean).join(" ");
 }
 
+/**
+ * REINS物件が新築かどうかを判定する
+ * 新築定義: 完成（築年月）から現在まで12ヶ月以内（宅建業法準拠）
+ * building_month が不明な場合は1月として安全側（古め）に計算
+ */
+function isReinsNewConstruction(item: any): boolean {
+  const yr: number | null = item.building_year ?? null;
+  if (yr === null) return false; // 築年不明は中古扱い
+
+  const month: number = item.building_month ?? 1;
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  const builtInMonths = yr * 12 + month;
+  const nowInMonths = currentYear * 12 + currentMonth;
+
+  return nowInMonths - builtInMonths <= 12;
+}
+
 
 export default function PropertySearchClient() {
   const session = useSession();
@@ -247,10 +268,25 @@ export default function PropertySearchClient() {
           const reinsData = await reinsRes.json();
           const reinsCombined: any[] = reinsData.properties ?? [];
 
-          // HP 側セーフティーネット: admin が source_type を無視しても確実に絞り込む
-          const matchesReinsType = (item: any) => {
-            if (!reinsSourceType) return true;
-            return item.source_type === reinsSourceType;
+          // HP 側セーフティーネット: source_type と築年月で確実に絞り込む
+          // 戸建ては REINS の source_type=HOUSE しか返らないため、
+          // building_year/building_month から 12ヶ月以内かどうかで新築/中古を振り分ける
+          const matchesReinsType = (item: any): boolean => {
+            const st: string = item.source_type ?? "";
+            if (selectedType === "MANSION" || selectedType === "NEW_MANSION") {
+              return st === "MANSION";
+            }
+            if (selectedType === "LAND") {
+              return st === "LAND";
+            }
+            if (selectedType === "NEW_HOUSE") {
+              return st === "HOUSE" && isReinsNewConstruction(item);
+            }
+            if (selectedType === "USED_HOUSE") {
+              return st === "HOUSE" && !isReinsNewConstruction(item);
+            }
+            // 「すべて」: 全 REINS 通す
+            return true;
           };
 
           reinsProps = reinsCombined
