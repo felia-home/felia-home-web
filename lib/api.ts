@@ -67,9 +67,22 @@ export async function getPropertyById(id: string): Promise<Property | null> {
       combinedImages = (imgRes as any).images ?? [];
     } catch {}
 
-    // マンション建物画像（property.mansion_building.images が返る場合に結合）
-    const mansionBuildingImages: any[] =
-      (property as any).mansion_building?.images ?? [];
+    // マンション建物外観画像（property.mansion_building.exterior_images）
+    // Admin 側で is_primary: desc → created_at: asc の順でソート済み
+    // 物件固有画像（order 0〜）の後ろに並べるため order: 1000 + idx を割り当てる
+    const mansionBuildingImages = (
+      (property as any).mansion_building?.exterior_images ?? []
+    ).map(
+      (
+        img: { id: string; url: string; caption: string | null; is_primary: boolean },
+        idx: number
+      ) => ({
+        url: img.url,
+        is_main: img.is_primary,
+        order: 1000 + idx,
+        caption: img.caption,
+      })
+    );
     if (mansionBuildingImages.length > 0) {
       combinedImages = [...combinedImages, ...mansionBuildingImages];
     }
