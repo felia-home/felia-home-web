@@ -353,6 +353,7 @@ export interface Property {
   area_land_m2?: number | null;
   created_at?: string | null;
   published_at?: string | null;
+  station_line1?: string | null;
   station_name1?: string | null;
   station_walk1?: number | null;
   is_open_house?: boolean;
@@ -376,6 +377,7 @@ export interface OpenHouse {
   open_house_end: string | null;
   description_hp?: string | null;
   is_open_house: boolean;
+  station_line1?: string | null;
   station_name1?: string | null;
   station_walk1?: number | null;
   property_type?: string | null;

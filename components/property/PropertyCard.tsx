@@ -273,8 +273,9 @@ export function PropertyCard({ property, size = "normal" }: Props) {
                   whiteSpace: "nowrap",
                 }}
               >
-                {(property as any).station_name1}駅 徒歩
-                {(property as any).station_walk1}分
+                {(property as any).station_line1 ? `${(property as any).station_line1} ` : ""}
+                {(property as any).station_name1}駅
+                {(property as any).station_walk1 ? ` 徒歩${(property as any).station_walk1}分` : ""}
               </span>
             </div>
           )}

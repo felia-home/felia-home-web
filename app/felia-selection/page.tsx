@@ -201,7 +201,7 @@ function FeliaSelectionCard({ property }: { property: Property }) {
           )}
           {property.station_name1 && (
             <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-              🚃 {property.station_name1}駅 徒歩{property.station_walk1}分
+              🚃 {property.station_line1 ? `${property.station_line1} ` : ""}{property.station_name1}駅{property.station_walk1 ? ` 徒歩${property.station_walk1}分` : ""}
             </p>
           )}
           {property.rooms && (

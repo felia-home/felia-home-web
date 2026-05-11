@@ -259,7 +259,7 @@ function PropertyCard({ property }: { property: Property }) {
             )}
             {(property as any).station_name1 && (
               <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                🚃 {(property as any).station_name1}駅 徒歩{(property as any).station_walk1}分
+                🚃 {(property as any).station_line1 ? `${(property as any).station_line1} ` : ""}{(property as any).station_name1}駅{(property as any).station_walk1 ? ` 徒歩${(property as any).station_walk1}分` : ""}
               </p>
             )}
             {(property as any).rooms && (

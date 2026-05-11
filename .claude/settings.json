@@ -33,7 +33,8 @@
       "Bash(curl -s --max-time 10 \"http://localhost:3001/api/hp/sale-results\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" --max-time 10 \"http://localhost:3001/api/hp/sale-results\")",
       "Bash(curl -s --max-time 10 \"http://localhost:3001/api/hp/open-house\")",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" --max-time 10 \"http://localhost:3001/api/hp/open-house\")"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" --max-time 10 \"http://localhost:3001/api/hp/open-house\")",
+      "Bash(grep -rn \"station_name1}駅 徒歩\\\\|station_name1}駅 徒歩\\\\${\" app/ components/ --include=\"*.tsx\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\User\\projects\\felia-home-web\\app\\staff",

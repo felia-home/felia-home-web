@@ -262,7 +262,7 @@ export default function FeliaSelecitonSlider({
                 <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
                   <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>最寄駅</span>
                   <span style={{ color: "#333" }}>
-                    {p.station_name1}駅 徒歩{p.station_walk1}分
+                    {p.station_line1 ? `${p.station_line1} ` : ""}{p.station_name1}駅{p.station_walk1 ? ` 徒歩${p.station_walk1}分` : ""}
                   </span>
                 </div>
               )}

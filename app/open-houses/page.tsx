@@ -320,7 +320,8 @@ function OpenHouseCard({ openHouse }: { openHouse: OpenHouse }) {
               color: "#888",
             }}>
               <Train size={11} style={{ color: "#5BAD52" }} />
-              {openHouse.station_name1}
+              {openHouse.station_line1 ? `${openHouse.station_line1} ` : ""}
+              {openHouse.station_name1}駅
               {openHouse.station_walk1 ? ` 徒歩${openHouse.station_walk1}分` : ""}
             </span>
           )}

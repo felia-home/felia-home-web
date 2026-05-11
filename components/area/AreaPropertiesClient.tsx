@@ -18,6 +18,7 @@ interface NormalProperty {
   area_land_m2: number | null;
   area_build_m2: number | null;
   area_exclusive_m2: number | null;
+  station_line1: string | null;
   station_name1: string | null;
   station_walk1: number | null;
   images: { url: string; is_main: boolean }[];
@@ -346,7 +347,7 @@ function NormalCard({ property }: { property: NormalProperty }) {
           <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "12px", flex: 1 }}>
             {location && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📍 {location}</p>}
             {property.station_name1 && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚃 {property.station_name1}駅 徒歩{property.station_walk1}分</p>
+              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚃 {property.station_line1 ? `${property.station_line1} ` : ""}{property.station_name1}駅{property.station_walk1 ? ` 徒歩${property.station_walk1}分` : ""}</p>
             )}
             {property.rooms && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚪 {property.rooms}</p>}
             {area && <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>📐 {area}㎡</p>}
