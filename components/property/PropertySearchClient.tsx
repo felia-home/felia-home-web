@@ -238,40 +238,44 @@ export default function PropertySearchClient() {
         .map((p: any) => ({ ...p, _type: "normal" }));
 
       // REINS物件取得（ログイン時のみ）
+      // 注意: REINS は HP の property_type ではなく source_type フィールドを使う
+      //       MANSION/NEW_MANSION → source_type=MANSION
+      //       NEW_HOUSE/USED_HOUSE → source_type=HOUSE
+      //       LAND → source_type=LAND
       let reinsProps: any[] = [];
       if (isLoggedIn) {
-        const fetchReins = async (typeValue: string) => {
+        const reinsSourceType =
+          selectedType === "MANSION" || selectedType === "NEW_MANSION"
+            ? "MANSION"
+            : selectedType === "NEW_HOUSE" || selectedType === "USED_HOUSE"
+              ? "HOUSE"
+              : selectedType === "LAND"
+                ? "LAND"
+                : "";
+
+        try {
           const p = new URLSearchParams();
           if (selectedArea) p.set("area", selectedArea);
           if (selectedLine) p.set("q", selectedLine);
           if (pr.max) p.set("price_max", pr.max);
-          if (typeValue) p.set("property_type", typeValue);
+          if (reinsSourceType) p.set("source_type", reinsSourceType);
           p.set("limit", "9999");
           const r = await fetch(`/api/reins?${p.toString()}`);
-          return r.json();
-        };
+          const data = await r.json();
+          const reinsCombined: any[] = data.properties ?? [];
 
-        try {
-          let reinsCombined: any[] = [];
-          if (selectedType === "MANSION") {
-            const [r1, r2] = await Promise.all([
-              fetchReins("MANSION"),
-              fetchReins("NEW_MANSION"),
-            ]);
-            reinsCombined = [
-              ...(r1.properties ?? []),
-              ...(r2.properties ?? []),
-            ];
-          } else {
-            const r = await fetchReins(selectedType);
-            reinsCombined = r.properties ?? [];
-          }
+          // HP 側セーフティーネット: admin が source_type を無視しても確実に絞り込む
+          const matchesReinsType = (item: any) => {
+            if (!reinsSourceType) return true;
+            return item.source_type === reinsSourceType;
+          };
+
           reinsProps = reinsCombined
-            .filter(matchesType)
-            .map((p: any) => ({
-              ...p,
+            .filter(matchesReinsType)
+            .map((item: any) => ({
+              ...item,
               _type: "reins",
-              _title: buildReinsTitle(p),
+              _title: buildReinsTitle(item),
             }));
         } catch {}
       }
