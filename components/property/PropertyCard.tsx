@@ -7,6 +7,7 @@ import Image from "next/image";
 import { MapPin, Train } from "lucide-react";
 import type { Property } from "@/lib/api";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
+import { isNewProperty, isPriceRevised } from "@/lib/propertyBadges";
 
 interface Props {
   property: Property;
@@ -27,6 +28,7 @@ const BADGE_COLORS: Record<string, string> = {
   felia: "#1a4a24",
   openhouse: "#E67E22",
   member: "#525252",
+  priceRevised: "#e67e22",
 };
 
 export function PropertyCard({ property, size = "normal", showFavoriteButton = false }: Props) {
@@ -54,10 +56,14 @@ export function PropertyCard({ property, size = "normal", showFavoriteButton = f
     PROPERTY_TYPE_LABELS[property.property_type ?? ""] ?? "";
   const location = [property.city, property.town].filter(Boolean).join("");
 
-  const isNew = (property as any).is_new ?? false;
+  const isNew = isNewProperty(property.published_at ?? null);
   const isFeliaSel = (property as any).is_felia_selection ?? false;
   const isOpenHouse = (property as any).is_open_house ?? false;
-  const isMember = (property as any).is_member_only ?? false;
+  const isMember = property.published_members ?? false;
+  const isPriceRev = isPriceRevised(
+    property.price_changed_at ?? null,
+    property.price_revised ?? null
+  );
 
   return (
     <Link href={`/properties/${property.id}`} className="property-card">
@@ -122,6 +128,20 @@ export function PropertyCard({ property, size = "normal", showFavoriteButton = f
               }}
             >
               NEW
+            </span>
+          )}
+          {isPriceRev && (
+            <span
+              style={{
+                fontSize: "10px",
+                fontWeight: "bold",
+                padding: "2px 8px",
+                borderRadius: "4px",
+                color: "#fff",
+                backgroundColor: BADGE_COLORS.priceRevised,
+              }}
+            >
+              価格改定
             </span>
           )}
           {isFeliaSel && (

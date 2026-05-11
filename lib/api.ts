@@ -378,6 +378,9 @@ export interface Property {
   building_year?: number | null;
   building_month?: number | null;
   features?: string[] | null;
+  published_members?: boolean | null;
+  price_changed_at?: string | null;
+  price_revised?: boolean | null;
 }
 
 export interface OpenHouse {
@@ -563,6 +566,10 @@ export interface PropertyDetail {
   national_land_act?: boolean | null;
   agricultural_act?: boolean | null;
   landscape_act?: boolean | null;
+  published_at?: string | null;
+  published_members?: boolean | null;
+  price_changed_at?: string | null;
+  price_revised?: boolean | null;
 }
 
 export interface PropertyImage {
