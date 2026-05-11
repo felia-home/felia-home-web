@@ -172,9 +172,7 @@ export default function PropertySearchClient() {
     setCurrentPage(page);
 
     // 「マンション」選択時は MANSION + NEW_MANSION の両方を対象にする
-    // admin API がカンマ区切りに対応していれば事前絞り込み、未対応でも HP 側で再フィルタする
-    const typeParamValue =
-      selectedType === "MANSION" ? "MANSION,NEW_MANSION" : selectedType;
+    // admin API はカンマ区切りに非対応のため、単一値で2回リクエストして結合する
     const matchesType = (p: { property_type?: string | null }) => {
       if (!selectedType) return true;
       const pt = p.property_type ?? "";
@@ -182,43 +180,91 @@ export default function PropertySearchClient() {
       return pt === selectedType;
     };
 
-    const params = new URLSearchParams();
-    if (keyword.trim()) params.set("keyword", keyword.trim());
-    if (typeParamValue) params.set("property_type", typeParamValue);
+    // 共通パラメータを構築するヘルパー
+    const buildBaseParams = () => {
+      const p = new URLSearchParams();
+      if (keyword.trim()) p.set("keyword", keyword.trim());
+      const pr = PRICE_RANGES[selectedPriceRange];
+      if (pr.min) p.set("price_min", pr.min);
+      if (pr.max) p.set("price_max", pr.max);
+      if (selectedArea) p.set("city", selectedArea);
+      if (selectedLine) p.set("station", selectedLine);
+      conditions.forEach((cond) => {
+        p.set(cond, "true");
+      });
+      p.set("page", String(page));
+      p.set("limit", "12");
+      return p;
+    };
+
+    const fetchNormal = async (typeValue: string) => {
+      const p = buildBaseParams();
+      if (typeValue) p.set("property_type", typeValue);
+      const r = await fetch(`/api/properties/search?${p.toString()}`);
+      return r.json();
+    };
+
     const pr = PRICE_RANGES[selectedPriceRange];
-    if (pr.min) params.set("price_min", pr.min);
-    if (pr.max) params.set("price_max", pr.max);
-    if (selectedArea) params.set("city", selectedArea);
-    // 沿線（station パラメータで部分一致検索）
-    if (selectedLine) params.set("station", selectedLine);
-    // こだわり条件
-    conditions.forEach(cond => {
-      params.set(cond, "true");
-    });
-    params.set("page", String(page));
-    params.set("limit", "12");
 
     try {
-      const res = await fetch(`/api/properties/search?${params.toString()}`);
-      const data = await res.json();
-      // HP 側でも正規化フィルタを適用（admin API がパラメータ未対応でも安全）
-      const normalProps = (data.properties ?? [])
+      // 通常検索: 「マンション」選択時は MANSION と NEW_MANSION を並列取得して結合
+      let mergedProperties: any[] = [];
+      let mergedTotal = 0;
+      let mergedTotalPages = 0;
+
+      if (selectedType === "MANSION") {
+        const [d1, d2] = await Promise.all([
+          fetchNormal("MANSION"),
+          fetchNormal("NEW_MANSION"),
+        ]);
+        const props1 = d1.properties ?? [];
+        const props2 = d2.properties ?? [];
+        mergedProperties = [...props1, ...props2];
+        mergedTotal =
+          (d1.total ?? props1.length) + (d2.total ?? props2.length);
+        mergedTotalPages = Math.max(d1.total_pages ?? 0, d2.total_pages ?? 0);
+      } else {
+        const data = await fetchNormal(selectedType);
+        mergedProperties = data.properties ?? [];
+        mergedTotal = data.total ?? mergedProperties.length;
+        mergedTotalPages = data.total_pages ?? 0;
+      }
+
+      // HP 側でも正規化フィルタを適用（admin が全種別を返した場合の保険）
+      const normalProps = mergedProperties
         .filter(matchesType)
         .map((p: any) => ({ ...p, _type: "normal" }));
 
       // REINS物件取得（ログイン時のみ）
       let reinsProps: any[] = [];
       if (isLoggedIn) {
+        const fetchReins = async (typeValue: string) => {
+          const p = new URLSearchParams();
+          if (selectedArea) p.set("area", selectedArea);
+          if (selectedLine) p.set("q", selectedLine);
+          if (pr.max) p.set("price_max", pr.max);
+          if (typeValue) p.set("property_type", typeValue);
+          p.set("limit", "9999");
+          const r = await fetch(`/api/reins?${p.toString()}`);
+          return r.json();
+        };
+
         try {
-          const reinsParams = new URLSearchParams();
-          if (selectedArea) reinsParams.set("area", selectedArea);
-          if (selectedLine) reinsParams.set("q", selectedLine);
-          if (pr.max) reinsParams.set("price_max", pr.max);
-          if (typeParamValue) reinsParams.set("property_type", typeParamValue);
-          reinsParams.set("limit", "9999");
-          const reinsRes = await fetch(`/api/reins?${reinsParams.toString()}`);
-          const reinsData = await reinsRes.json();
-          reinsProps = (reinsData.properties ?? [])
+          let reinsCombined: any[] = [];
+          if (selectedType === "MANSION") {
+            const [r1, r2] = await Promise.all([
+              fetchReins("MANSION"),
+              fetchReins("NEW_MANSION"),
+            ]);
+            reinsCombined = [
+              ...(r1.properties ?? []),
+              ...(r2.properties ?? []),
+            ];
+          } else {
+            const r = await fetchReins(selectedType);
+            reinsCombined = r.properties ?? [];
+          }
+          reinsProps = reinsCombined
             .filter(matchesType)
             .map((p: any) => ({
               ...p,
@@ -230,8 +276,8 @@ export default function PropertySearchClient() {
 
       const allProps = [...normalProps, ...reinsProps];
       setProperties(allProps);
-      setTotal((data.total ?? normalProps.length) + reinsProps.length);
-      setTotalPages(data.total_pages ?? 0);
+      setTotal(mergedTotal + reinsProps.length);
+      setTotalPages(mergedTotalPages);
     } catch {
       setProperties([]);
       setTotal(0);
