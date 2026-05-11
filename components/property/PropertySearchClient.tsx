@@ -105,13 +105,23 @@ function buildReinsTitle(p: any): string {
 /**
  * REINS物件が新築かどうかを判定する
  * 新築定義: 完成（築年月）から現在まで12ヶ月以内（宅建業法準拠）
- * building_month が不明な場合は1月として安全側（古め）に計算
+ *
+ * フィールド名の差異:
+ * - 自社物件（Property）: building_year / building_month
+ * - REINS物件（ReinsProperty）: built_year / built_year_text（"令和3年4月築" 等から月を抽出）
  */
 function isReinsNewConstruction(item: any): boolean {
-  const yr: number | null = item.building_year ?? null;
+  // 築年: REINSは built_year、自社物件は building_year（フォールバック）
+  const yr: number | null = item.built_year ?? item.building_year ?? null;
   if (yr === null) return false; // 築年不明は中古扱い
 
-  const month: number = item.building_month ?? 1;
+  // 築月: REINSは built_year_text から抽出、自社物件は building_month
+  // built_year_text 例: "令和3年4月築" → 4 を抽出
+  let month: number = item.building_month ?? 1;
+  if (item.built_year_text) {
+    const m = item.built_year_text.match(/(\d+)月/);
+    if (m) month = parseInt(m[1], 10);
+  }
 
   const now = new Date();
   const currentYear = now.getFullYear();
