@@ -218,6 +218,15 @@ export default function PropertySearchClient() {
       let mergedTotal = 0;
       let mergedTotalPages = 0;
 
+      const dedupeById = (arr: any[]) => {
+        const seen = new Set<string>();
+        return arr.filter((p) => {
+          if (!p?.id || seen.has(p.id)) return false;
+          seen.add(p.id);
+          return true;
+        });
+      };
+
       if (selectedType === "MANSION") {
         const [d1, d2] = await Promise.all([
           fetchNormal("MANSION"),
@@ -225,10 +234,12 @@ export default function PropertySearchClient() {
         ]);
         const props1 = d1.properties ?? [];
         const props2 = d2.properties ?? [];
-        mergedProperties = [...props1, ...props2];
-        mergedTotal =
-          (d1.total ?? props1.length) + (d2.total ?? props2.length);
-        mergedTotalPages = Math.max(d1.total_pages ?? 0, d2.total_pages ?? 0);
+        // admin が部分一致等で重複を返す可能性があるため ID で排除
+        mergedProperties = dedupeById([...props1, ...props2]);
+        // total は重複排除後の件数を採用（admin の合算 total では重複が二重に数えられる）
+        mergedTotal = mergedProperties.length;
+        // ページ数は重複排除後の件数 / limit で再計算
+        mergedTotalPages = Math.ceil(mergedTotal / 12) || 0;
       } else {
         const data = await fetchNormal(selectedType);
         mergedProperties = data.properties ?? [];
@@ -284,7 +295,30 @@ export default function PropertySearchClient() {
         } catch {}
       }
 
-      const allProps = [...normalProps, ...reinsProps];
+      // 表示順序のソート
+      // 共通: 通常物件 → REINS物件
+      // マンション選択時: 通常もREINSも、マンション建物紐づきあり → なし の順
+      const isMansionSearch = selectedType === "MANSION";
+
+      const sortedNormal = isMansionSearch
+        ? [
+            ...normalProps.filter(
+              (p: any) => p.mansion_building_id || p.building_name
+            ),
+            ...normalProps.filter(
+              (p: any) => !p.mansion_building_id && !p.building_name
+            ),
+          ]
+        : normalProps;
+
+      const sortedReins = isMansionSearch
+        ? [
+            ...reinsProps.filter((p: any) => p.building_name),
+            ...reinsProps.filter((p: any) => !p.building_name),
+          ]
+        : reinsProps;
+
+      const allProps = [...sortedNormal, ...sortedReins];
       setProperties(allProps);
       setTotal(mergedTotal + reinsProps.length);
       setTotalPages(mergedTotalPages);
