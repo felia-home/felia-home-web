@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Property } from "@/lib/api";
+import { formatLocation } from "@/lib/addressFormat";
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地",
@@ -50,8 +51,7 @@ export default function FeliaSelecitonSlider({
   const subImages = allImages.filter((_, i) => i !== selectedImageIndex).slice(0, 3);
   const typeLabel =
     PROPERTY_TYPE_MAP[p.property_type ?? p.propertyType ?? ""] ?? "";
-  const address =
-    [p.city, p.town].filter(Boolean).join("") || p.address || "";
+  const address = formatLocation(p) || "";
 
   return (
     <div style={{ position: "relative", width: "100%" }}>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getFeliaSectionProperties } from "@/lib/api";
 import type { Property } from "@/lib/api";
 import { PropertyImage } from "@/components/ui/PropertyImage";
+import { formatLocation } from "@/lib/addressFormat";
 
 export const revalidate = 60;
 
@@ -95,7 +96,7 @@ export default async function FeliaSelectionPage() {
 function FeliaSelectionCard({ property }: { property: Property }) {
   const mainImage = property.images?.[0]?.url ?? null;
   const propertyTypeLabel = PROPERTY_TYPE_MAP[property.property_type ?? ""] ?? "";
-  const address = [property.city, property.town].filter(Boolean).join("") || property.address || "";
+  const address = formatLocation(property) || "";
 
   return (
     <Link

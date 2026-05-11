@@ -8,6 +8,7 @@ import { MapPin, Train } from "lucide-react";
 import type { Property } from "@/lib/api";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import { isNewProperty, isPriceRevised } from "@/lib/propertyBadges";
+import { formatLocation } from "@/lib/addressFormat";
 
 interface Props {
   property: Property;
@@ -48,9 +49,7 @@ export function PropertyCard({ property, size = "normal", showFavoriteButton = f
   const displayTitle =
     isMansion && buildingName
       ? buildingName
-      : [property.city, property.town, property.address]
-          .filter(Boolean)
-          .join("") || "物件詳細";
+      : formatLocation(property) || "物件詳細";
 
   const typeLabel =
     PROPERTY_TYPE_LABELS[property.property_type ?? ""] ?? "";

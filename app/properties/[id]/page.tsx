@@ -14,6 +14,7 @@ import { AreaColumnAccordion } from "@/components/property/AreaColumnAccordion";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import PropertyViewBeacon from "@/components/PropertyViewBeacon";
 import { displayFeatures } from "@/lib/featureLabels";
+import { formatLocation } from "@/lib/addressFormat";
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
@@ -227,8 +228,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   if (isMansion && p.building_name) {
     displayTitle = `${p.building_name}${blockSuffix}`;
   } else if (isMansion) {
-    // マンション系で building_name が無い場合は従来通り住所表示
-    displayTitle = [p.city, p.town, p.address].filter(Boolean).join("") || "物件詳細";
+    // マンション系で building_name が無い場合は住所表示（address_display_level に従う）
+    displayTitle = formatLocation(p) || "物件詳細";
     if (p.building_block) displayTitle = `${displayTitle}${blockSuffix}`;
   } else {
     // 戸建て・土地系: address は出さず city+town に block を付ける

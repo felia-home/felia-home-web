@@ -7,6 +7,7 @@ import {
 } from "@/lib/api";
 import type { Property } from "@/lib/api";
 import { PropertyImage } from "@/components/ui/PropertyImage";
+import { formatLocation } from "@/lib/addressFormat";
 
 // searchParams を確実に反映するため毎回サーバ実行（ISR キャッシュ無効化）
 export const dynamic = "force-dynamic";
@@ -159,7 +160,7 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
 function PropertyCard({ property }: { property: Property }) {
   const mainImage = (property.images as any)?.[0]?.url ?? null;
   const typeLabel = PROPERTY_TYPE_MAP[property.property_type ?? ""] ?? "";
-  const location = [property.city, property.town].filter(Boolean).join("") || property.address || "";
+  const location = formatLocation(property) || "";
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return "";

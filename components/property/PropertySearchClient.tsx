@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
+import { formatLocation } from "@/lib/addressFormat";
 import Link from "next/link";
 
 const PROPERTY_TYPES = [
@@ -84,6 +85,7 @@ interface Property {
   station_name3: string | null;
   station_walk3: number | null;
   building_year: number | null;
+  address_display_level?: string | null;
   images: { id: string; url: string; is_main: boolean }[];
   is_felia_selection: boolean;
   is_open_house: boolean;
@@ -760,9 +762,7 @@ function PropertyCard({ property }: { property: Property }) {
   const displayTitle =
     isMansion && buildingName
       ? buildingName
-      : [property.city, property.town, property.address]
-          .filter(Boolean)
-          .join("") || "物件詳細";
+      : formatLocation(property) || "物件詳細";
 
   return (
     <Link

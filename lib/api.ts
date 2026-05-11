@@ -381,6 +381,7 @@ export interface Property {
   published_members?: boolean | null;
   price_changed_at?: string | null;
   price_revised?: boolean | null;
+  address_display_level?: string | null;
 }
 
 export interface OpenHouse {
