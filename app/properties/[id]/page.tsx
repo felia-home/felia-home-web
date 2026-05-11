@@ -339,9 +339,9 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
       {/* ③ 360度ツアー */}
       {tourUrl && (
-        <div style={{ backgroundColor: "#fff", padding: "0 24px 24px" }}>
-          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ borderTop: "1px solid #e8e8e8", paddingTop: "20px" }}>
+        <div style={{ backgroundColor: "#fff" }}>
+          <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+            <div style={{ borderTop: "1px solid #e8e8e8", paddingTop: "20px", paddingBottom: "24px" }}>
               <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#333", margin: "0 0 12px", display: "flex", alignItems: "center", gap: "8px" }}>
                 <span>🔭</span> 360°バーチャルツアー
               </h2>
