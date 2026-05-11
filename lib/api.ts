@@ -61,25 +61,34 @@ export async function getPropertyById(id: string): Promise<Property | null> {
     if (!property) return null;
 
     // 全画像を /images エンドポイントから取得（caption・order含む）
+    let combinedImages: any[] = [];
     try {
       const imgRes = await fetchFromAdmin<{ images: any[] }>(`/api/properties/${id}/images`);
-      const images = (imgRes as any).images ?? [];
-      if (images.length > 0) {
-        // URL重複の防御（DBにPropertyImageが二重登録されていた場合に備える）
-        const seenUrls = new Set<string>();
-        const unique = images.filter((img: any) => {
-          if (!img?.url || seenUrls.has(img.url)) return false;
-          seenUrls.add(img.url);
-          return true;
-        });
-        property.images = unique
-          .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-          .map((img: any) => ({
-            ...img,
-            caption: img.caption ?? img.ai_caption ?? null,
-          }));
-      }
+      combinedImages = (imgRes as any).images ?? [];
     } catch {}
+
+    // マンション建物画像（property.mansion_building.images が返る場合に結合）
+    const mansionBuildingImages: any[] =
+      (property as any).mansion_building?.images ?? [];
+    if (mansionBuildingImages.length > 0) {
+      combinedImages = [...combinedImages, ...mansionBuildingImages];
+    }
+
+    if (combinedImages.length > 0) {
+      // URL重複の防御（PropertyImage二重登録 / MansionBuilding画像との重複に備える）
+      const seenUrls = new Set<string>();
+      const unique = combinedImages.filter((img: any) => {
+        if (!img?.url || seenUrls.has(img.url)) return false;
+        seenUrls.add(img.url);
+        return true;
+      });
+      property.images = unique
+        .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
+        .map((img: any) => ({
+          ...img,
+          caption: img.caption ?? img.ai_caption ?? null,
+        }));
+    }
 
     return property;
   } catch {

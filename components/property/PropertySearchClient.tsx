@@ -92,6 +92,10 @@ interface Property {
 }
 
 function buildReinsTitle(p: any): string {
+  // マンションは building_name を優先
+  if (p.source_type === "MANSION" && p.building_name) {
+    return p.building_name;
+  }
   const location = [p.area, p.town ?? p.address].filter(Boolean).join(" ");
   const type = p.property_type ?? "";
   const price = p.price != null ? ` ${p.price.toLocaleString()}万円` : "";
