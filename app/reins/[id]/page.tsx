@@ -65,8 +65,9 @@ export default function ReinsDetailPage() {
   // 近隣物件取得（property がセットされてから実行）
   useEffect(() => {
     if (!property?.id) return;
-    const propLat = property.latitude ?? property.lat;
-    const propLng = property.longitude ?? property.lng;
+    // REINS自身には座標なし。紐づいた MansionBuilding の座標を使用
+    const propLat = property.mansion_building?.latitude ?? null;
+    const propLng = property.mansion_building?.longitude ?? null;
     const targetType =
       property.source_type === "MANSION"
         ? "MANSION"
@@ -240,8 +241,9 @@ export default function ReinsDetailPage() {
 
             {/* 地図・周辺情報 + 近隣物件 */}
             {(() => {
-              const propLat = property.latitude ?? property.lat;
-              const propLng = property.longitude ?? property.lng;
+              // REINS自身には座標なし。紐づいた MansionBuilding の座標を使用
+              const propLat = property.mansion_building?.latitude ?? null;
+              const propLng = property.mansion_building?.longitude ?? null;
               const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
               const mapSrc =
                 mapsKey && propLat && propLng
