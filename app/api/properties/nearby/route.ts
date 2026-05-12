@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const adminUrl = new URL(`${process.env.ADMIN_API_URL}/api/properties/nearby`);
-  ["lat", "lng", "limit", "exclude_id", "city"].forEach((k) => {
+  ["lat", "lng", "limit", "exclude_id", "city", "type", "priceMin", "priceMax"].forEach((k) => {
     const v = searchParams.get(k);
     if (v) adminUrl.searchParams.set(k, v);
   });

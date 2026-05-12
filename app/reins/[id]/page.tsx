@@ -8,6 +8,7 @@ import Link from "next/link";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import LoanSimulator from "@/components/property/LoanSimulator";
+import PropertyGallery from "@/components/property/PropertyGallery";
 
 function buildReinsTitle(p: any): string {
   // マンションは building_name を優先
@@ -36,6 +37,7 @@ export default function ReinsDetailPage() {
   const [property, setProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [contactPhone, setContactPhone] = useState("03-5981-8601");
+  const [nearbyProperties, setNearbyProperties] = useState<any[]>([]);
 
   const status = session?.status ?? "loading";
 
@@ -52,12 +54,49 @@ export default function ReinsDetailPage() {
       fetch("/api/company-info").then((r) => r.json()),
     ])
       .then(([propData, compData]) => {
-        setProperty(propData.property ?? propData);
+        const p = propData.property ?? propData;
+        setProperty(p);
         if (compData.company?.phone) setContactPhone(compData.company.phone);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [status, id]);
+
+  // 近隣物件取得（property がセットされてから実行）
+  useEffect(() => {
+    if (!property?.id) return;
+    const propLat = property.latitude ?? property.lat;
+    const propLng = property.longitude ?? property.lng;
+    const targetType =
+      property.source_type === "MANSION"
+        ? "MANSION"
+        : property.source_type === "LAND"
+          ? "LAND"
+          : "NEW_HOUSE";
+
+    const nearbyParams = new URLSearchParams();
+    if (propLat && propLng) {
+      nearbyParams.set("lat", String(propLat));
+      nearbyParams.set("lng", String(propLng));
+    } else if (property.area) {
+      nearbyParams.set("city", property.area);
+    } else {
+      return;
+    }
+    nearbyParams.set("limit", "4");
+    nearbyParams.set("exclude_id", property.id);
+    nearbyParams.set("type", targetType);
+
+    fetch(`/api/properties/nearby?${nearbyParams.toString()}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const items = (data.properties ?? []).filter(
+          (np: any) => np.id !== property.id
+        );
+        setNearbyProperties(items.slice(0, 4));
+      })
+      .catch(() => {});
+  }, [property]);
 
   if (status === "loading" || status === "unauthenticated" || loading) {
     return (
@@ -133,70 +172,41 @@ export default function ReinsDetailPage() {
         </div>
       </div>
 
-      {/* 画像ギャラリー */}
+      {/* 画像ギャラリー（通常物件詳細と同じ PropertyGallery を使用） */}
       {(() => {
         // 表示画像の優先順位:
         //   1) mansion_building.exterior_images（マンション外観写真）
         //   2) property.images（「広告写真準備中」プレースホルダーは除外）
         const mansionImgs = (property.mansion_building?.exterior_images ?? []).map(
-          (img: { url: string; is_primary?: boolean; caption?: string | null }) => ({
+          (img: { url: string; is_primary?: boolean; caption?: string | null }, idx: number) => ({
+            id: `mb-${idx}`,
             url: img.url,
+            is_main: !!img.is_primary,
+            order: idx,
             caption: img.caption ?? null,
-            is_primary: !!img.is_primary,
           })
         );
-        const ownImgs = ((property.images ?? []) as { url: string }[])
-          .filter(
-            (img) =>
-              img?.url &&
-              !img.url.toLowerCase().includes("preparation")
-          )
-          .map((img) => ({ url: img.url, caption: null, is_primary: false }));
-        const displayImages = [...mansionImgs, ...ownImgs];
-
-        if (displayImages.length === 0) {
-          return (
-            <div style={{ backgroundColor: "#fff" }}>
-              <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-                <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#111" }}>
-                  <PropertyImage src={null} alt={displayTitle} seed={property.id} sizes="100vw" style={{ objectFit: "contain" }} />
-                </div>
-              </div>
-            </div>
-          );
-        }
+        const ownImgs = ((property.images ?? []) as { url: string; id?: string }[])
+          .filter((img) => img?.url && !img.url.toLowerCase().includes("preparation"))
+          .map((img, idx: number) => ({
+            id: img.id ?? `img-${idx}`,
+            url: img.url,
+            is_main: false,
+            order: 1000 + idx,
+            caption: null,
+          }));
+        const galleryImages = [...mansionImgs, ...ownImgs];
 
         return (
           <div style={{ backgroundColor: "#fff" }}>
-            <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px 24px" }}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                  gap: "8px",
-                }}
-              >
-                {displayImages.map((img, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      position: "relative",
-                      aspectRatio: "4/3",
-                      overflow: "hidden",
-                      borderRadius: "8px",
-                      backgroundColor: "#f0f0f0",
-                    }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={img.url}
-                      alt={img.caption ?? `${displayTitle} 写真${i + 1}`}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      loading={i === 0 ? "eager" : "lazy"}
-                    />
-                  </div>
-                ))}
-              </div>
+            <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+              {galleryImages.length > 0 ? (
+                <PropertyGallery images={galleryImages} title={displayTitle} />
+              ) : (
+                <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#111" }}>
+                  <PropertyImage src={null} alt={displayTitle} seed={property.id} sizes="100vw" style={{ objectFit: "contain" }} />
+                </div>
+              )}
             </div>
           </div>
         );
@@ -227,6 +237,87 @@ export default function ReinsDetailPage() {
                 ))}
               </div>
             </div>
+
+            {/* 地図・周辺情報 + 近隣物件 */}
+            {(() => {
+              const propLat = property.latitude ?? property.lat;
+              const propLng = property.longitude ?? property.lng;
+              const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+              const mapSrc =
+                mapsKey && propLat && propLng
+                  ? `https://www.google.com/maps/embed/v1/place?key=${mapsKey}&q=${propLat},${propLng}&zoom=15`
+                  : null;
+
+              if (!mapSrc && nearbyProperties.length === 0) return null;
+
+              return (
+                <div style={{ backgroundColor: "#fff", borderRadius: "12px", border: "1px solid #e8e8e8", overflow: "hidden" }}>
+                  <div style={{ backgroundColor: "#f8f8f8", padding: "14px 20px", borderBottom: "1px solid #e8e8e8" }}>
+                    <h2 style={{ fontSize: "15px", fontWeight: "bold", color: "#333", margin: 0 }}>地図・周辺情報</h2>
+                  </div>
+                  <div style={{ padding: "20px" }}>
+                    {mapSrc ? (
+                      <div style={{ position: "relative", paddingBottom: "60%", height: 0, overflow: "hidden", borderRadius: "8px", marginBottom: nearbyProperties.length > 0 ? "20px" : 0 }}>
+                        <iframe
+                          src={mapSrc}
+                          style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                        />
+                      </div>
+                    ) : (
+                      <div style={{ backgroundColor: "#f0f0f0", borderRadius: "8px", padding: "32px", textAlign: "center", marginBottom: nearbyProperties.length > 0 ? "20px" : 0, color: "#aaa", fontSize: "13px" }}>
+                        📍 {location || "地図情報準備中"}
+                      </div>
+                    )}
+
+                    {nearbyProperties.length > 0 && (
+                      <div>
+                        <h3 style={{ fontSize: "14px", fontWeight: "bold", color: "#333", margin: "0 0 12px" }}>
+                          近隣の物件
+                        </h3>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                          {nearbyProperties.map((np: any) => (
+                            <Link
+                              key={np.id}
+                              href={`/properties/${np.id}`}
+                              style={{ textDecoration: "none", color: "inherit" }}
+                            >
+                              <div style={{
+                                display: "flex", gap: "12px", alignItems: "center",
+                                padding: "12px", borderRadius: "8px",
+                                border: "1px solid #e8e8e8", backgroundColor: "#fafafa",
+                                transition: "background-color 0.15s ease",
+                              }}>
+                                <div style={{ width: "72px", height: "54px", borderRadius: "6px", overflow: "hidden", flexShrink: 0, position: "relative" }}>
+                                  <PropertyImage
+                                    src={np.images?.[0]?.url ?? null}
+                                    alt={np.title ?? "物件"}
+                                    seed={np.id}
+                                    sizes="72px"
+                                  />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <p style={{ fontSize: "12px", color: "#333", fontWeight: "bold", margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    {np.title ?? `${np.city ?? ""}${np.town ?? ""}`}
+                                  </p>
+                                  {np.price != null && (
+                                    <p style={{ fontSize: "13px", color: "#5BAD52", fontWeight: "bold", margin: 0 }}>
+                                      {np.price.toLocaleString()}万円
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* 注意事項 */}
             <div style={{ padding: "16px 20px", backgroundColor: "#faf8f4", borderRadius: "8px", border: "1px solid #e0dbd4" }}>
