@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import { formatLocation } from "@/lib/addressFormat";
@@ -180,6 +181,12 @@ function isReinsNewConstruction(item: any): boolean {
 export default function PropertySearchClient() {
   const session = useSession();
   const isLoggedIn = session?.status === "authenticated";
+  const sessionLoaded = session?.status !== "loading";
+
+  // URL → state 初期化（ブラウザ戻る・進むで条件が復元される）
+  const urlParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const [properties, setProperties] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
@@ -188,13 +195,17 @@ export default function PropertySearchClient() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  // 検索条件
-  const [keyword, setKeyword] = useState("");
-  const [selectedType, setSelectedType] = useState("");
-  const [selectedPriceRange, setSelectedPriceRange] = useState(0);
-  const [selectedArea, setSelectedArea] = useState("");
-  const [selectedLine, setSelectedLine] = useState("");
-  const [conditions, setConditions] = useState<string[]>([]);
+  // 検索条件（URL から初期値を取得）
+  const [keyword, setKeyword] = useState(urlParams.get("keyword") ?? "");
+  const [selectedType, setSelectedType] = useState(urlParams.get("type") ?? "");
+  const [selectedPriceRange, setSelectedPriceRange] = useState(
+    Number(urlParams.get("price") ?? 0) || 0
+  );
+  const [selectedArea, setSelectedArea] = useState(urlParams.get("area") ?? "");
+  const [selectedLine, setSelectedLine] = useState(urlParams.get("line") ?? "");
+  const [conditions, setConditions] = useState<string[]>(
+    (urlParams.get("cond") ?? "").split(",").filter(Boolean)
+  );
 
   // アコーディオン開閉
   const [openArea, setOpenArea] = useState(false);
@@ -250,6 +261,19 @@ export default function PropertySearchClient() {
     setLoading(true);
     setSearched(true);
     setCurrentPage(page);
+
+    // 検索条件を URL に反映（ブラウザ戻る・進むで復元できるように）
+    const urlSync = new URLSearchParams();
+    if (keyword.trim()) urlSync.set("keyword", keyword.trim());
+    if (selectedType) urlSync.set("type", selectedType);
+    if (selectedPriceRange > 0) urlSync.set("price", String(selectedPriceRange));
+    if (selectedArea) urlSync.set("area", selectedArea);
+    if (selectedLine) urlSync.set("line", selectedLine);
+    if (conditions.length > 0) urlSync.set("cond", conditions.join(","));
+    const queryStr = urlSync.toString();
+    router.replace(queryStr ? `${pathname}?${queryStr}` : pathname, {
+      scroll: false,
+    });
 
     // 物件種別フィルタ（HP 側で厳密判定）。
     // admin の property_type フィルタが部分一致等で不正確な可能性があるため、
@@ -450,8 +474,12 @@ export default function PropertySearchClient() {
     }
   }, [keyword, selectedType, selectedPriceRange, selectedArea, selectedLine, conditions, isLoggedIn]);
 
-  // 初回
-  useEffect(() => { doSearch(1); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // 初回: session の loading が解消されてから検索開始（REINS は会員のみ取得のため）
+  // sessionLoaded が変わったときに 1 回だけ doSearch を実行する
+  useEffect(() => {
+    if (sessionLoaded) doSearch(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionLoaded]);
 
   const reset = () => {
     setKeyword("");
