@@ -91,6 +91,39 @@ interface Property {
   is_open_house: boolean;
 }
 
+// REINS物件のローカル型（admin /api/hp/reins が返す形）
+// admin が将来 mansion_building を embed することを見越して定義
+interface ReinsItem {
+  id: string;
+  source_type?: string; // HOUSE / MANSION / LAND
+  property_type?: string;
+  title?: string | null;
+  area?: string | null;
+  city?: string | null;
+  town?: string | null;
+  address?: string | null;
+  building_name?: string | null;
+  price?: number | null;
+  rooms?: string | null;
+  area_m2?: number | null;
+  area_build_m2?: number | null;
+  area_land_m2?: number | null;
+  built_year?: number | null;
+  built_year_text?: string | null;
+  station_line?: string | null;
+  station_name?: string | null;
+  walk_minutes?: number | null;
+  images?: { id?: string; url: string; is_main?: boolean }[];
+  thumbnail_url?: string | null;
+  exterior_images?: { url: string; is_primary?: boolean }[];
+  mansion_building_id?: string | null;
+  mansion_building?: {
+    id: string;
+    building_name?: string | null;
+    exterior_images?: { url: string; is_primary?: boolean; caption?: string | null }[];
+  } | null;
+}
+
 function buildReinsTitle(p: any): string {
   // マンションは building_name を優先
   if (p.source_type === "MANSION" && p.building_name) {
@@ -348,7 +381,8 @@ export default function PropertySearchClient() {
       // 共通: 通常物件 → REINS物件
       // マンション選択時: 通常もREINSも、マンション建物紐づきあり → なし の順
       // ※ REINS には mansion_building_id が無いため building_name 有無で判定する
-      const isMansionSearch = selectedType === "MANSION";
+      const isMansionSearch =
+        selectedType === "MANSION" || selectedType === "NEW_MANSION";
       // admin が REINS レスポンスに mansion_building を embed した場合の id も判定対象
       const hasMansionLink = (item: any) =>
         !!(item.mansion_building?.id || item.mansion_building_id || item.building_name);
