@@ -392,8 +392,11 @@ export default function PropertySearchClient() {
         return ownImages + mansionImages;
       };
       const isSelection = (p: any) => !!p.is_felia_selection;
+      // 紐づき判定は mansion_building 実体の有無のみで行う。
+      // building_name は admin 側の自由入力で MansionBuilding と紐づいていない場合があるため
+      // 「紐づきあり」の根拠としては不十分。よって除外する。
       const hasMansionLink = (p: any) =>
-        !!(p.mansion_building?.id || p.mansion_building_id || p.building_name);
+        !!(p.mansion_building?.id || p.mansion_building_id);
       const byPublishedAt = (a: any, b: any) => {
         const dateA = a.published_at ? new Date(a.published_at).getTime() : 0;
         const dateB = b.published_at ? new Date(b.published_at).getTime() : 0;
