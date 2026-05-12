@@ -377,29 +377,56 @@ export default function PropertySearchClient() {
         } catch {}
       }
 
-      // 表示順序のソート
-      // 共通: 通常物件 → REINS物件
-      // マンション選択時: 通常もREINSも、マンション建物紐づきあり → なし の順
-      // ※ REINS には mansion_building_id が無いため building_name 有無で判定する
-      const isMansionSearch =
-        selectedType === "MANSION" || selectedType === "NEW_MANSION";
-      // admin が REINS レスポンスに mansion_building を embed した場合の id も判定対象
-      const hasMansionLink = (item: any) =>
-        !!(item.mansion_building?.id || item.mansion_building_id || item.building_name);
+      // 表示順序のソート（全種別共通の優先度ルール）
+      // 1位: フェリアセレクション（通常物件のみ）
+      // 2位: 写真10枚以上の通常物件
+      // 3位: 写真5枚以上10枚未満の通常物件
+      // 4位: その他の通常物件（写真5枚未満）
+      // 5位: REINS紐づき物件（mansion_building or building_name）
+      // 6位: その他のREINS物件
+      // 同一グループ内は published_at 降順（新着優先）
+      const getPhotoCount = (item: any): number => {
+        const ownImages: number = item.images?.length ?? 0;
+        const mansionImages: number =
+          item.mansion_building?.exterior_images?.length ?? 0;
+        return ownImages + mansionImages;
+      };
+      const isSelection = (p: any) => !!p.is_felia_selection;
+      const hasMansionLink = (p: any) =>
+        !!(p.mansion_building?.id || p.mansion_building_id || p.building_name);
+      const byPublishedAt = (a: any, b: any) => {
+        const dateA = a.published_at ? new Date(a.published_at).getTime() : 0;
+        const dateB = b.published_at ? new Date(b.published_at).getTime() : 0;
+        return dateB - dateA; // 降順（新着優先）
+      };
 
-      const sortedNormal = isMansionSearch
-        ? [
-            ...normalProps.filter(hasMansionLink),
-            ...normalProps.filter((item: any) => !hasMansionLink(item)),
-          ]
-        : normalProps;
+      const normalSelection = normalProps
+        .filter((p: any) => isSelection(p))
+        .sort(byPublishedAt);
+      const normalPhoto10 = normalProps
+        .filter((p: any) => !isSelection(p) && getPhotoCount(p) >= 10)
+        .sort(byPublishedAt);
+      const normalPhoto5 = normalProps
+        .filter(
+          (p: any) =>
+            !isSelection(p) && getPhotoCount(p) >= 5 && getPhotoCount(p) < 10
+        )
+        .sort(byPublishedAt);
+      const normalOther = normalProps
+        .filter((p: any) => !isSelection(p) && getPhotoCount(p) < 5)
+        .sort(byPublishedAt);
 
-      const sortedReins = isMansionSearch
-        ? [
-            ...reinsProps.filter(hasMansionLink),
-            ...reinsProps.filter((item: any) => !hasMansionLink(item)),
-          ]
-        : reinsProps;
+      const sortedNormal = [
+        ...normalSelection,
+        ...normalPhoto10,
+        ...normalPhoto5,
+        ...normalOther,
+      ];
+
+      const reinsLinked = reinsProps.filter(hasMansionLink);
+      const reinsOther = reinsProps.filter((p: any) => !hasMansionLink(p));
+
+      const sortedReins = [...reinsLinked, ...reinsOther];
 
       const allItems = [...sortedNormal, ...sortedReins];
 
