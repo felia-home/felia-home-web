@@ -133,14 +133,74 @@ export default function ReinsDetailPage() {
         </div>
       </div>
 
-      {/* 画像 */}
-      <div style={{ backgroundColor: "#fff" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#111" }}>
-            <PropertyImage src={null} alt={displayTitle} seed={property.id} sizes="100vw" style={{ objectFit: "contain" }} />
+      {/* 画像ギャラリー */}
+      {(() => {
+        // 表示画像の優先順位:
+        //   1) mansion_building.exterior_images（マンション外観写真）
+        //   2) property.images（「広告写真準備中」プレースホルダーは除外）
+        const mansionImgs = (property.mansion_building?.exterior_images ?? []).map(
+          (img: { url: string; is_primary?: boolean; caption?: string | null }) => ({
+            url: img.url,
+            caption: img.caption ?? null,
+            is_primary: !!img.is_primary,
+          })
+        );
+        const ownImgs = ((property.images ?? []) as { url: string }[])
+          .filter(
+            (img) =>
+              img?.url &&
+              !img.url.toLowerCase().includes("preparation")
+          )
+          .map((img) => ({ url: img.url, caption: null, is_primary: false }));
+        const displayImages = [...mansionImgs, ...ownImgs];
+
+        if (displayImages.length === 0) {
+          return (
+            <div style={{ backgroundColor: "#fff" }}>
+              <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+                <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#111" }}>
+                  <PropertyImage src={null} alt={displayTitle} seed={property.id} sizes="100vw" style={{ objectFit: "contain" }} />
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div style={{ backgroundColor: "#fff" }}>
+            <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px 24px" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                  gap: "8px",
+                }}
+              >
+                {displayImages.map((img, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      position: "relative",
+                      aspectRatio: "4/3",
+                      overflow: "hidden",
+                      borderRadius: "8px",
+                      backgroundColor: "#f0f0f0",
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={img.url}
+                      alt={img.caption ?? `${displayTitle} 写真${i + 1}`}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      loading={i === 0 ? "eager" : "lazy"}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* メインコンテンツ */}
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 24px 80px" }}>
