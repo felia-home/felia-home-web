@@ -1037,12 +1037,15 @@ function ReinsSearchCard({ property }: { property: any }) {
   const area = property.area_build_m2 ?? property.area_m2 ?? property.area_land_m2;
 
   // REINS 物件のサムネイル取得（優先順位）
-  // 1) 通常画像 images[0].url
-  // 2) マンション建物外観 mansion_building.exterior_images[0].url
-  // 3) 直接サムネイル thumbnail_url
+  // 1) マンション建物外観 mansion_building.exterior_images[0].url（紐づき優先）
+  // 2) REINS 自身の画像 images[0].url
+  // 3) 物件直下の exterior_images
+  // 4) 直接サムネイル thumbnail_url
+  // ※ REINS の images は「広告写真準備中」プレースホルダーの場合があるため、
+  //   マンション紐づきの外観写真を最優先する
   const reinsThumb: string | null =
-    property.images?.[0]?.url ??
     property.mansion_building?.exterior_images?.[0]?.url ??
+    property.images?.[0]?.url ??
     property.exterior_images?.[0]?.url ??
     property.thumbnail_url ??
     null;
