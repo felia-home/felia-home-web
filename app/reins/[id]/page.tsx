@@ -120,6 +120,34 @@ export default function ReinsDetailPage() {
   const location = [property.area, property.town ?? property.address].filter(Boolean).join(" ");
   const area = property.area_build_m2 ?? property.area_exclusive_m2 ?? property.area_m2 ?? property.area_land_m2;
 
+  // マンション判定（source_type または property_type 文字列を見る）
+  const isMansion =
+    property.source_type === "MANSION" ||
+    (property.property_type ?? "").includes("マンション");
+
+  // マンション系スペックは REINS 自身 → mansion_building の順でフォールバック
+  const floorUnit: number | null =
+    property.floor_unit ?? property.mansion_building?.floor_unit ?? null;
+  const floorsTotal: number | null =
+    property.floors_total ?? property.mansion_building?.floors_total ?? null;
+  const floorsUnder: number | null =
+    property.floors_underground ??
+    property.mansion_building?.floors_underground ??
+    null;
+  const structure: string | null =
+    property.structure ?? property.mansion_building?.structure ?? null;
+  const totalUnits: number | null =
+    property.total_units ?? property.mansion_building?.total_units ?? null;
+
+  // 所在階表示文字列を組み立て
+  const floorDisplay = (() => {
+    const parts: string[] = [];
+    if (floorUnit) parts.push(`${floorUnit}階`);
+    if (floorsTotal) parts.push(`地上${floorsTotal}階建`);
+    if (floorsUnder) parts.push(`地下${floorsUnder}階`);
+    return parts.length > 0 ? parts.join(" / ") : null;
+  })();
+
   const specs: { label: string; value: string | null }[] = [
     { label: "物件種別", value: property.property_type ?? null },
     { label: "販売価格", value: property.price != null ? `${property.price.toLocaleString()}万円` : null },
@@ -127,9 +155,20 @@ export default function ReinsDetailPage() {
     { label: "最寄駅", value: property.station_name ? `${property.station_line ?? ""} ${property.station_name}駅 徒歩${property.walk_minutes ?? "?"}分` : null },
     { label: "間取り", value: property.rooms ?? null },
     { label: "面積", value: area ? `${area}㎡` : null },
-    { label: "土地面積", value: property.area_land_m2 ? `${property.area_land_m2}㎡` : null },
+    // 土地面積: マンションでは非表示
+    ...(isMansion
+      ? []
+      : [{ label: "土地面積", value: property.area_land_m2 ? `${property.area_land_m2}㎡` : null }]),
     { label: "建物面積", value: property.area_build_m2 ? `${property.area_build_m2}㎡` : null },
     { label: "専有面積", value: property.area_exclusive_m2 ? `${property.area_exclusive_m2}㎡` : null },
+    // マンション系スペック
+    ...(isMansion
+      ? [
+          { label: "所在階", value: floorDisplay },
+          { label: "構造", value: structure },
+          { label: "総戸数", value: totalUnits ? `${totalUnits}戸` : null },
+        ]
+      : []),
     { label: "築年月", value: cleanBuiltYear(property.built_year_text) },
     { label: "用途地域", value: property.use_zone ?? null },
     { label: "取引態様", value: property.transaction_type ?? null },
