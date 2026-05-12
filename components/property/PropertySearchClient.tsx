@@ -116,11 +116,21 @@ function isReinsNewConstruction(item: any): boolean {
   if (yr === null) return false; // 築年不明は中古扱い
 
   // 築月: REINSは built_year_text から抽出、自社物件は building_month
-  // built_year_text 例: "令和3年4月築" → 4 を抽出
+  // built_year_text 実フォーマット例:
+  //   "1995年（平成 7年） 1"   → ） の後ろが月
+  //   "2026年（令和 8年） 6"
+  //   "令和3年4月築"           → "4月" のように月文字あり（旧フォーマット保険）
   let month: number = item.building_month ?? 1;
   if (item.built_year_text) {
-    const m = item.built_year_text.match(/(\d+)月/);
-    if (m) month = parseInt(m[1], 10);
+    // パターン1: "） 6" のように ） の後に月数字（実フォーマット）
+    const m1 = item.built_year_text.match(/[）]\s*(\d{1,2})\s*$/);
+    // パターン2: "6月" のように月文字あり（旧フォーマット保険）
+    const m2 = item.built_year_text.match(/(\d{1,2})月/);
+    const matched = m1 ?? m2;
+    if (matched) {
+      const parsed = parseInt(matched[1], 10);
+      if (parsed >= 1 && parsed <= 12) month = parsed; // 1〜12 の範囲チェック
+    }
   }
 
   const now = new Date();
