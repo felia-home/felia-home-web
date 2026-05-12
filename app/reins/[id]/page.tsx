@@ -125,26 +125,29 @@ export default function ReinsDetailPage() {
     property.source_type === "MANSION" ||
     (property.property_type ?? "").includes("マンション");
 
-  // マンション系スペックは REINS 自身 → mansion_building の順でフォールバック
-  const floorUnit: number | null =
-    property.floor_unit ?? property.mansion_building?.floor_unit ?? null;
+  // マンション系スペック（admin 確認済みのフィールド名）
+  const floorNum: number | null = property.floor ?? null; // 所在階（REINS本体）
   const floorsTotal: number | null =
-    property.floors_total ?? property.mansion_building?.floors_total ?? null;
-  const floorsUnder: number | null =
-    property.floors_underground ??
-    property.mansion_building?.floors_underground ??
-    null;
+    property.mansion_building?.floors_total ?? null; // 総階数
+  const floorsBase: number | null =
+    property.mansion_building?.floors_basement ?? null; // 地下階数
   const structure: string | null =
-    property.structure ?? property.mansion_building?.structure ?? null;
+    property.mansion_building?.structure ?? null; // 構造
   const totalUnits: number | null =
-    property.total_units ?? property.mansion_building?.total_units ?? null;
+    property.mansion_building?.total_units ?? null; // 総戸数
+  const mgmtFee: number | null = property.management_fee ?? null; // 管理費
+  const repairRes: number | null =
+    property.mansion_building?.repair_reserve ?? null; // 修繕積立金
+  const mgmtType: string | null =
+    property.mansion_building?.management_type ?? null; // 管理形態
+  const direction: string | null = property.direction ?? null; // バルコニー向き
 
   // 所在階表示文字列を組み立て
   const floorDisplay = (() => {
     const parts: string[] = [];
-    if (floorUnit) parts.push(`${floorUnit}階`);
+    if (floorNum) parts.push(`${floorNum}階`);
     if (floorsTotal) parts.push(`地上${floorsTotal}階建`);
-    if (floorsUnder) parts.push(`地下${floorsUnder}階`);
+    if (floorsBase) parts.push(`地下${floorsBase}階`);
     return parts.length > 0 ? parts.join(" / ") : null;
   })();
 
@@ -156,9 +159,9 @@ export default function ReinsDetailPage() {
     { label: "間取り", value: property.rooms ?? null },
     { label: "面積", value: area ? `${area}㎡` : null },
     // 土地面積: マンションでは非表示
-    ...(isMansion
-      ? []
-      : [{ label: "土地面積", value: property.area_land_m2 ? `${property.area_land_m2}㎡` : null }]),
+    ...(!isMansion
+      ? [{ label: "土地面積", value: property.area_land_m2 ? `${property.area_land_m2}㎡` : null }]
+      : []),
     { label: "建物面積", value: property.area_build_m2 ? `${property.area_build_m2}㎡` : null },
     { label: "専有面積", value: property.area_exclusive_m2 ? `${property.area_exclusive_m2}㎡` : null },
     // マンション系スペック
@@ -167,6 +170,10 @@ export default function ReinsDetailPage() {
           { label: "所在階", value: floorDisplay },
           { label: "構造", value: structure },
           { label: "総戸数", value: totalUnits ? `${totalUnits}戸` : null },
+          { label: "管理費", value: mgmtFee ? `${mgmtFee.toLocaleString()}円/月` : null },
+          { label: "修繕積立金", value: repairRes ? `${repairRes.toLocaleString()}円/月` : null },
+          { label: "管理形態", value: mgmtType },
+          { label: "バルコニー向き", value: direction },
         ]
       : []),
     { label: "築年月", value: cleanBuiltYear(property.built_year_text) },
