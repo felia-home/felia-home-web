@@ -15,6 +15,7 @@ import { FavoriteButton } from "@/components/ui/FavoriteButton";
 import PropertyViewBeacon from "@/components/PropertyViewBeacon";
 import { displayFeatures } from "@/lib/featureLabels";
 import { formatLocation } from "@/lib/addressFormat";
+import { calcDisplayDateRange, formatDateJP } from "@/lib/openHouseUtils";
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
@@ -342,6 +343,41 @@ export default async function PropertyDetailPage({ params }: PageProps) {
               {p.catch_copy}
             </p>
           )}
+
+          {/* ① -2 現地販売会バナー */}
+          {p.is_open_house && (() => {
+            const range = calcDisplayDateRange(p.open_house_start, p.open_house_end);
+            // 終了済み or 日付不正の場合はバナー非表示
+            if (!range && (p.open_house_start || p.open_house_end)) return null;
+            const dateLabel = range
+              ? `${formatDateJP(range.from)} 〜 ${formatDateJP(range.to)}`
+              : null;
+            return (
+              <div style={{
+                background: "linear-gradient(135deg, #e67e22 0%, #f39c12 100%)",
+                color: "#fff",
+                borderRadius: "8px",
+                padding: "16px 20px",
+                margin: "16px 0 0",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                boxShadow: "0 4px 12px rgba(230, 126, 34, 0.3)",
+              }}>
+                <span style={{ fontSize: "28px", flexShrink: 0 }}>🏠</span>
+                <div>
+                  <p style={{ fontSize: "18px", fontWeight: 800, margin: 0, letterSpacing: "0.05em" }}>
+                    現地販売会 開催中！
+                  </p>
+                  {dateLabel && (
+                    <p style={{ fontSize: "14px", margin: "4px 0 0", opacity: 0.9 }}>
+                      {dateLabel}
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
 
