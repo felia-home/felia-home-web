@@ -49,6 +49,77 @@ function formatTimeRange(start: string | null | undefined, end: string | null | 
   return `${s}〜${e}`;
 }
 
+/**
+ * 今週の月曜日を返す（日本時間基準）
+ */
+function getThisMonday(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay(); // 0=日, 1=月, ..., 6=土
+  const diff = day === 0 ? -6 : 1 - day; // 日曜の場合は前週月曜
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+/**
+ * 月の最終日を返す
+ */
+function getLastDayOfMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
+
+/**
+ * 現地販売会の表示日付範囲を計算する
+ * @returns null の場合は表示しない（終了済み）
+ */
+function calcDisplayDateRange(
+  startDateStr: string | null | undefined,
+  endDateStr: string | null | undefined
+): { from: Date; to: Date } | null {
+  if (!startDateStr || !endDateStr) return null;
+  const startDate = new Date(startDateStr);
+  const endDate = new Date(endDateStr);
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return null;
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // 終了済み → 非表示
+  if (today > endDate) return null;
+
+  // 開催前 → 元の開始日〜終了日をそのまま表示
+  if (today < startDate) {
+    return { from: startDate, to: endDate };
+  }
+
+  // 開催中 → 動的計算
+  const monday = getThisMonday(today);
+  const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastOfMonth = getLastDayOfMonth(today);
+
+  // 表示開始: max(今週月曜, 当月1日, 開催開始日)
+  const from = new Date(
+    Math.max(monday.getTime(), firstOfMonth.getTime(), startDate.getTime())
+  );
+
+  // 表示終了: min(当月末日, 開催終了日)
+  const to = new Date(Math.min(lastOfMonth.getTime(), endDate.getTime()));
+
+  return { from, to };
+}
+
+/**
+ * 日付を「M月D日（曜）」形式でフォーマット
+ */
+function formatDateJP(date: Date): string {
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const w = WEEKDAYS[date.getDay()];
+  return `${m}月${d}日(${w})`;
+}
+
 function getDisplayArea(oh: OpenHouse): string | null {
   const type = oh.property_type ?? "";
   const isMansion = ["MANSION", "NEW_MANSION"].includes(type);
@@ -108,13 +179,26 @@ export async function OpenHouseAndInfoSection() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {openHouses.length === 0 ? (
-                <p style={{ fontSize: "13px", color: "#aaa", padding: "16px 0" }}>現地販売会の予定はありません</p>
-              ) : (
-                openHouses.slice(0, 3).map((oh) => (
-                  <OpenHouseCard key={oh.id} openHouse={oh} />
-                ))
-              )}
+              {(() => {
+                // 終了済みの現地販売会を除外
+                const activeOpenHouses = openHouses.filter(
+                  (oh) =>
+                    calcDisplayDateRange(
+                      oh.open_house_start,
+                      oh.open_house_end
+                    ) !== null
+                );
+                if (activeOpenHouses.length === 0) {
+                  return (
+                    <p style={{ fontSize: "13px", color: "#aaa", padding: "16px 0" }}>
+                      現地販売会の予定はありません
+                    </p>
+                  );
+                }
+                return activeOpenHouses
+                  .slice(0, 3)
+                  .map((oh) => <OpenHouseCard key={oh.id} openHouse={oh} />);
+              })()}
             </div>
           </div>
 
@@ -159,7 +243,15 @@ export async function OpenHouseAndInfoSection() {
 
 // 現地販売会カード
 function OpenHouseCard({ openHouse }: { openHouse: OpenHouse }) {
-  const dateStr = formatOpenHouseDate(openHouse.open_house_start);
+  // 表示日付範囲を動的計算（終了済みは null）
+  const range = calcDisplayDateRange(
+    openHouse.open_house_start,
+    openHouse.open_house_end
+  );
+  // 終了済みカードは描画しない
+  if (!range) return null;
+
+  const dateStr = `${formatDateJP(range.from)} 〜 ${formatDateJP(range.to)}`;
   const timeRange = formatTimeRange(openHouse.open_house_start, openHouse.open_house_end);
   const typeLabel = PROPERTY_TYPE_LABEL[openHouse.property_type ?? ""] ?? "";
   const isMansion = ["MANSION", "NEW_MANSION"].includes(openHouse.property_type ?? "");
