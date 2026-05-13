@@ -545,7 +545,7 @@ export interface PropertyDetail {
   bcr: number | null;
   far: number | null;
   land_right: string | null;
-  leasehold_fee?: number | null;
+  land_lease_fee?: number | null;
   leasehold_term?: string | null;
   road_width: number | null;
   road_type: string | null;

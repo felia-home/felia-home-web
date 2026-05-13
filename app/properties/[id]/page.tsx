@@ -288,8 +288,8 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       ? [
           {
             label: "地代",
-            value: p.leasehold_fee
-              ? `${p.leasehold_fee.toLocaleString()}円/月`
+            value: p.land_lease_fee
+              ? `${p.land_lease_fee.toLocaleString()}円/月`
               : null,
           },
           { label: "借地期間", value: p.leasehold_term ?? null },
