@@ -283,6 +283,18 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     { label: "階数", value: !isMansion && p.floors_total ? `${p.floors_total}階建` : null },
     { label: "取引態様", value: p.transaction_type ?? null },
     { label: "土地権利", value: p.land_right ?? null },
+    // 借地権（所有権以外）の場合のみ 地代・借地期間 を表示
+    ...(p.land_right && p.land_right !== "所有権"
+      ? [
+          {
+            label: "地代",
+            value: p.leasehold_fee
+              ? `${p.leasehold_fee.toLocaleString()}円/月`
+              : null,
+          },
+          { label: "借地期間", value: p.leasehold_term ?? null },
+        ]
+      : []),
     { label: "用途地域", value: p.use_zone ?? null },
     { label: "引渡し", value: p.delivery_timing ?? null },
     { label: "建ぺい率", value: p.bcr ? `${p.bcr}%` : null },
