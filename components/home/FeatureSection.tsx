@@ -27,7 +27,7 @@ export async function FeatureSection({ heading, subheading }: FeatureSectionProp
           {features.slice(0, 3).map((feature) => (
             <Link
               key={feature.id}
-              href={feature.href}
+              href={feature.href || "#"}
               className="feature-card"
               style={{ paddingBottom: "65%" }}
             >
