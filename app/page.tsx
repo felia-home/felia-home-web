@@ -9,10 +9,10 @@ import { NewAndNewsSection } from "@/components/home/NewAndNewsSection";
 import { FullWidthBannerSection } from "@/components/home/FullWidthBannerSection";
 import { SearchSection } from "@/components/home/SearchSection";
 import { OpenHouseAndInfoSection } from "@/components/home/OpenHouseAndInfoSection";
-import { FeatureSection } from "@/components/home/FeatureSection";
+import FeatureSection from "@/components/home/FeatureSection";
 import { FreeBannerSection } from "@/components/home/FreeBannerSection";
 import { AccessSection } from "@/components/home/AccessSection";
-import { getHpSections, type HpSection } from "@/lib/api";
+import { getHpSections, getFeatures, type HpSection } from "@/lib/api";
 
 // sections APIが失敗した場合のデフォルト順序（全表示）
 const DEFAULT_SECTIONS: HpSection[] = [
@@ -37,7 +37,10 @@ function getSubheading(sections: HpSection[], key: string): string | null {
 }
 
 export default async function HomePage() {
-  const fetched = await getHpSections();
+  const [fetched, features] = await Promise.all([
+    getHpSections(),
+    getFeatures().catch(() => []),
+  ]);
   // API失敗（空配列）時はデフォルト順序にフォールバック
   const sectionList = fetched.length > 0 ? fetched : DEFAULT_SECTIONS;
 
@@ -65,12 +68,7 @@ export default async function HomePage() {
     search_banner: <FullWidthBannerSection />,
     search: <SearchSection />,
     open_house: <OpenHouseAndInfoSection />,
-    features: (
-      <FeatureSection
-        heading={getHeading(sectionList, "features")}
-        subheading={getSubheading(sectionList, "features")}
-      />
-    ),
+    features: <FeatureSection features={features} />,
     free_banner: <FreeBannerSection />,
     access: <AccessSection />,
   };
