@@ -24,10 +24,15 @@ export async function FeatureSection({ heading, subheading }: FeatureSectionProp
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
         <SectionTitle en={heading ?? "Feature"} ja={subheading ?? "特集"} />
         <div className="feature-grid">
-          {features.slice(0, 3).map((feature) => (
+          {features.slice(0, 3).map((feature) => {
+            // 遷移先 URL の決定: Admin 設定の href 最優先 → slug から生成 → "#"
+            const featureHref =
+              feature.href ||
+              (feature.slug ? `/feature/${feature.slug}` : "#");
+            return (
             <Link
               key={feature.id}
-              href={feature.href || "#"}
+              href={featureHref}
               className="feature-card"
               style={{ paddingBottom: "65%" }}
             >
@@ -43,7 +48,8 @@ export async function FeatureSection({ heading, subheading }: FeatureSectionProp
                 )}
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
