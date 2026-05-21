@@ -4,8 +4,6 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: {
@@ -23,22 +21,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  let session = null;
-  try {
-    session = await getServerSession(authOptions);
-  } catch (e) {
-    console.error("[Layout] getServerSession failed:", e);
-  }
-
   return (
     <html lang="ja">
       <body style={{ backgroundColor: "#ffffff", margin: 0, padding: 0 }}>
-        <Providers session={session}>
+        <Providers>
           <Header />
           <main>{children}</main>
           <Footer />

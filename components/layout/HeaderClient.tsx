@@ -4,13 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search, Heart, Menu, Lock } from "lucide-react";
 import { AccordionMenu } from "./AccordionMenu";
-import { useSession, signOut } from "next-auth/react";
+import { useAuth } from "@/app/providers";
 
 export function HeaderClient() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
-  const session = useSession();
-  const isLoggedIn = session?.status === "authenticated";
+  const { user, signOut } = useAuth();
+  const isLoggedIn = !!user;
 
   const navItemStyle = (key: string): React.CSSProperties => ({
     display: "flex",
@@ -153,7 +153,7 @@ export function HeaderClient() {
                     マイページ
                   </Link>
                   <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
+                    onClick={() => signOut()}
                     style={{
                       padding: "8px 14px",
                       backgroundColor: "transparent",

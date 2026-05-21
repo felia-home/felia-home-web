@@ -2,7 +2,7 @@
 
 // app/reins/[id]/page.tsx
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/app/providers";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { PropertyImage } from "@/components/ui/PropertyImage";
@@ -29,7 +29,7 @@ function cleanBuiltYear(text: string | null | undefined): string | null {
 }
 
 export default function ReinsDetailPage() {
-  const session = useSession();
+  const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
@@ -39,7 +39,11 @@ export default function ReinsDetailPage() {
   const [contactPhone, setContactPhone] = useState("03-5981-8601");
   const [nearbyProperties, setNearbyProperties] = useState<any[]>([]);
 
-  const status = session?.status ?? "loading";
+  const status: "loading" | "authenticated" | "unauthenticated" = authLoading
+    ? "loading"
+    : user
+      ? "authenticated"
+      : "unauthenticated";
 
   useEffect(() => {
     if (status === "unauthenticated") {

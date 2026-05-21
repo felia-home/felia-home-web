@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { useAuth } from "@/app/providers";
 
 interface MenuItem {
   label: string;
@@ -59,8 +59,8 @@ interface AccordionMenuProps {
 export function AccordionMenu({ isOpen, onClose }: AccordionMenuProps) {
   const [openItems, setOpenItems] = useState<string[]>([]);
   const [closeHover, setCloseHover] = useState(false);
-  const session = useSession();
-  const isLoggedIn = session?.status === "authenticated";
+  const { user, signOut } = useAuth();
+  const isLoggedIn = !!user;
 
   useEffect(() => {
     if (isOpen) {
@@ -320,7 +320,7 @@ export function AccordionMenu({ isOpen, onClose }: AccordionMenuProps) {
           <button
             onClick={() => {
               onClose();
-              signOut({ callbackUrl: "/" });
+              signOut();
             }}
             style={{
               display: "block",

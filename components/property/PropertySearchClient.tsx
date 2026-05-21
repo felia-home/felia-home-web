@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/app/providers";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
@@ -179,9 +179,9 @@ function isReinsNewConstruction(item: any): boolean {
 
 
 export default function PropertySearchClient() {
-  const session = useSession();
-  const isLoggedIn = session?.status === "authenticated";
-  const sessionLoaded = session?.status !== "loading";
+  const { user, isLoading: authLoading } = useAuth();
+  const isLoggedIn = !!user;
+  const sessionLoaded = !authLoading;
 
   // URL → state 初期化（ブラウザ戻る・進むで条件が復元される）
   const urlParams = useSearchParams();

@@ -4,7 +4,7 @@
 import { useState, useEffect, Suspense, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/app/providers";
 
 // ---- 営業日カレンダー生成（火・水定休） ----
 function getBusinessDays(count: number): Date[] {
@@ -59,9 +59,9 @@ function ContactForm() {
   const isReins    = type === "reins" || !!reinsId;
   const isProperty = !!propertyId || isReins || isPrivate || isDocument || isVisit;
 
-  const session    = useSession();
-  const isLoggedIn = session?.status === "authenticated";
-  const memberId   = (session?.data?.user as any)?.id ?? null;
+  const { user } = useAuth();
+  const isLoggedIn = !!user;
+  const memberId   = user?.id ?? null;
 
   const [form, setForm]                 = useState({ name: "", email: "", phone: "", message: "" });
   const [loading, setLoading]           = useState(false);

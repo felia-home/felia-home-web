@@ -2,7 +2,7 @@
 
 // app/private-selection/page.tsx
 import { useEffect, useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/app/providers";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -189,8 +189,12 @@ const AREAS = [
 ];
 
 export default function PrivateSelectionPage() {
-  const session = useSession();
-  const status = session?.status ?? "loading";
+  const { user, isLoading: authLoading } = useAuth();
+  const status: "loading" | "authenticated" | "unauthenticated" = authLoading
+    ? "loading"
+    : user
+      ? "authenticated"
+      : "unauthenticated";
   const router = useRouter();
 
   const [properties, setProperties] = useState<PrivateProperty[]>([]);

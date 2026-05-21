@@ -1,14 +1,15 @@
 // components/members/LogoutButton.tsx
 "use client";
 
-import { signOut } from "next-auth/react";
+import { useAuth } from "@/app/providers";
 import { LogOut } from "lucide-react";
 
 export function LogoutButton() {
+  const { signOut } = useAuth();
   return (
     <button
       type="button"
-      onClick={() => signOut({ callbackUrl: "/" })}
+      onClick={() => signOut()}
       className="logout-btn"
       style={{
         width: "100%",

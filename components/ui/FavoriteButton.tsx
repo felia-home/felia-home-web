@@ -2,7 +2,7 @@
 
 // components/ui/FavoriteButton.tsx
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/app/providers";
 import { useRouter } from "next/navigation";
 
 interface FavoriteButtonProps {
@@ -11,9 +11,9 @@ interface FavoriteButtonProps {
 }
 
 export function FavoriteButton({ propertyId, size = "md" }: FavoriteButtonProps) {
-  const session = useSession();
+  const { user } = useAuth();
   const router = useRouter();
-  const isLoggedIn = session?.status === "authenticated";
+  const isLoggedIn = !!user;
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
