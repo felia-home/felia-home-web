@@ -32,7 +32,7 @@ export async function FeatureSection({ heading, subheading }: FeatureSectionProp
               style={{ paddingBottom: "65%" }}
             >
               <div style={{ position: "absolute", inset: 0 }}>
-                {feature.image ? (
+                {feature.image && (
                   <Image
                     src={feature.image}
                     alt={feature.title}
@@ -40,50 +40,7 @@ export async function FeatureSection({ heading, subheading }: FeatureSectionProp
                     style={{ objectFit: "cover" }}
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
-                ) : (
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      backgroundImage: `url(${feature.image})`,
-                      backgroundSize: "cover",
-                    }}
-                  />
                 )}
-                <div className="feature-overlay" />
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "16px",
-                    textAlign: "center",
-                  }}
-                >
-                  <p
-                    style={{
-                      color: "#fff",
-                      fontWeight: "bold",
-                      fontSize: "17px",
-                      lineHeight: 1.4,
-                      margin: "0 0 4px",
-                    }}
-                  >
-                    {feature.title}
-                  </p>
-                  <p
-                    style={{
-                      color: "rgba(255,255,255,0.7)",
-                      fontSize: "13px",
-                      margin: 0,
-                    }}
-                  >
-                    {feature.subTitle}
-                  </p>
-                </div>
               </div>
             </Link>
           ))}
