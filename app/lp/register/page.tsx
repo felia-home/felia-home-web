@@ -2,7 +2,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import HeroSection from "@/components/lp/HeroSection";
 
 // ---- カラー定数 ----
@@ -124,15 +123,30 @@ export default function RegisterLPPage() {
         throw new Error(data.message ?? "登録に失敗しました");
       }
 
-      // Step2: 自動ログイン
-      const result = await signIn("credentials", {
-        redirect: false,
-        email: step1.email,
-        password: step1.password,
-      });
+      // Step2: 自動ログイン（直接 next-auth の credentials エンドポイントを叩く）
+      try {
+        const csrfRes = await fetch("/api/auth/csrf");
+        const { csrfToken } = await csrfRes.json();
 
-      if (result?.error) {
-        // ログインに失敗してもregistration自体は成功しているので完了ページへ
+        const result = await fetch("/api/auth/callback/credentials", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            email: step1.email,
+            password: step1.password,
+            csrfToken: csrfToken ?? "",
+            json: "true",
+          }).toString(),
+        });
+
+        const data = await result.json().catch(() => ({}));
+        if (data?.error || !result.ok) {
+          // ログインに失敗してもregistration自体は成功しているので完了ページへ
+          router.push("/members/register/complete");
+          return;
+        }
+      } catch {
+        // 自動ログイン失敗時は完了ページにフォールバック
         router.push("/members/register/complete");
         return;
       }

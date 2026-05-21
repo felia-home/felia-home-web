@@ -4,7 +4,6 @@
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 
 const inputStyle: React.CSSProperties = {
@@ -34,13 +33,36 @@ function LoginForm() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const result = await signIn("credentials", { email, password, redirect: false });
-    if (result?.error) {
-      setError("メールアドレスまたはパスワードが正しくありません");
+
+    try {
+      // CSRFトークン取得
+      const csrfRes = await fetch("/api/auth/csrf");
+      const { csrfToken } = await csrfRes.json();
+
+      // 認証
+      const result = await fetch("/api/auth/callback/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          email,
+          password,
+          csrfToken: csrfToken ?? "",
+          json: "true",
+        }).toString(),
+      });
+
+      const data = await result.json().catch(() => ({}));
+
+      if (data?.error || !result.ok) {
+        setError("メールアドレスまたはパスワードが正しくありません");
+        setLoading(false);
+      } else {
+        router.push(callbackUrl);
+        router.refresh();
+      }
+    } catch {
+      setError("ログインに失敗しました。しばらくしてから再度お試しください。");
       setLoading(false);
-    } else {
-      router.push(callbackUrl);
-      router.refresh();
     }
   };
 
