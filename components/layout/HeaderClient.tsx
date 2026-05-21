@@ -6,12 +6,7 @@ import { Search, Heart, Menu, Lock } from "lucide-react";
 import { AccordionMenu } from "./AccordionMenu";
 import { useSession, signOut } from "next-auth/react";
 
-interface HeaderClientProps {
-  isLoggedIn?: boolean;
-  userName?: string | null;
-}
-
-export function HeaderClient({ isLoggedIn: _isLoggedIn, userName }: HeaderClientProps) {
+export function HeaderClient() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
   const session = useSession();
