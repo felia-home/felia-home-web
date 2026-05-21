@@ -591,15 +591,6 @@ img {
   border-radius: 8px;
   text-decoration: none;
 }
-.feature-overlay {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  transition: background-color 0.2s ease;
-}
-.feature-card:hover .feature-overlay {
-  background-color: rgba(0, 0, 0, 0.55);
-}
 
 /* FeaturedSlider */
 .featured-grid {
