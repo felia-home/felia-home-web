@@ -1,12 +1,11 @@
 // components/property/PropertyCard.tsx
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { MapPin, Train } from "lucide-react";
 import type { Property } from "@/lib/api";
 import { FavoriteButton } from "@/components/ui/FavoriteButton";
+import { PropertyImage } from "@/components/ui/PropertyImage";
 import { isNewProperty, isPriceRevised } from "@/lib/propertyBadges";
 import { formatLocation } from "@/lib/addressFormat";
 
@@ -33,7 +32,6 @@ const BADGE_COLORS: Record<string, string> = {
 };
 
 export function PropertyCard({ property, size = "normal", showFavoriteButton = false }: Props) {
-  const [imgError, setImgError] = useState(false);
   const isLarge = size === "large";
 
   const mainImage =
@@ -71,37 +69,17 @@ export function PropertyCard({ property, size = "normal", showFavoriteButton = f
         className="property-card-img-wrap"
         style={{ aspectRatio: isLarge ? "16/9" : "4/3" }}
       >
-        {mainImage && !imgError ? (
-          <Image
-            src={mainImage}
-            alt={displayTitle}
-            fill
-            className="property-card-img"
-            sizes={
-              isLarge
-                ? "(max-width: 768px) 100vw, 50vw"
-                : "(max-width: 768px) 50vw, 33vw"
-            }
-            onError={() => setImgError(true)}
-          />
-        ) : (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#aaa",
-              fontSize: "12px",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
-            <span style={{ fontSize: "32px" }}>🏠</span>
-            <span>画像準備中</span>
-          </div>
-        )}
+        <PropertyImage
+          src={mainImage}
+          alt={displayTitle}
+          seed={property.id}
+          sizes={
+            isLarge
+              ? "(max-width: 768px) 100vw, 50vw"
+              : "(max-width: 768px) 50vw, 33vw"
+          }
+        />
+
 
         {/* 左上バッジ群 */}
         <div
