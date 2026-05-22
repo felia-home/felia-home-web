@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getFeatures, type Feature, type Property } from "@/lib/api";
 import PropertyCard from "@/components/property/PropertyCard";
@@ -102,51 +101,55 @@ export default async function FeatureSlugPage({
       {heroImage && (
         <div
           style={{
-            position: "relative",
             width: "100%",
-            height: "260px",
-            overflow: "hidden",
+            maxWidth: "1920px",
+            margin: "0 auto",
+            lineHeight: 0,
           }}
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={heroImage}
             alt={feature.title}
-            fill
-            style={{ objectFit: "cover" }}
-            priority
-            sizes="100vw"
-          />
-          <div
             style={{
-              position: "absolute",
-              inset: 0,
-              background: "rgba(0,0,0,0.4)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#fff",
-              textAlign: "center",
-              padding: "0 24px",
+              width: "100%",
+              height: "auto",
+              display: "block",
             }}
-          >
-            <h1 style={{ fontSize: "32px", fontWeight: 800, margin: 0 }}>
-              {feature.title}
-            </h1>
-            {feature.subTitle && (
-              <p
-                style={{
-                  fontSize: "16px",
-                  margin: "12px 0 0",
-                  opacity: 0.9,
-                }}
-              >
-                {feature.subTitle}
-              </p>
-            )}
-          </div>
+          />
         </div>
       )}
+
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "32px 24px 0",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "28px",
+            fontWeight: 800,
+            color: "#1a1a1a",
+            margin: 0,
+          }}
+        >
+          {feature.title}
+        </h1>
+        {feature.subTitle && (
+          <p
+            style={{
+              fontSize: "15px",
+              color: "#555",
+              margin: "12px 0 0",
+              lineHeight: 1.7,
+            }}
+          >
+            {feature.subTitle}
+          </p>
+        )}
+      </div>
 
       <div
         style={{
