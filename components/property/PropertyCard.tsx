@@ -34,15 +34,18 @@ const BADGE_COLORS: Record<string, string> = {
 export function PropertyCard({ property, size = "normal", showFavoriteButton = false }: Props) {
   const isLarge = size === "large";
 
+  const mansionBuildingExt = (property as any).mansion_building?.exterior_images ?? [];
   const mainImage =
     property.images?.find((img) => img.is_main)?.url ??
     property.images?.[0]?.url ??
+    mansionBuildingExt[0]?.url ??
     null;
 
   const isMansion =
     property.property_type === "MANSION" ||
     property.property_type === "NEW_MANSION";
-  const buildingName = property.building_name;
+  const buildingName =
+    property.building_name ?? (property as any).mansion_building?.name ?? null;
 
   const displayTitle =
     isMansion && buildingName
