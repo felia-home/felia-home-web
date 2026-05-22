@@ -124,38 +124,7 @@ export default async function FeatureSlugPage({
         style={{
           maxWidth: "1200px",
           margin: "0 auto",
-          padding: "32px 24px 0",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "28px",
-            fontWeight: 800,
-            color: "#1a1a1a",
-            margin: 0,
-          }}
-        >
-          {feature.title}
-        </h1>
-        {feature.subTitle && (
-          <p
-            style={{
-              fontSize: "15px",
-              color: "#555",
-              margin: "12px 0 0",
-              lineHeight: 1.7,
-            }}
-          >
-            {feature.subTitle}
-          </p>
-        )}
-      </div>
-
-      <div
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          padding: "48px 24px",
+          padding: "32px 24px",
         }}
       >
         <h2
