@@ -452,6 +452,10 @@ export interface Feature {
   image: string;
   href: string;
   order: number;
+  hero_image_url?: string | null;
+  conditions?: Record<string, unknown> | string | null;
+  sort_type?: string | null;
+  display_limit?: number | null;
 }
 
 export interface Banner {
