@@ -104,7 +104,7 @@ export default async function FeatureSlugPage({
           style={{
             position: "relative",
             width: "100%",
-            height: "400px",
+            height: "260px",
             overflow: "hidden",
           }}
         >
