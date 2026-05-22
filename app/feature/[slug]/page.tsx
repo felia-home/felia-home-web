@@ -94,7 +94,7 @@ export default async function FeatureSlugPage({
 
   const properties = await getFeatureProperties(feature);
 
-  const heroImage = feature.hero_image_url || feature.image;
+  const heroImage = feature.hero_image_url ?? feature.image ?? null;
 
   return (
     <main style={{ backgroundColor: "#fff", minHeight: "100vh" }}>
