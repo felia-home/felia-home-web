@@ -3,57 +3,20 @@ import { notFound } from "next/navigation";
 import { getFeatures, type Feature, type Property } from "@/lib/api";
 import PropertyCard from "@/components/property/PropertyCard";
 
-interface FeatureConditions {
-  price_min?: number | null;
-  price_max?: number | null;
-  property_types?: string[];
-  areas?: string[];
-  flags?: string[];
-  photo_min?: number | null;
-}
-
 async function getFeatureProperties(feature: Feature): Promise<Property[]> {
   try {
     const adminBase = process.env.ADMIN_API_URL ?? "http://localhost:3001";
-    const adminUrl = new URL(`${adminBase}/api/properties`);
-    adminUrl.searchParams.set("published_hp", "true");
-    adminUrl.searchParams.set("limit", String(feature.display_limit ?? 20));
-
-    if (feature.sort_type) {
-      adminUrl.searchParams.set("sort", feature.sort_type);
-    }
-
-    const conditions =
-      feature.conditions && typeof feature.conditions === "object"
-        ? (feature.conditions as FeatureConditions)
-        : null;
-
-    if (conditions) {
-      if (conditions.price_min != null) {
-        adminUrl.searchParams.set("min_price", String(conditions.price_min));
-      }
-      if (conditions.price_max != null) {
-        adminUrl.searchParams.set("max_price", String(conditions.price_max));
-      }
-
-      conditions.property_types?.forEach((type) => {
-        adminUrl.searchParams.append("type", type);
-      });
-
-      conditions.areas?.forEach((area) => {
-        adminUrl.searchParams.append("area", area);
-      });
-
-      conditions.flags?.forEach((flag) => {
-        adminUrl.searchParams.append("flag", flag);
-      });
-
-      if (conditions.photo_min != null) {
-        adminUrl.searchParams.set("photo_min", String(conditions.photo_min));
-      }
-    }
-
-    const res = await fetch(adminUrl.toString(), { cache: "no-store" });
+    const res = await fetch(`${adminBase}/api/hp/properties`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        conditions: feature.conditions ?? {},
+        sort_type: feature.sort_type ?? "newest",
+        limit: feature.display_limit ?? 20,
+        page: 1,
+      }),
+      cache: "no-store",
+    });
     if (!res.ok) return [];
     const data = await res.json();
     return data.properties ?? [];
