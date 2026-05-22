@@ -268,11 +268,23 @@ function PropertyCard({ property }: { property: Property }) {
                 🚪 {(property as any).rooms}
               </p>
             )}
-            {(property as any).area_build_m2 && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                📐 建物{(property as any).area_build_m2}㎡
-              </p>
-            )}
+            {(() => {
+              const pt = (property as any).property_type as string | null | undefined;
+              const isMansion = pt === "MANSION" || pt === "NEW_MANSION";
+              const isLand = pt === "LAND";
+              const displayArea = isMansion
+                ? (property as any).area_exclusive_m2
+                : isLand
+                  ? (property as any).area_land_m2
+                  : (property as any).area_build_m2;
+              const label = isMansion ? "専有" : isLand ? "土地" : "建物";
+              if (displayArea == null) return null;
+              return (
+                <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
+                  📐 {label}{displayArea}㎡
+                </p>
+              );
+            })()}
           </div>
 
           <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "12px" }}>

@@ -304,7 +304,14 @@ function NormalCard({ property }: { property: NormalProperty }) {
   const mainImage = property.images?.find((i) => i.is_main)?.url ?? property.images?.[0]?.url ?? null;
   const typeLabel = PROPERTY_TYPE_MAP[property.property_type ?? ""] ?? "";
   const location = [property.city, property.town].filter(Boolean).join("");
-  const area = property.area_build_m2 ?? property.area_exclusive_m2 ?? property.area_land_m2;
+  const pt = property.property_type ?? "";
+  const isMansion = pt === "MANSION" || pt === "NEW_MANSION";
+  const isLand = pt === "LAND";
+  const area = isMansion
+    ? property.area_exclusive_m2
+    : isLand
+      ? property.area_land_m2
+      : property.area_build_m2;
 
   return (
     <Link href={`/properties/${property.id}`} style={{ textDecoration: "none", color: "inherit", display: "block" }}

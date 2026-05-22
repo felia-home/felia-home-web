@@ -1032,11 +1032,20 @@ function PropertyCard({ property }: { property: Property }) {
             {(property as any).rooms && (
               <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>🚪 {(property as any).rooms}</p>
             )}
-            {((property as any).area_build_m2 || (property as any).area_land_m2) && (
-              <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
-                📐 {(property as any).area_build_m2 ?? (property as any).area_land_m2}㎡
-              </p>
-            )}
+            {(() => {
+              const isLand = property.property_type === "LAND";
+              const displayArea = isMansion
+                ? (property as any).area_exclusive_m2
+                : isLand
+                  ? (property as any).area_land_m2
+                  : (property as any).area_build_m2;
+              if (displayArea == null) return null;
+              return (
+                <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
+                  📐 {displayArea}㎡
+                </p>
+              );
+            })()}
             {(property as any).building_year && (
               <p style={{ fontSize: "12px", color: "#666", margin: 0 }}>
                 📅 {(property as any).building_year}年築

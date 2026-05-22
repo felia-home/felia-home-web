@@ -272,18 +272,45 @@ export default function FeliaSelecitonSlider({
                   <span style={{ color: "#333" }}>{p.rooms}</span>
                 </div>
               )}
-              {p.area_build_m2 && (
-                <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
-                  <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>建物面積</span>
-                  <span style={{ color: "#333" }}>{p.area_build_m2}㎡</span>
-                </div>
-              )}
-              {p.area_land_m2 && (
-                <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
-                  <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>土地面積</span>
-                  <span style={{ color: "#333" }}>{p.area_land_m2}㎡</span>
-                </div>
-              )}
+              {(() => {
+                const pt = p.property_type ?? p.propertyType ?? "";
+                const isMansion = pt === "MANSION" || pt === "NEW_MANSION";
+                const isLand = pt === "LAND";
+                if (isMansion) {
+                  if (p.area_exclusive_m2 == null) return null;
+                  return (
+                    <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
+                      <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>専有面積</span>
+                      <span style={{ color: "#333" }}>{p.area_exclusive_m2}㎡</span>
+                    </div>
+                  );
+                }
+                if (isLand) {
+                  if (p.area_land_m2 == null) return null;
+                  return (
+                    <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
+                      <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>土地面積</span>
+                      <span style={{ color: "#333" }}>{p.area_land_m2}㎡</span>
+                    </div>
+                  );
+                }
+                return (
+                  <>
+                    {p.area_build_m2 != null && (
+                      <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
+                        <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>建物面積</span>
+                        <span style={{ color: "#333" }}>{p.area_build_m2}㎡</span>
+                      </div>
+                    )}
+                    {p.area_land_m2 != null && (
+                      <div style={{ display: "flex", gap: "8px", fontSize: "13px" }}>
+                        <span style={{ color: "#aaa", width: "70px", flexShrink: 0 }}>土地面積</span>
+                        <span style={{ color: "#333" }}>{p.area_land_m2}㎡</span>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
 

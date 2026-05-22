@@ -314,30 +314,30 @@ export function PropertyCard({ property, size = "normal", showFavoriteButton = f
               </span>
             </div>
           )}
-          {((property as any).rooms ||
-            (property as any).area_build_m2 ||
-            (property as any).area_land_m2) && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                fontSize: "12px",
-                color: "#888",
-              }}
-            >
-              {(property as any).rooms && (
-                <span>{(property as any).rooms}</span>
-              )}
-              {(property as any).area_build_m2 && (
-                <span>{(property as any).area_build_m2}㎡</span>
-              )}
-              {!(property as any).area_build_m2 &&
-                (property as any).area_land_m2 && (
-                  <span>{(property as any).area_land_m2}㎡</span>
-                )}
-            </div>
-          )}
+          {(() => {
+            const isLand = property.property_type === "LAND";
+            const displayArea = isMansion
+              ? property.area_exclusive_m2
+              : isLand
+                ? property.area_land_m2
+                : property.area_build_m2;
+            const rooms = (property as any).rooms as string | null | undefined;
+            if (!rooms && !displayArea) return null;
+            return (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  fontSize: "12px",
+                  color: "#888",
+                }}
+              >
+                {rooms && <span>{rooms}</span>}
+                {displayArea != null && <span>{displayArea}㎡</span>}
+              </div>
+            );
+          })()}
         </div>
       </div>
     </Link>
