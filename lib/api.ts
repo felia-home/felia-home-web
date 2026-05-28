@@ -7,13 +7,14 @@ async function fetchFromAdmin<T>(
 ): Promise<T> {
   const url = `${ADMIN_API_URL}${path}`;
 
+  const hasOverride = options?.cache !== undefined || options?.next !== undefined;
   const res = await fetch(url, {
+    ...(hasOverride ? {} : { next: { revalidate: 60 } }),
     ...options,
     headers: {
       "Content-Type": "application/json",
       ...options?.headers,
     },
-    cache: "no-store",
   });
 
   if (!res.ok) {
@@ -169,7 +170,10 @@ export interface HpSection {
 
 export async function getHpSections(): Promise<HpSection[]> {
   try {
-    const res = await fetchFromAdmin<{ sections: HpSection[] }>("/api/hp/sections");
+    const res = await fetchFromAdmin<{ sections: HpSection[] }>(
+      "/api/hp/sections",
+      { cache: "no-store" }
+    );
     return res.sections ?? [];
   } catch {
     // セクション取得失敗時は全セクション表示（フォールバック）

@@ -82,6 +82,17 @@ export default function RegisterLPPage() {
   const toggle = (arr: string[], val: string) =>
     arr.includes(val) ? arr.filter(v => v !== val) : [...arr, val];
 
+  const parseBudget = (s: string): number | null => {
+    if (!s) return null;
+    const t = s.replace(/,/g, "");
+    const oku = t.match(/^([\d.]+)億円?/);
+    if (oku) return Math.round(parseFloat(oku[1]) * 10000);
+    const man = t.match(/^([\d.]+)万円?/);
+    if (man) return Math.round(parseFloat(man[1]));
+    const num = parseFloat(t);
+    return Number.isFinite(num) ? num : null;
+  };
+
   const handleStep1 = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -108,11 +119,26 @@ export default function RegisterLPPage() {
     setError("");
 
     try {
+      const body = {
+        email:     step1.email,
+        password:  step1.password,
+        name:      step1.name,
+        name_kana: step1.name_kana,
+        phone:     step1.phone,
+        desired_property_type: step2.property_types    ?? [],
+        desired_areas:         step2.preferred_areas   ?? [],
+        desired_rooms:         step2.preferred_rooms   ?? [],
+        desired_budget_min:    parseBudget(step2.budget_min) ?? null,
+        desired_budget_max:    parseBudget(step2.budget_max) ?? null,
+        desired_move_timing:   step2.move_timing       ?? null,
+        desired_note:          step2.remarks           ?? null,
+      };
+
       // Step1: 会員登録
       const res = await fetch("/api/members/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...step1, ...step2 }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {

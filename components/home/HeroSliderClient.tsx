@@ -176,12 +176,14 @@ function SlideItem({
 }) {
   return (
     <div
+      aria-hidden={!isActive}
       style={{
         position: "absolute",
         inset: 0,
         width: "100%",
         height: "100%",
         opacity: isActive ? 1 : 0,
+        pointerEvents: isActive ? "auto" : "none",
         transition: "opacity 0.7s ease",
       }}
     >
@@ -239,7 +241,7 @@ function SlideItem({
                 transition: "opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s",
               }}
             >
-              {slide.catchCopy && (
+              {isActive && slide.catchCopy && (
                 <h1
                   style={{
                     color: "#fff",

@@ -31,7 +31,7 @@ export default function RootLayout({
       <body style={{ backgroundColor: "#ffffff", margin: 0, padding: 0 }}>
         <Providers>
           <Header />
-          <main>{children}</main>
+          <div>{children}</div>
           <Footer />
         </Providers>
       </body>

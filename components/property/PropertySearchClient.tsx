@@ -277,19 +277,6 @@ export default function PropertySearchClient() {
       scroll: false,
     });
 
-    // 物件種別フィルタ（HP 側で厳密判定）。
-    // admin の property_type フィルタが部分一致等で不正確な可能性があるため、
-    // admin には property_type を送らず HP 側で確実に絞り込む。
-    // 防御策: property_type / propertyType の両方を参照し、大文字正規化して比較
-    const matchesType = (p: { property_type?: string | null; propertyType?: string | null }) => {
-      if (!selectedType) return true;
-      const raw = (p.property_type ?? p.propertyType ?? "") as string;
-      const pt = raw.toUpperCase();
-      const target = selectedType.toUpperCase();
-      if (target === "MANSION") return pt === "MANSION" || pt === "NEW_MANSION";
-      return pt === target;
-    };
-
     // 公開フィルタ（admin が published_hp パラメータを無視している場合の保険）
     // p.published_hp === false の場合のみ除外。undefined/true は通す
     const isPublished = (p: any) => p.published_hp !== false;
@@ -297,8 +284,7 @@ export default function PropertySearchClient() {
     try {
       const pr = PRICE_RANGES[selectedPriceRange];
 
-      // 通常物件: サーバーサイドページング
-      // admin に property_type は送らない（HP 側で厳密フィルタ）
+      // 通常物件: サーバーサイドページング・サーバーサイド種別フィルタ
       const offset = (page - 1) * PAGE_SIZE;
       const p = new URLSearchParams();
       if (keyword.trim()) p.set("keyword", keyword.trim());
@@ -306,6 +292,7 @@ export default function PropertySearchClient() {
       if (pr.max) p.set("price_max", pr.max);
       if (selectedArea) p.set("city", selectedArea);
       if (selectedLine) p.set("station", selectedLine);
+      if (selectedType) p.set("property_type", selectedType);
       conditions.forEach((cond) => p.set(cond, "true"));
       p.set("limit",  String(PAGE_SIZE));
       p.set("offset", String(offset));
@@ -315,10 +302,9 @@ export default function PropertySearchClient() {
       const allFromAdmin: any[] = data.properties ?? [];
       const normalTotal: number = data.total ?? allFromAdmin.length;
 
-      // HP 側で published_hp + property_type 厳密フィルタ
+      // サーバー側で種別絞り込み済み。published_hp のみ保険でフィルタ。
       const normalProps = allFromAdmin
         .filter(isPublished)
-        .filter(matchesType)
         .map((item: any) => ({ ...item, _type: "normal" }));
 
       // REINS物件取得（ログイン時のみ）
@@ -460,9 +446,9 @@ export default function PropertySearchClient() {
 
       const allItems = [...sortedNormal, ...sortedReins];
 
-      // 通常物件はサーバー側でページング済み。REINS はクライアント側で全件取得。
-      // 件数は admin の total（通常物件のみ）＋ REINS 件数で表示する。
-      const totalCount = normalTotal + sortedReins.length;
+      // 通常物件はサーバー側でページング・種別絞り込み済み。
+      // 総件数・総ページ数は admin の data.total をそのまま使う。
+      const totalCount = normalTotal;
       const totalPagesCount = Math.ceil(totalCount / PAGE_SIZE) || 0;
 
       setProperties(allItems);
