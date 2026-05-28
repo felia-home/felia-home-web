@@ -13,8 +13,7 @@ async function fetchFromAdmin<T>(
       "Content-Type": "application/json",
       ...options?.headers,
     },
-    // Next.js のキャッシュ設定（必要に応じて変更）
-    next: { revalidate: 60 }, // 60秒キャッシュ
+    cache: "no-store",
   });
 
   if (!res.ok) {
@@ -183,6 +182,7 @@ export async function getHpSections(): Promise<HpSection[]> {
 export interface HeroBanner {
   id: string;
   title: string;
+  catch_copy?: string;
   image_url: string;
   link_url: string | null;
   link_target: "_self" | "_blank";
@@ -193,7 +193,7 @@ export async function getHeroBanners(): Promise<HeroBanner[]> {
   try {
     const res = await fetchFromAdmin<{ banners: HeroBanner[] }>(
       "/api/hp/hero-banners",
-      { next: { revalidate: 60 } }
+      { cache: "no-store" }
     );
     return res.banners ?? [];
   } catch {
@@ -218,7 +218,7 @@ export async function getAreas(): Promise<AreaSetting[]> {
   try {
     const res = await fetchFromAdmin<{ areas: AreaSetting[] }>(
       "/api/hp/areas",
-      { next: { revalidate: 60 } }
+      { cache: "no-store" }
     );
     return res.areas ?? [];
   } catch {
@@ -244,7 +244,7 @@ export async function getFreeBanners(): Promise<Banner[]> {
   try {
     const res = await fetchFromAdmin<{ banners: Banner[] }>(
       "/api/hp/banners",
-      { next: { revalidate: 60 } }
+      { cache: "no-store" }
     );
     return res.banners ?? [];
   } catch {
@@ -290,7 +290,7 @@ export async function getCompanyInfo(): Promise<CompanyInfo | null> {
   try {
     const res = await fetchFromAdmin<{ company: CompanyInfo }>(
       "/api/hp/company",
-      { next: { revalidate: 300 } }
+      { cache: "no-store" }
     );
     return res.company ?? null;
   } catch {
@@ -340,7 +340,7 @@ export async function getProperties(
 
   return fetchFromAdmin<PropertyListResponse>(
     `/api/properties?${query.toString()}`,
-    { next: { revalidate: 30 } }
+    { cache: "no-store" }
   );
 }
 
@@ -500,7 +500,7 @@ export async function getCompanyBranches(): Promise<CompanyBranch[]> {
   try {
     const res = await fetchFromAdmin<{ branches: CompanyBranch[] }>(
       "/api/hp/company-branches",
-      { next: { revalidate: 300 } }
+      { cache: "no-store" }
     );
     return res.branches ?? [];
   } catch {
@@ -722,7 +722,7 @@ export async function getPrivateProperties(): Promise<PrivateProperty[]> {
   try {
     const res = await fetchFromAdmin<{ properties: PrivateProperty[] }>(
       "/api/private-properties?filter=ACTIVE",
-      { next: { revalidate: 0 } }
+      { cache: "no-store" }
     );
     return res.properties ?? [];
   } catch {
@@ -736,7 +736,7 @@ export async function getPrivatePropertyById(
   try {
     const res = await fetchFromAdmin<{ properties: PrivateProperty[] }>(
       "/api/private-properties?filter=ACTIVE",
-      { next: { revalidate: 0 } }
+      { cache: "no-store" }
     );
     return res.properties?.find((p) => p.id === id) ?? null;
   } catch {
@@ -756,7 +756,7 @@ export async function verifyPrivateSelectionToken(
   try {
     return await fetchFromAdmin<TokenVerifyResult>(
       `/api/private-selection/verify?token=${encodeURIComponent(token)}`,
-      { next: { revalidate: 0 } }
+      { cache: "no-store" }
     );
   } catch {
     return { valid: false, reason: "server_error" };
@@ -823,7 +823,7 @@ export async function saveMemberProfile(
     {
       method: "POST",
       body: JSON.stringify(data),
-      next: { revalidate: 0 },
+      cache: "no-store",
     }
   );
 }
@@ -838,7 +838,7 @@ export async function updateMemberProfile(
     {
       method: "PATCH",
       body: JSON.stringify(data),
-      next: { revalidate: 0 },
+      cache: "no-store",
     }
   );
 }
@@ -855,7 +855,7 @@ export async function registerMember(data: {
     {
       method: "POST",
       body: JSON.stringify(data),
-      next: { revalidate: 0 },
+      cache: "no-store",
     }
   );
 }
@@ -863,7 +863,7 @@ export async function registerMember(data: {
 // 会員プロフィール取得（memberId はサーバーサイドでセッションから取得）
 export async function getMemberProfile(memberId: string) {
   return fetchFromAdmin<MemberProfile>(`/api/members/${memberId}`, {
-    next: { revalidate: 0 },
+    cache: "no-store",
   });
 }
 
@@ -871,7 +871,7 @@ export async function getMemberProfile(memberId: string) {
 export async function getFavorites(memberId: string) {
   return fetchFromAdmin<FavoriteProperty[]>(
     `/api/members/${memberId}/favorites`,
-    { next: { revalidate: 0 } }
+    { cache: "no-store" }
   );
 }
 
@@ -882,7 +882,7 @@ export async function addFavorite(memberId: string, propertyId: string) {
     {
       method: "POST",
       body: JSON.stringify({ propertyId }),
-      next: { revalidate: 0 },
+      cache: "no-store",
     }
   );
 }
@@ -891,7 +891,7 @@ export async function addFavorite(memberId: string, propertyId: string) {
 export async function removeFavorite(memberId: string, propertyId: string) {
   return fetchFromAdmin<{ success: boolean }>(
     `/api/members/${memberId}/favorites/${propertyId}`,
-    { method: "DELETE", next: { revalidate: 0 } }
+    { method: "DELETE", cache: "no-store" }
   );
 }
 
@@ -899,7 +899,7 @@ export async function removeFavorite(memberId: string, propertyId: string) {
 export async function getMemberInquiries(memberId: string) {
   return fetchFromAdmin<MemberInquiry[]>(
     `/api/members/${memberId}/inquiries`,
-    { next: { revalidate: 0 } }
+    { cache: "no-store" }
   );
 }
 
@@ -935,7 +935,7 @@ export async function getMemberProfileData(
   try {
     return await fetchFromAdmin<MemberProfileData>(
       `/api/members/${memberId}/profile`,
-      { next: { revalidate: 0 } }
+      { cache: "no-store" }
     );
   } catch {
     return null;
@@ -968,7 +968,7 @@ export async function getStaffList(): Promise<StaffMember[]> {
   try {
     const res = await fetchFromAdmin<{ staff: StaffMember[] }>(
       "/api/hp/staff",
-      { next: { revalidate: 60 } }
+      { cache: "no-store" }
     );
     return res.staff ?? [];
   } catch {
@@ -980,7 +980,7 @@ export async function getStaffById(id: string): Promise<StaffMember | null> {
   try {
     const res = await fetchFromAdmin<{ staff: StaffMember }>(
       `/api/hp/staff/${id}`,
-      { next: { revalidate: 60 } }
+      { cache: "no-store" }
     );
     return res.staff ?? null;
   } catch {
@@ -1007,7 +1007,7 @@ export async function getTestimonials(): Promise<Testimonial[]> {
   try {
     const res = await fetchFromAdmin<{ testimonials: Testimonial[] }>(
       "/api/hp/testimonials",
-      { next: { revalidate: 60 } }
+      { cache: "no-store" }
     );
     return res.testimonials ?? [];
   } catch {
@@ -1031,7 +1031,7 @@ export async function getWebFlyers(): Promise<WebFlyer[]> {
   try {
     const res = await fetchFromAdmin<{ flyers: WebFlyer[] }>(
       "/api/hp/web-flyers",
-      { next: { revalidate: 60 } }
+      { cache: "no-store" }
     );
     return res.flyers ?? [];
   } catch {

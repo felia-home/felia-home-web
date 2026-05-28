@@ -189,7 +189,7 @@ function SlideItem({
       {slide.image ? (
         <Image
           src={slide.image}
-          alt={slide.catchCopy.replace("\n", " ")}
+          alt={slide.catchCopy?.replace("\n", " ") || "フェリアホーム"}
           fill
           quality={100}
           style={{ objectFit: "cover", objectPosition: "center" }}

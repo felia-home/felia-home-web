@@ -95,15 +95,42 @@ export default function RegisterPage() {
     window.scrollTo(0, 0);
   };
 
+  const parseBudget = (s: string): number | null => {
+    if (!s) return null;
+    const t = s.replace(/,/g, "");
+    const oku = t.match(/^([\d.]+)億円?/);
+    if (oku) return Math.round(parseFloat(oku[1]) * 10000);
+    const man = t.match(/^([\d.]+)万円?/);
+    if (man) return Math.round(parseFloat(man[1]));
+    const num = parseFloat(t);
+    return Number.isFinite(num) ? num : null;
+  };
+
   const handleStep2Submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
+      const body = {
+        name:      step1.name,
+        name_kana: step1.name_kana,
+        email:     step1.email,
+        phone:     step1.phone,
+        password:  step1.password,
+        desired_property_type: step2.property_types ?? [],
+        desired_areas:         step2.preferred_areas ?? [],
+        desired_stations:      [],
+        desired_rooms:         step2.preferred_rooms ?? [],
+        desired_features:      [],
+        desired_budget_min:    parseBudget(step2.budget_min),
+        desired_budget_max:    parseBudget(step2.budget_max),
+        desired_move_timing:   step2.move_timing || null,
+        desired_note:          step2.remarks || null,
+      };
       const res = await fetch("/api/members/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...step1, ...step2 }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) {
         const data = await res.json();

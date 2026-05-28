@@ -257,6 +257,8 @@ export default function PropertySearchClient() {
     </button>
   );
 
+  const PAGE_SIZE = 45;
+
   const doSearch = useCallback(async (page = 1) => {
     setLoading(true);
     setSearched(true);
@@ -292,13 +294,12 @@ export default function PropertySearchClient() {
     // p.published_hp === false の場合のみ除外。undefined/true は通す
     const isPublished = (p: any) => p.published_hp !== false;
 
-    const PAGE_SIZE = 45;
-
     try {
       const pr = PRICE_RANGES[selectedPriceRange];
 
-      // 通常物件: 全件取得（admin にはページングさせない）
+      // 通常物件: サーバーサイドページング
       // admin に property_type は送らない（HP 側で厳密フィルタ）
+      const offset = (page - 1) * PAGE_SIZE;
       const p = new URLSearchParams();
       if (keyword.trim()) p.set("keyword", keyword.trim());
       if (pr.min) p.set("price_min", pr.min);
@@ -306,11 +307,13 @@ export default function PropertySearchClient() {
       if (selectedArea) p.set("city", selectedArea);
       if (selectedLine) p.set("station", selectedLine);
       conditions.forEach((cond) => p.set(cond, "true"));
-      p.set("limit", "9999");
+      p.set("limit",  String(PAGE_SIZE));
+      p.set("offset", String(offset));
 
       const res = await fetch(`/api/properties/search?${p.toString()}`);
       const data = await res.json();
       const allFromAdmin: any[] = data.properties ?? [];
+      const normalTotal: number = data.total ?? allFromAdmin.length;
 
       // HP 側で published_hp + property_type 厳密フィルタ
       const normalProps = allFromAdmin
@@ -457,12 +460,12 @@ export default function PropertySearchClient() {
 
       const allItems = [...sortedNormal, ...sortedReins];
 
-      // HP 側ページング
-      const totalCount = allItems.length;
+      // 通常物件はサーバー側でページング済み。REINS はクライアント側で全件取得。
+      // 件数は admin の total（通常物件のみ）＋ REINS 件数で表示する。
+      const totalCount = normalTotal + sortedReins.length;
       const totalPagesCount = Math.ceil(totalCount / PAGE_SIZE) || 0;
-      const pageItems = allItems.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-      setProperties(pageItems);
+      setProperties(allItems);
       setTotal(totalCount);
       setTotalPages(totalPagesCount);
     } catch {
