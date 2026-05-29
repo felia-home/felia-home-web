@@ -219,8 +219,27 @@ function SlideItem({
         />
       )}
 
-      {/* キャプション */}
-      {(slide.catchCopy || slide.subCopy) && (
+      {/* H1: SEO 用に visually-hidden で残す（画面非表示・スクリーンリーダー/検索エンジンには認識される） */}
+      {isActive && slide.catchCopy && (
+        <h1
+          style={{
+            position: "absolute",
+            width: "1px",
+            height: "1px",
+            padding: 0,
+            margin: "-1px",
+            overflow: "hidden",
+            clip: "rect(0,0,0,0)",
+            whiteSpace: "nowrap",
+            border: 0,
+          }}
+        >
+          {slide.catchCopy}
+        </h1>
+      )}
+
+      {/* CTA ボタン（buttonLabel がある場合のみ表示。subCopy/H1 の見た目は非表示） */}
+      {slide.buttonLabel && slide.buttonHref && (
         <div
           style={{
             position: "absolute",
@@ -241,63 +260,31 @@ function SlideItem({
                 transition: "opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s",
               }}
             >
-              {isActive && slide.catchCopy && (
-                <h1
-                  style={{
-                    color: "#fff",
-                    fontFamily: "'Noto Sans JP', sans-serif",
-                    fontSize: "clamp(22px, 3.5vw, 44px)",
-                    fontWeight: "bold",
-                    lineHeight: 1.3,
-                    marginBottom: "12px",
-                    textShadow: "0 1px 4px rgba(0,0,0,0.6)",
-                    whiteSpace: "pre-line",
-                  }}
-                >
-                  {slide.catchCopy}
-                </h1>
-              )}
-
-              {slide.subCopy && (
-                <p
-                  style={{
-                    color: "#fff",
-                    fontSize: "clamp(13px, 1.5vw, 17px)",
-                    marginBottom: "24px",
-                    textShadow: "0 1px 4px rgba(0,0,0,0.6)",
-                  }}
-                >
-                  {slide.subCopy}
-                </p>
-              )}
-
-              {slide.buttonLabel && slide.buttonHref && (
-                <Link
-                  href={slide.buttonHref}
-                  target={slide.linkTarget === "_blank" ? "_blank" : undefined}
-                  rel={
-                    slide.linkTarget === "_blank"
-                      ? "noopener noreferrer"
-                      : undefined
-                  }
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "12px 24px",
-                    borderRadius: "6px",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    color: "white",
-                    backgroundColor: "#5BAD52",
-                    boxShadow: "0 4px 12px rgba(91,173,82,0.4)",
-                    textDecoration: "none",
-                  }}
-                >
-                  {slide.buttonLabel}
-                  <ChevronRight size={16} />
-                </Link>
-              )}
+              <Link
+                href={slide.buttonHref}
+                target={slide.linkTarget === "_blank" ? "_blank" : undefined}
+                rel={
+                  slide.linkTarget === "_blank"
+                    ? "noopener noreferrer"
+                    : undefined
+                }
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "12px 24px",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  color: "white",
+                  backgroundColor: "#5BAD52",
+                  boxShadow: "0 4px 12px rgba(91,173,82,0.4)",
+                  textDecoration: "none",
+                }}
+              >
+                {slide.buttonLabel}
+                <ChevronRight size={16} />
+              </Link>
             </div>
           </div>
         </div>
