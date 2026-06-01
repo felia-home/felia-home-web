@@ -14,9 +14,7 @@ export function FreeBannerItem({ banner }: { banner: Banner }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        position: "relative",
-        aspectRatio: "16/9",
-        backgroundColor: "#f5f5f5",
+        display: "block",
         cursor: banner.link_url ? "pointer" : "default",
         opacity: hovered ? 0.85 : 1,
         transition: "opacity 0.2s ease",
@@ -27,9 +25,10 @@ export function FreeBannerItem({ banner }: { banner: Banner }) {
       <Image
         src={banner.image_url}
         alt={banner.title ?? "バナー"}
-        fill
-        style={{ objectFit: "contain" }}
+        width={1200}
+        height={675}
         sizes="(max-width: 768px) 100vw, 50vw"
+        style={{ display: "block", width: "100%", height: "auto" }}
       />
     </div>
   );
