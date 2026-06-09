@@ -3,11 +3,11 @@ import {
   getNewProperties,
   getFeaturedProperties,
   getPropertiesByArea,
-  getPropertiesByLine,
 } from "@/lib/api";
 import type { Property } from "@/lib/api";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 import { formatLocation } from "@/lib/addressFormat";
+import LinePropertiesClient from "@/components/property/LinePropertiesClient";
 
 // searchParams を確実に反映するため毎回サーバ実行（ISR キャッシュ無効化）
 export const dynamic = "force-dynamic";
@@ -42,12 +42,17 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
   let pageEn = "NEW ARRIVALS";
   let pageDesc = "最新の掲載物件をご紹介します";
 
+  const isLineMode = !!line;
+  if (isLineMode) {
+    pageTitle = `${line}沿線の物件`;
+    pageEn = "BY LINE";
+    pageDesc = `${line}沿線の物件をご紹介します`;
+  }
+
   try {
-    if (line) {
-      properties = await getPropertiesByLine(line);
-      pageTitle = `${line}沿線の物件`;
-      pageEn = "BY LINE";
-      pageDesc = `${line}沿線の物件をご紹介します`;
+    if (isLineMode) {
+      // 沿線モード: 一覧描画はクライアントコンポーネントへ委譲（REINS含む・ページ内絞り込み）
+      // 件数表示用に通常物件のみここで保持しない（クライアント側で件数管理）
     } else if (area) {
       properties = await getPropertiesByArea(area);
       pageTitle = `${area}の物件`;
@@ -110,49 +115,55 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
           <p style={{ fontSize: "14px", color: "#666", margin: "0 0 20px" }}>
             {pageDesc}
           </p>
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            <Link
-              href="/search"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "10px 20px",
-                backgroundColor: "#5BAD52",
-                color: "#fff",
-                borderRadius: "6px",
-                textDecoration: "none",
-                fontSize: "13px",
-                fontWeight: "bold",
-              }}
-            >
-              条件で絞り込む →
-            </Link>
-            <span style={{ fontSize: "13px", color: "#888" }}>
-              {properties.length}件掲載中
-            </span>
-          </div>
+          {!isLineMode && (
+            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              <Link
+                href="/search"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "10px 20px",
+                  backgroundColor: "#5BAD52",
+                  color: "#fff",
+                  borderRadius: "6px",
+                  textDecoration: "none",
+                  fontSize: "13px",
+                  fontWeight: "bold",
+                }}
+              >
+                条件で絞り込む →
+              </Link>
+              <span style={{ fontSize: "13px", color: "#888" }}>
+                {properties.length}件掲載中
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* 物件一覧 */}
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 24px 80px" }}>
-        {properties.length === 0 ? (
-          <div style={{
-            textAlign: "center", padding: "80px 0",
-            backgroundColor: "#fff", borderRadius: "12px",
-            border: "1px solid #e8e8e8",
-          }}>
-            <p style={{ fontSize: "16px", color: "#888" }}>現在、掲載中の新着物件はありません</p>
-          </div>
-        ) : (
-          <div className="properties-search-grid">
-            {properties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
-        )}
-      </div>
+      {isLineMode ? (
+        <LinePropertiesClient line={line} />
+      ) : (
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 24px 80px" }}>
+          {properties.length === 0 ? (
+            <div style={{
+              textAlign: "center", padding: "80px 0",
+              backgroundColor: "#fff", borderRadius: "12px",
+              border: "1px solid #e8e8e8",
+            }}>
+              <p style={{ fontSize: "16px", color: "#888" }}>現在、掲載中の新着物件はありません</p>
+            </div>
+          ) : (
+            <div className="properties-search-grid">
+              {properties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </main>
   );
 }
