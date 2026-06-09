@@ -46,49 +46,6 @@ const AREAS = [
   "杉並区", "豊島区", "北区", "荒川区", "板橋区", "練馬区",
 ];
 
-// ホームの沿線ボタンは短縮名（"山手線" 等）で URL を発行する一方、
-// REINS の station_line はフル名（"JR山手線" 等）で格納されている。
-// admin の REINS q= は短縮名にヒットしないため、HP 側で展開してフル名を送る。
-// 公開物件の line= は admin 側で部分一致しており短縮名のままで OK のため触らない。
-const REINS_LINE_FULL_NAME: Record<string, string> = {
-  // JR
-  "山手線":       "JR山手線",
-  "中央線":       "JR中央線",
-  "総武線":       "JR総武線",
-  "埼京線":       "JR埼京線",
-  "京浜東北線":   "JR京浜東北線",
-  "横須賀線":     "JR横須賀線",
-  // 東急
-  "東横線":       "東急東横線",
-  "田園都市線":   "東急田園都市線",
-  "目黒線":       "東急目黒線",
-  "大井町線":     "東急大井町線",
-  "池上線":       "東急池上線",
-  "世田谷線":     "東急世田谷線",
-  // 東京メトロ
-  "銀座線":       "東京メトロ銀座線",
-  "丸ノ内線":     "東京メトロ丸ノ内線",
-  "日比谷線":     "東京メトロ日比谷線",
-  "東西線":       "東京メトロ東西線",
-  "千代田線":     "東京メトロ千代田線",
-  "有楽町線":     "東京メトロ有楽町線",
-  "半蔵門線":     "東京メトロ半蔵門線",
-  "南北線":       "東京メトロ南北線",
-  "副都心線":     "東京メトロ副都心線",
-  // 都営
-  "三田線":       "都営三田線",
-  "新宿線":       "都営新宿線",
-  "大江戸線":     "都営大江戸線",
-  // 私鉄
-  "小田原線":     "小田急小田原線",
-  "多摩線":       "小田急多摩線",
-  "井の頭線":     "京王井の頭線",
-};
-
-function reinsQueryFor(line: string): string {
-  return REINS_LINE_FULL_NAME[line] ?? line;
-}
-
 function buildReinsTitle(p: any): string {
   if (p.source_type === "MANSION" && p.building_name) return p.building_name;
   const location = [p.area, p.town ?? p.address].filter(Boolean).join(" ");
@@ -146,7 +103,9 @@ export default function LinePropertiesClient({ line }: { line: string }) {
           let hasMore = true;
           while (hasMore && page <= REINS_MAX_PAGES) {
             const rp = new URLSearchParams();
-            rp.set("q", reinsQueryFor(line));
+            // 沿線一致は admin の station_line contains 用の line= で送る
+            // q= は駅名/住所/建物名への contains 誤マッチを避けるため送らない
+            rp.set("line", line);
             if (pr.min) rp.set("price_min", pr.min);
             if (pr.max) rp.set("price_max", pr.max);
             rp.set("limit", String(REINS_BATCH));

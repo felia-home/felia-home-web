@@ -7,10 +7,10 @@ export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
   const hasSession = !!session?.user;
 
-  // [REINS-DEBUG] 一時調査ログ（原因確定後に必ず撤去する）
-  // 個人情報（メール/氏名/電話/会員ID等）は出力しない。
+  // [REINS-DEBUG] 検証用ログ（個人情報は出力しない）
   console.log("[REINS-DEBUG] enter", {
     hasSession,
+    line: request.nextUrl.searchParams.get("line"),
     q: request.nextUrl.searchParams.get("q"),
     area: request.nextUrl.searchParams.get("area"),
     source_type: request.nextUrl.searchParams.get("source_type"),
@@ -28,8 +28,8 @@ export async function GET(request: NextRequest) {
   const adminUrl = new URL(`${process.env.ADMIN_API_URL}/api/hp/reins`);
   adminUrl.searchParams.set("member_id", memberId);
 
-  // クエリパラメータを転送
-  ["area", "source_type", "price_min", "price_max", "q", "page", "limit"].forEach((key) => {
+  // クエリパラメータを転送（line は admin の station_line contains 一致用）
+  ["area", "source_type", "price_min", "price_max", "q", "line", "page", "limit"].forEach((key) => {
     const val = searchParams.get(key);
     if (val) adminUrl.searchParams.set(key, val);
   });
