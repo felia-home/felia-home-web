@@ -210,7 +210,7 @@ export async function getHeroBanners(): Promise<HeroBanner[]> {
 export interface AreaSetting {
   id: string;
   area_name: string;
-  area_type: "ward" | "city";
+  area_type: "ward" | "city" | "line";
   image_url: string | null;
   description?: string | null;
   link_url?: string | null;
@@ -224,7 +224,26 @@ export async function getAreas(): Promise<AreaSetting[]> {
       "/api/hp/areas",
       { cache: "no-store" }
     );
-    return res.areas ?? [];
+    // admin の /api/hp/areas は area_type で絞っていない仕様のため、
+    // 路線行（area_type="line"）はエリア一覧から除外する。
+    return (res.areas ?? []).filter((a) => a.area_type !== "line");
+  } catch {
+    return [];
+  }
+}
+
+// 路線一覧（エリアと対称の契約）
+// admin の /api/hp/lines は AreaSetting テーブルから area_type="line" を返す。
+// area_name は路線名（Property.station_line1/2/3 / REINS の station_line と突合）。
+export type LineSetting = AreaSetting;
+
+export async function getLines(): Promise<LineSetting[]> {
+  try {
+    const res = await fetchFromAdmin<{ lines: LineSetting[] }>(
+      "/api/hp/lines",
+      { cache: "no-store" }
+    );
+    return res.lines ?? [];
   } catch {
     return [];
   }

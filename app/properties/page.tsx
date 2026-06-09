@@ -1,10 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   getNewProperties,
   getFeaturedProperties,
   getPropertiesByArea,
+  getLines,
 } from "@/lib/api";
-import type { Property } from "@/lib/api";
+import type { Property, LineSetting } from "@/lib/api";
 import { PropertyImage } from "@/components/ui/PropertyImage";
 import { formatLocation } from "@/lib/addressFormat";
 import LinePropertiesClient from "@/components/property/LinePropertiesClient";
@@ -49,6 +51,17 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
     pageDesc = `${line}沿線の物件をご紹介します`;
   }
 
+  // 沿線モード時の admin 路線データ（エリアの hero と対称に表示）
+  let lineData: LineSetting | null = null;
+  if (isLineMode) {
+    try {
+      const lines = await getLines();
+      lineData = lines.find((l) => l.area_name === line) ?? null;
+    } catch {
+      lineData = null;
+    }
+  }
+
   try {
     if (isLineMode) {
       // 沿線モード: 一覧描画はクライアントコンポーネントへ委譲（REINS含む・ページ内絞り込み）
@@ -78,69 +91,73 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
   return (
     <main style={{ backgroundColor: "#f8f8f8", minHeight: "100vh" }}>
 
-      {/* パンくず */}
-      <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e8e8e8", padding: "12px 24px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", gap: "8px", fontSize: "12px", color: "#888" }}>
-          <Link href="/" style={{ color: "#888", textDecoration: "none" }}>ホーム</Link>
-          <span>›</span>
-          <span style={{ color: "#333" }}>{pageTitle}</span>
-        </div>
-      </div>
-
-      {/* ページヘッダー */}
-      <div style={{
-        backgroundColor: "#fff",
-        borderBottom: "3px solid #5BAD52",
-        padding: "40px 24px 32px",
-      }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          <p style={{
-            fontSize: "11px",
-            color: "#5BAD52",
-            letterSpacing: "0.3em",
-            margin: "0 0 8px",
-            fontFamily: "'Montserrat', sans-serif",
-            fontWeight: "600",
-          }}>
-            {pageEn}
-          </p>
-          <h1 style={{
-            fontSize: "clamp(24px, 4vw, 36px)",
-            fontWeight: "bold",
-            color: "#1a1a1a",
-            margin: "0 0 8px",
-          }}>
-            {pageTitle}
-          </h1>
-          <p style={{ fontSize: "14px", color: "#666", margin: "0 0 20px" }}>
-            {pageDesc}
-          </p>
-          {!isLineMode && (
-            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-              <Link
-                href="/search"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  padding: "10px 20px",
-                  backgroundColor: "#5BAD52",
-                  color: "#fff",
-                  borderRadius: "6px",
-                  textDecoration: "none",
-                  fontSize: "13px",
-                  fontWeight: "bold",
-                }}
-              >
-                条件で絞り込む →
-              </Link>
-              <span style={{ fontSize: "13px", color: "#888" }}>
-                {properties.length}件掲載中
-              </span>
+      {isLineMode ? (
+        <LineHero line={line} lineData={lineData} />
+      ) : (
+        <>
+          {/* パンくず */}
+          <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e8e8e8", padding: "12px 24px" }}>
+            <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", gap: "8px", fontSize: "12px", color: "#888" }}>
+              <Link href="/" style={{ color: "#888", textDecoration: "none" }}>ホーム</Link>
+              <span>›</span>
+              <span style={{ color: "#333" }}>{pageTitle}</span>
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+
+          {/* ページヘッダー（非line モード）*/}
+          <div style={{
+            backgroundColor: "#fff",
+            borderBottom: "3px solid #5BAD52",
+            padding: "40px 24px 32px",
+          }}>
+            <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+              <p style={{
+                fontSize: "11px",
+                color: "#5BAD52",
+                letterSpacing: "0.3em",
+                margin: "0 0 8px",
+                fontFamily: "'Montserrat', sans-serif",
+                fontWeight: "600",
+              }}>
+                {pageEn}
+              </p>
+              <h1 style={{
+                fontSize: "clamp(24px, 4vw, 36px)",
+                fontWeight: "bold",
+                color: "#1a1a1a",
+                margin: "0 0 8px",
+              }}>
+                {pageTitle}
+              </h1>
+              <p style={{ fontSize: "14px", color: "#666", margin: "0 0 20px" }}>
+                {pageDesc}
+              </p>
+              <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <Link
+                  href="/search"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "10px 20px",
+                    backgroundColor: "#5BAD52",
+                    color: "#fff",
+                    borderRadius: "6px",
+                    textDecoration: "none",
+                    fontSize: "13px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  条件で絞り込む →
+                </Link>
+                <span style={{ fontSize: "13px", color: "#888" }}>
+                  {properties.length}件掲載中
+                </span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* 物件一覧 */}
       {isLineMode ? (
@@ -165,6 +182,103 @@ export default async function PropertiesPage({ searchParams }: PageProps) {
         </div>
       )}
     </main>
+  );
+}
+
+function LineHero({
+  line,
+  lineData,
+}: {
+  line: string;
+  lineData: LineSetting | null;
+}) {
+  // エリア /areas/[area] の hero と対称な構造
+  const heroImageUrl = lineData?.image_url ?? null;
+  const catchCopy = lineData?.description ?? `${line}沿線の物件をご紹介します`;
+  const fallbackGradient = "linear-gradient(135deg, #1a4a24 0%, #2d7a3a 100%)";
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        height: "400px",
+        overflow: "hidden",
+        background: heroImageUrl ? undefined : fallbackGradient,
+      }}
+    >
+      {heroImageUrl && (
+        <>
+          <Image
+            src={heroImageUrl}
+            alt={`${line}沿線のイメージ`}
+            fill
+            quality={100}
+            style={{ objectFit: "cover", objectPosition: "center" }}
+            sizes="100vw"
+            priority
+          />
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.65) 100%)",
+          }} />
+        </>
+      )}
+
+      {!heroImageUrl && (
+        <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.2)" }} />
+      )}
+
+      <div style={{
+        position: "relative", zIndex: 1,
+        maxWidth: "1200px", margin: "0 auto",
+        padding: "0 24px",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-end",
+        paddingBottom: "48px",
+      }}>
+        {/* パンくず */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: "6px",
+          marginBottom: "20px", fontSize: "12px",
+          color: "rgba(255,255,255,0.55)",
+        }}>
+          <Link href="/" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>ホーム</Link>
+          <span>›</span>
+          <Link href="/search" style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none" }}>物件検索</Link>
+          <span>›</span>
+          <span style={{ color: "rgba(255,255,255,0.9)" }}>{line}</span>
+        </div>
+
+        <p style={{
+          fontSize: "11px", letterSpacing: "0.3em",
+          color: "rgba(255,255,255,0.6)", margin: "0 0 10px",
+          fontFamily: "'Montserrat', sans-serif", fontWeight: "600",
+        }}>
+          LINE GUIDE
+        </p>
+
+        <h1 style={{
+          fontSize: "clamp(36px, 6vw, 60px)",
+          fontWeight: "bold", color: "#fff",
+          margin: "0 0 10px", lineHeight: 1.15,
+          fontFamily: "'Noto Serif JP', serif",
+          textShadow: "0 2px 16px rgba(0,0,0,0.3)",
+        }}>
+          {line}
+        </h1>
+
+        {catchCopy && (
+          <p style={{
+            fontSize: "16px", color: "rgba(255,255,255,0.85)",
+            margin: 0, textShadow: "0 1px 8px rgba(0,0,0,0.3)",
+          }}>
+            {catchCopy}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
 

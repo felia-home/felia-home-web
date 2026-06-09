@@ -709,3 +709,9 @@ img {
 .area-card:hover .area-card-hover-line {
   width: 100%;
 }
+
+/* 路線リンク（SearchSection 右カラム・サーバーコンポーネント化したため hover を CSS で実現） */
+.line-link:hover {
+  border-color: #5BAD52 !important;
+  color: #5BAD52 !important;
+}

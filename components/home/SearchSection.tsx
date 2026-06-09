@@ -1,12 +1,13 @@
 // components/home/SearchSection.tsx
-"use client";
-
 import Link from "next/link";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { TokyoWardMap } from "./TokyoWardMap";
 import { Train } from "lucide-react";
+import { getLines, type LineSetting } from "@/lib/api";
 
-const lineGroups = [
+// admin 未登録時のフォールバック（現状のハードコード路線一覧）
+// admin の AreaSetting (area_type=line) に1件でも登録が入れば DB 表示に切り替わる
+const FALLBACK_LINE_GROUPS = [
   {
     group: "JR",
     lines: [
@@ -49,7 +50,15 @@ const lineGroups = [
   },
 ];
 
-export function SearchSection() {
+export async function SearchSection() {
+  let dbLines: LineSetting[] = [];
+  try {
+    dbLines = await getLines();
+  } catch {
+    dbLines = [];
+  }
+  const useDb = dbLines.length > 0;
+
   return (
     <section style={{ padding: "64px 0", backgroundColor: "#F8F8F8" }}>
       <div className="container-content">
@@ -73,50 +82,95 @@ export function SearchSection() {
               路線から探す
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-              {lineGroups.map((group) => (
-                <div key={group.group}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                    <Train size={14} style={{ color: "#5BAD52" }} />
-                    <span style={{
-                      fontSize: "11px", fontWeight: "bold", color: "#999", letterSpacing: "0.1em",
-                    }}>
-                      {group.group}
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                    {group.lines.map((line) => (
-                      <Link
-                        key={line.name}
-                        href={line.href}
-                        style={{
-                          fontSize: "13px",
-                          padding: "6px 12px",
-                          borderRadius: "6px",
-                          border: "1px solid #E5E5E5",
-                          color: "#555",
-                          backgroundColor: "white",
-                          textDecoration: "none",
-                          transition: "all 0.2s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = "#5BAD52";
-                          e.currentTarget.style.color = "#5BAD52";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = "#E5E5E5";
-                          e.currentTarget.style.color = "#555";
-                        }}
-                      >
-                        {line.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ))}
+              {useDb ? (
+                <DbLineList lines={dbLines} />
+              ) : (
+                FALLBACK_LINE_GROUPS.map((group) => (
+                  <LineGroupBlock key={group.group} group={group} />
+                ))
+              )}
             </div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function DbLineList({ lines }: { lines: LineSetting[] }) {
+  // DB 路線は管理側で sort_order 昇順に整列済み。
+  // エリア（区）と同じく単純なフラット並び。グルーピングは持たない（admin にグループ概念がないため）。
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+        <Train size={14} style={{ color: "#5BAD52" }} />
+        <span style={{
+          fontSize: "11px", fontWeight: "bold", color: "#999", letterSpacing: "0.1em",
+        }}>
+          沿線一覧
+        </span>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+        {lines.map((line) => (
+          <Link
+            key={line.id}
+            href={line.link_url || `/properties?line=${encodeURIComponent(line.area_name)}`}
+            className="line-link"
+            style={{
+              fontSize: "13px",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              border: "1px solid #E5E5E5",
+              color: "#555",
+              backgroundColor: "white",
+              textDecoration: "none",
+              transition: "all 0.2s ease",
+            }}
+          >
+            {line.area_name}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LineGroupBlock({
+  group,
+}: {
+  group: { group: string; lines: { name: string; href: string }[] };
+}) {
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+        <Train size={14} style={{ color: "#5BAD52" }} />
+        <span style={{
+          fontSize: "11px", fontWeight: "bold", color: "#999", letterSpacing: "0.1em",
+        }}>
+          {group.group}
+        </span>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+        {group.lines.map((line) => (
+          <Link
+            key={line.name}
+            href={line.href}
+            className="line-link"
+            style={{
+              fontSize: "13px",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              border: "1px solid #E5E5E5",
+              color: "#555",
+              backgroundColor: "white",
+              textDecoration: "none",
+              transition: "all 0.2s ease",
+            }}
+          >
+            {line.name}
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
