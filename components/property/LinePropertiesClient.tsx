@@ -46,6 +46,49 @@ const AREAS = [
   "杉並区", "豊島区", "北区", "荒川区", "板橋区", "練馬区",
 ];
 
+// ホームの沿線ボタンは短縮名（"山手線" 等）で URL を発行する一方、
+// REINS の station_line はフル名（"JR山手線" 等）で格納されている。
+// admin の REINS q= は短縮名にヒットしないため、HP 側で展開してフル名を送る。
+// 公開物件の line= は admin 側で部分一致しており短縮名のままで OK のため触らない。
+const REINS_LINE_FULL_NAME: Record<string, string> = {
+  // JR
+  "山手線":       "JR山手線",
+  "中央線":       "JR中央線",
+  "総武線":       "JR総武線",
+  "埼京線":       "JR埼京線",
+  "京浜東北線":   "JR京浜東北線",
+  "横須賀線":     "JR横須賀線",
+  // 東急
+  "東横線":       "東急東横線",
+  "田園都市線":   "東急田園都市線",
+  "目黒線":       "東急目黒線",
+  "大井町線":     "東急大井町線",
+  "池上線":       "東急池上線",
+  "世田谷線":     "東急世田谷線",
+  // 東京メトロ
+  "銀座線":       "東京メトロ銀座線",
+  "丸ノ内線":     "東京メトロ丸ノ内線",
+  "日比谷線":     "東京メトロ日比谷線",
+  "東西線":       "東京メトロ東西線",
+  "千代田線":     "東京メトロ千代田線",
+  "有楽町線":     "東京メトロ有楽町線",
+  "半蔵門線":     "東京メトロ半蔵門線",
+  "南北線":       "東京メトロ南北線",
+  "副都心線":     "東京メトロ副都心線",
+  // 都営
+  "三田線":       "都営三田線",
+  "新宿線":       "都営新宿線",
+  "大江戸線":     "都営大江戸線",
+  // 私鉄
+  "小田原線":     "小田急小田原線",
+  "多摩線":       "小田急多摩線",
+  "井の頭線":     "京王井の頭線",
+};
+
+function reinsQueryFor(line: string): string {
+  return REINS_LINE_FULL_NAME[line] ?? line;
+}
+
 function buildReinsTitle(p: any): string {
   if (p.source_type === "MANSION" && p.building_name) return p.building_name;
   const location = [p.area, p.town ?? p.address].filter(Boolean).join(" ");
@@ -67,6 +110,7 @@ export default function LinePropertiesClient({ line }: { line: string }) {
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [selectedWalkMax,    setSelectedWalkMax]    = useState(0);
   const [selectedArea,       setSelectedArea]       = useState("");
+  const [filterOpen,         setFilterOpen]         = useState(false);
 
   // 取得：沿線スコープは固定。価格は admin にも投げて軽くしつつ、種別/徒歩/区はクライアント側で確実に絞る
   useEffect(() => {
@@ -102,7 +146,7 @@ export default function LinePropertiesClient({ line }: { line: string }) {
           let hasMore = true;
           while (hasMore && page <= REINS_MAX_PAGES) {
             const rp = new URLSearchParams();
-            rp.set("q", line);
+            rp.set("q", reinsQueryFor(line));
             if (pr.min) rp.set("price_min", pr.min);
             if (pr.max) rp.set("price_max", pr.max);
             rp.set("limit", String(REINS_BATCH));
@@ -194,81 +238,59 @@ export default function LinePropertiesClient({ line }: { line: string }) {
     setSelectedArea("");
   };
 
+  const activeFilterCount =
+    (selectedType ? 1 : 0) +
+    (selectedPriceRange > 0 ? 1 : 0) +
+    (selectedWalkMax > 0 ? 1 : 0) +
+    (selectedArea ? 1 : 0);
+
   return (
     <>
-      {/* フィルタパネル（ページ内絞り込み） */}
-      <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e8e8e8", padding: "20px 24px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      {/* フィルタパネル（ページ内絞り込み・アコーディオン） */}
+      <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e8e8e8" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "12px 24px" }}>
 
-          {/* 物件種別 */}
-          <FilterRow label="物件種別">
-            {PROPERTY_TYPES.map((t) => (
-              <PillButton
-                key={t.value || "all"}
-                active={selectedType === t.value}
-                onClick={() => setSelectedType(t.value)}
-              >
-                {t.label}
-              </PillButton>
-            ))}
-          </FilterRow>
-
-          {/* 価格帯 */}
-          <FilterRow label="価格帯">
-            {PRICE_RANGES.map((r, i) => (
-              <PillButton
-                key={i}
-                active={selectedPriceRange === i}
-                onClick={() => setSelectedPriceRange(i)}
-              >
-                {r.label}
-              </PillButton>
-            ))}
-          </FilterRow>
-
-          {/* 駅徒歩 */}
-          <FilterRow label="駅徒歩">
-            {WALK_MAX_OPTIONS.map((w, i) => (
-              <PillButton
-                key={i}
-                active={selectedWalkMax === w.value}
-                onClick={() => setSelectedWalkMax(w.value)}
-              >
-                {w.label}
-              </PillButton>
-            ))}
-          </FilterRow>
-
-          {/* エリア（区） */}
-          <FilterRow label="エリア">
-            <PillButton active={selectedArea === ""} onClick={() => setSelectedArea("")}>
-              すべて
-            </PillButton>
-            {AREAS.map((a) => (
-              <PillButton
-                key={a}
-                active={selectedArea === a}
-                onClick={() => setSelectedArea(selectedArea === a ? "" : a)}
-              >
-                {a}
-              </PillButton>
-            ))}
-          </FilterRow>
-
-          <div style={{ display: "flex", gap: "12px", alignItems: "center", marginTop: "12px" }}>
+          {/* ヘッダー行（開閉ボタン＋件数） */}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
             <button
-              onClick={resetFilters}
+              onClick={() => setFilterOpen((o) => !o)}
+              aria-expanded={filterOpen}
+              aria-controls="line-filter-panel"
               style={{
-                padding: "10px 20px",
-                backgroundColor: "#fff",
-                color: "#888",
-                border: "1px solid #ddd",
-                borderRadius: "6px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "10px 18px",
+                backgroundColor: filterOpen ? "#5BAD52" : "#fff",
+                color: filterOpen ? "#fff" : "#333",
+                border: filterOpen ? "1.5px solid #5BAD52" : "1.5px solid #5BAD52",
+                borderRadius: "8px",
                 fontSize: "13px",
+                fontWeight: "bold",
                 cursor: "pointer",
+                transition: "all 0.15s ease",
               }}
             >
-              リセット
+              <span>条件で絞り込む</span>
+              {activeFilterCount > 0 && (
+                <span style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: "20px",
+                  height: "20px",
+                  padding: "0 6px",
+                  borderRadius: "10px",
+                  backgroundColor: filterOpen ? "#fff" : "#5BAD52",
+                  color: filterOpen ? "#5BAD52" : "#fff",
+                  fontSize: "11px",
+                }}>
+                  {activeFilterCount}
+                </span>
+              )}
+              <span aria-hidden="true" style={{ fontSize: "12px" }}>
+                {filterOpen ? "▴" : "▾"}
+              </span>
             </button>
             <span style={{ fontSize: "13px", color: "#888" }}>
               {loading ? "読み込み中..." : `${totalCount}件`}
@@ -279,6 +301,79 @@ export default function LinePropertiesClient({ line }: { line: string }) {
               </span>
             )}
           </div>
+
+          {/* 開閉領域 */}
+          {filterOpen && (
+            <div id="line-filter-panel" style={{ paddingTop: "16px" }}>
+              <FilterRow label="物件種別">
+                {PROPERTY_TYPES.map((t) => (
+                  <PillButton
+                    key={t.value || "all"}
+                    active={selectedType === t.value}
+                    onClick={() => setSelectedType(t.value)}
+                  >
+                    {t.label}
+                  </PillButton>
+                ))}
+              </FilterRow>
+
+              <FilterRow label="価格帯">
+                {PRICE_RANGES.map((r, i) => (
+                  <PillButton
+                    key={i}
+                    active={selectedPriceRange === i}
+                    onClick={() => setSelectedPriceRange(i)}
+                  >
+                    {r.label}
+                  </PillButton>
+                ))}
+              </FilterRow>
+
+              <FilterRow label="駅徒歩">
+                {WALK_MAX_OPTIONS.map((w, i) => (
+                  <PillButton
+                    key={i}
+                    active={selectedWalkMax === w.value}
+                    onClick={() => setSelectedWalkMax(w.value)}
+                  >
+                    {w.label}
+                  </PillButton>
+                ))}
+              </FilterRow>
+
+              <FilterRow label="エリア">
+                <PillButton active={selectedArea === ""} onClick={() => setSelectedArea("")}>
+                  すべて
+                </PillButton>
+                {AREAS.map((a) => (
+                  <PillButton
+                    key={a}
+                    active={selectedArea === a}
+                    onClick={() => setSelectedArea(selectedArea === a ? "" : a)}
+                  >
+                    {a}
+                  </PillButton>
+                ))}
+              </FilterRow>
+
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", marginTop: "4px" }}>
+                <button
+                  onClick={resetFilters}
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#fff",
+                    color: "#888",
+                    border: "1px solid #ddd",
+                    borderRadius: "6px",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                  }}
+                >
+                  リセット
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
