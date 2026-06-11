@@ -16,6 +16,7 @@ import PropertyViewBeacon from "@/components/PropertyViewBeacon";
 import { displayFeatures } from "@/lib/featureLabels";
 import { formatLocation } from "@/lib/addressFormat";
 import { calcDisplayDateRange, formatDateJP } from "@/lib/openHouseUtils";
+import { getLinesByStation } from "@/lib/station-master";
 
 const PROPERTY_TYPE_MAP: Record<string, string> = {
   LAND: "土地", USED_HOUSE: "中古戸建", NEW_HOUSE: "新築戸建",
@@ -179,12 +180,30 @@ export default async function PropertyDetailPage({ params }: PageProps) {
   const sellingPoints: string[] = p.selling_points ?? [];
 
   // 沿線・駅情報を配列化（最大3件、駅名があるものだけ）
+  // ★ HP では admin/出稿系の 3 沿線制限が不要なため、駅マスタ逆引きで
+  //   「その駅を通る全沿線」を allLines として併記する。登録 source の
+  //   沿線（station_lineN）を先頭にし、残りを続ける（重複排除）。
   const stations = [1, 2, 3]
-    .map((i) => ({
-      line: p[`station_line${i}`] ?? null,
-      name: p[`station_name${i}`] ?? null,
-      walk: p[`station_walk${i}`] ?? null,
-    }))
+    .map((i) => {
+      const name = p[`station_name${i}`] ?? null;
+      const sourceLine: string | null = p[`station_line${i}`] ?? null;
+      let allLines: string[] = [];
+      if (name) {
+        const inferred = getLinesByStation(String(name));
+        const ordered: string[] = [];
+        if (sourceLine) ordered.push(String(sourceLine));
+        for (const l of inferred) {
+          if (!ordered.includes(l)) ordered.push(l);
+        }
+        allLines = ordered;
+      }
+      return {
+        line: sourceLine,
+        name,
+        walk: p[`station_walk${i}`] ?? null,
+        allLines,
+      };
+    })
     .filter((s) => s.name);
 
   const equipmentLabels = Object.entries(EQUIPMENT_LABELS)
@@ -738,31 +757,44 @@ export default async function PropertyDetailPage({ params }: PageProps) {
                   flexDirection: "column",
                   gap: "6px",
                 }}>
-                  {stations.map((s, i) => (
-                    <div key={i} style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      fontSize: "12px",
-                      color: "rgba(255,255,255,0.85)",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}>
-                      <span style={{ fontSize: "13px", flexShrink: 0 }}>🚃</span>
-                      <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {s.line && (
-                          <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "11px", marginRight: "4px" }}>
-                            {s.line}
-                          </span>
-                        )}
-                        <span style={{ fontWeight: "500" }}>{s.name}駅</span>
-                        <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "11px", marginLeft: "6px" }}>
-                          徒歩{s.walk}分
+                  {stations.map((s, i) => {
+                    // ★ allLines が空（マスタ未収録）の場合は登録 source のみ表示。
+                    //   先頭は登録 source の沿線、続けて駅マスタ逆引きで判明した
+                    //   残りの沿線を「・」で連結。
+                    const linesLabel =
+                      s.allLines.length > 0
+                        ? s.allLines.join("・")
+                        : (s.line ?? "");
+                    return (
+                      <div key={i} style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: "6px",
+                        fontSize: "12px",
+                        color: "rgba(255,255,255,0.85)",
+                      }}>
+                        <span style={{ fontSize: "13px", flexShrink: 0, lineHeight: "1.4" }}>🚃</span>
+                        <span style={{ lineHeight: 1.5 }}>
+                          <span style={{ fontWeight: "500" }}>{s.name}駅</span>
+                          {s.walk != null && (
+                            <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "11px", marginLeft: "6px" }}>
+                              徒歩{s.walk}分
+                            </span>
+                          )}
+                          {linesLabel && (
+                            <span style={{
+                              color: "rgba(255,255,255,0.6)",
+                              fontSize: "11px",
+                              marginLeft: "6px",
+                              display: "inline-block",
+                            }}>
+                              （{linesLabel}）
+                            </span>
+                          )}
                         </span>
-                      </span>
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
